@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace chessGame
 {
-    internal class Queen:Piece
+    internal class Empty:Piece
     {
-        public Queen()
+        public Empty()
         {
-            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\queen.png");
+            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\BLANK_ICON.png");
         }
     }
 }

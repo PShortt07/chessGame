@@ -8,5 +8,9 @@ namespace chessGame
 {
     internal class Knight:Piece
     {
+        public Knight()
+        {
+            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\knight.png");
+        }
     }
 }

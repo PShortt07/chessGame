@@ -8,5 +8,9 @@ namespace chessGame
 {
     internal class Bishop:Piece
     {
+        public Bishop()
+        {
+            ImageLocation = new Bitmap(@"C:\\Users\\AQ231513\\Downloads\\bishop.png");
+        }
     }
 }

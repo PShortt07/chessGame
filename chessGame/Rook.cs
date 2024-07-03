@@ -8,5 +8,9 @@ namespace chessGame
 {
     internal class Rook:Piece
     {
+        public Rook()
+        {
+            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\rook.png");
+        }
     }
 }
