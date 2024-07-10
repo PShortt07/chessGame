@@ -10,7 +10,8 @@ namespace chessGame
     {
         public Rook()
         {
-            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\rook.png");
+            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\rook.png");
+            PieceName = "rook";
         }
     }
 }

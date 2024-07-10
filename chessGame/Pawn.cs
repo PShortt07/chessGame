@@ -10,7 +10,8 @@ namespace chessGame
     {
         public Pawn()
         {
-            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\pawn.png");
+            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\pawn.png");
+            PieceName = "pawn";
         }
         public static void promote(Piece p)
         {

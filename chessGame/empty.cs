@@ -10,7 +10,8 @@ namespace chessGame
     {
         public Empty()
         {
-            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\BLANK_ICON.png");
+            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\BLANK_ICON.png");
+            PieceName = "empty";
         }
     }
 }

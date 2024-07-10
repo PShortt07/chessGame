@@ -10,7 +10,8 @@ namespace chessGame
     {
         public Queen()
         {
-            ImageLocation = new Bitmap(@"C:\Users\AQ231513\Downloads\queen.png");
+            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\queen.png");
+            PieceName = "queen";
         }
     }
 }
