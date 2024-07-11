@@ -3,9 +3,9 @@ namespace chessGame
 {
     public partial class Form1 : Form
     {
-        bool gameActive = false;
         Board b = new Board();
         Button[,] boardDisplay = new Button[8, 8];
+        Button lastClicked = new Button();
         public Form1()
         {
             InitializeComponent();
@@ -18,37 +18,58 @@ namespace chessGame
         //if player clicks board/button
         private void board_Click(object sender, EventArgs e)
         {
-            resetColours();
-            int xPos = 0;
-            int yPos = 0;
             Button clicked = (Button)sender;
+            int currentX = 0;
+            int currentY = 0;
+            int pastX = 0;
+            int pastY = 0;
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     if (boardDisplay[i, j] == clicked)
                     {
-                        xPos = i;
-                        yPos = j;
-                        break;
+                        currentX = i;
+                        currentY = j;
+                    }
+                    if (boardDisplay[i,j] == lastClicked)
+                    {
+                        pastX = i;
+                        pastY = j;
                     }
                 }
             }
-            //fix later
-            if (b.board[xPos, yPos].OnCell.IsWhite)
+            //moves piece if one has been selected and the clicked button is a legal move
+            if (b.board[currentX, currentY].LegalMove)
             {
-                b.LegalMoves(xPos, yPos);
-                for (int i = 0;i < 8;i++)
+                b.movePiece(currentX, currentY, pastX, pastY);
+                boardDisplay[currentX, currentY].Image = new Bitmap(b.board[currentX, currentY].OnCell.ImageLocation);
+                boardDisplay[currentX, currentY].Refresh();
+                boardDisplay[pastX, pastY].Image = new Bitmap(b.board[pastX, pastY].OnCell.ImageLocation);
+                boardDisplay[pastX, pastY].Refresh();
+                resetColours();
+            }
+            else
+            {
+                resetColours();
+                //fix later
+                //changes all legal move position background colours to light green
+                if (b.board[currentX, currentY].OnCell.IsWhite)
                 {
-                    for(int j = 0;j < 8;j++)
+                    b.LegalMoves(currentX, currentY);
+                    for (int i = 0; i < 8; i++)
                     {
-                        if (b.board[i,j].LegalMove)
+                        for (int j = 0; j < 8; j++)
                         {
-                            boardDisplay[i,j].BackColor = Color.LightGreen;
-                            boardDisplay[i, j].Refresh();
+                            if (b.board[i, j].LegalMove)
+                            {
+                                boardDisplay[i, j].BackColor = Color.LightGreen;
+                                boardDisplay[i, j].Refresh();
+                            }
                         }
                     }
                 }
+                lastClicked = clicked;
             }
         }
         //start game
@@ -57,7 +78,6 @@ namespace chessGame
             label1.Hide();
             button1.Hide();
             DrawBoard(b.board);
-            gameActive = true;
         }
         //displaying game board
         private void DrawBoard(Cell[,] b)
@@ -101,7 +121,16 @@ namespace chessGame
                     this.Controls.Add(boardDisplay[i, j]);
                 }
             }
-
+            //timer for the players
+            System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
+            t.Interval = 600000;
+            t.Start();
+            t.Tick += new EventHandler(timer_tick);
+        }
+        //updates text box with timer value each second
+        private void timer_tick(object sender, EventArgs e)
+        {
+            TextBox timerShow = new TextBox();
         }
         private void resetColours()
         {

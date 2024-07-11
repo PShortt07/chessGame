@@ -21,42 +21,55 @@ namespace chessGame
             }
             for (int i = 0; i < 8; i++)
             {
-                board[i, 1].OnCell = new Pawn();
-                board[i, 1].OnCell.IsWhite = true;
+                board[i, 1].OnCell = new Pawn(); 
                 board[i, 6].OnCell = new Pawn();
+                board[i, 6].OnCell.IsWhite = true;
             }
             board[0, 0].OnCell = new Rook();
-            board[0, 7].OnCell.IsWhite = true;
             board[0, 7].OnCell = new Rook();
             board[7, 0].OnCell = new Rook();
-            board[7, 7].OnCell.IsWhite = true;
             board[7, 7].OnCell = new Rook();
             board[1, 0].OnCell = new Knight();
-            board[1, 7].OnCell.IsWhite = true;
             board[6, 0].OnCell = new Knight();
-            board[6, 7].OnCell.IsWhite = true;
             board[1, 7].OnCell = new Knight();
             board[6, 7].OnCell = new Knight();
             board[2, 0].OnCell = new Bishop();
-            board[2, 7].OnCell.IsWhite = true;
             board[5, 0].OnCell = new Bishop();
-            board[5, 7].OnCell.IsWhite = true;
             board[2, 7].OnCell = new Bishop();
             board[5, 7].OnCell = new Bishop();
             board[3, 0].OnCell = new Queen();
-            board[3, 7].OnCell.IsWhite = true;
             board[3, 7].OnCell = new Queen();
             board[4, 0].OnCell = new King();
-            board[4, 7].OnCell.IsWhite = true;
             board[4, 7].OnCell = new King();
         }
-        public bool SpaceOccupied(int posX, int posY)
+        //checks occupation status of a cell
+        public string SpaceOccupied(int posX, int posY)
         {
-            if (board[posX, posY].OnCell.PieceName == "empty")
+            if (posX > 7 || posY > 7 || posX < 0 || posY < 0)
             {
-                return false;
+                return "outside";
             }
-            return true;
+            else
+            {
+                if (board[posX, posY].OnCell.PieceName == "empty")
+                {
+                    return "free";
+                }
+                else if (board[posX, posY].OnCell.IsWhite)
+                {
+                    return "ownpiece";
+                }
+                else
+                {
+                    return "piece";
+                }
+            }
+        }
+        //updates board array when a piece is moved
+        public void movePiece(int newX, int newY, int pastX, int pastY)
+        {
+            board[newX, newY].OnCell = board[pastX, pastY].OnCell;
+            board[pastX, pastY].OnCell = new Empty();
         }
         //exception handling not done
         //finds all available moves
@@ -74,28 +87,28 @@ namespace chessGame
                 case ("pawn"):
                     if (!board[posX, posY].OnCell.HasMoved)
                     {
-                        if (!SpaceOccupied(posX, posY + 2))
+                        if (SpaceOccupied(posX, posY - 2) == "free")
                         {
-                            board[posX, posY + 2].LegalMove = true;
+                            board[posX, posY - 2].LegalMove = true;
                         }
                     }
-                    if (!SpaceOccupied(posX, posY + 1))
+                    if (SpaceOccupied(posX, posY - 1) == "free")
                     {
-                        board[posX, posY + 1].LegalMove = true;
+                        board[posX, posY - 1].LegalMove = true;
                     }
-                    if (SpaceOccupied(posX-1, posY+1))
+                    if (SpaceOccupied(posX-1, posY-1) == "piece")
                     {
-                        board[posX-1, posY + 1].LegalMove = true;
+                        board[posX-1, posY - 1].LegalMove = true;
                     }
-                    if (SpaceOccupied(posX + 1, posY + 1))
+                    if (SpaceOccupied(posX + 1, posY - 1) == "piece")
                     {
-                        board[posX + 1, posY + 1].LegalMove = true;
+                        board[posX + 1, posY - 1].LegalMove = true;
                     }
                     break;
                 case ("rook"):
                     for (int i = posY; i < 8; i++)
                     {
-                        if (!SpaceOccupied(posX, i))
+                        if (SpaceOccupied(posX, i) == "free")
                         {
                             board[posX, i].LegalMove = true;
                         }
