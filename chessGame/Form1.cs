@@ -52,11 +52,11 @@ namespace chessGame
             else
             {
                 resetColours();
-                //fix later
+                //assumes player is white
                 //changes all legal move position background colours to light green
                 if (b.board[currentX, currentY].OnCell.IsWhite)
                 {
-                    b.LegalMoves(currentX, currentY);
+                    b.FindLegalMoves(currentX, currentY);
                     for (int i = 0; i < 8; i++)
                     {
                         for (int j = 0; j < 8; j++)
