@@ -8,9 +8,17 @@ namespace chessGame
 {
     internal class Knight:Piece
     {
-        public Knight()
+        public Knight(bool white)
         {
-            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\knight.png");
+            IsWhite = white;
+            if (IsWhite)
+            {
+                PieceImage = Properties.Resources.Wknight;
+            }
+            else
+            {
+                PieceImage = Properties.Resources.knight;
+            }
             PieceName = "knight";
         }
     }

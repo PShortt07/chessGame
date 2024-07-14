@@ -8,9 +8,17 @@ namespace chessGame
 {
     internal class Rook:Piece
     {
-        public Rook()
+        public Rook(bool white)
         {
-            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\rook.png");
+            IsWhite = white;
+            if (IsWhite)
+            {
+                PieceImage = Properties.Resources.Wrook;
+            }
+            else
+            {
+                PieceImage = Properties.Resources.rook;
+            }
             PieceName = "rook";
         }
     }

@@ -8,9 +8,17 @@ namespace chessGame
 {
     internal class King:Piece
     {
-        public King()
+        public King(bool white)
         {
-            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\king.png");
+            IsWhite = white;
+            if (IsWhite)
+            {
+                PieceImage = Properties.Resources.Wking;
+            }
+            else
+            {
+                PieceImage = Properties.Resources.king;
+            }
             PieceName = "king";
         }
     }

@@ -8,9 +8,17 @@ namespace chessGame
 {
     internal class Bishop:Piece
     {
-        public Bishop()
+        public Bishop(bool white)
         {
-            ImageLocation = new Bitmap(@"C:\\Users\\patri\\Downloads\\bishop.png");
+            IsWhite = white;
+            if (IsWhite)
+            {
+                PieceImage = Properties.Resources.Wbishop;
+            }
+            else
+            {
+                PieceImage = Properties.Resources.bishop;
+            }
             PieceName = "bishop";
         }
     }

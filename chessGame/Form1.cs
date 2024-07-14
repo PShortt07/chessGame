@@ -43,9 +43,9 @@ namespace chessGame
             if (b.board[currentX, currentY].LegalMove)
             {
                 b.movePiece(currentX, currentY, pastX, pastY);
-                boardDisplay[currentX, currentY].Image = new Bitmap(b.board[currentX, currentY].OnCell.ImageLocation);
+                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
-                boardDisplay[pastX, pastY].Image = new Bitmap(b.board[pastX, pastY].OnCell.ImageLocation);
+                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
             }
@@ -89,7 +89,7 @@ namespace chessGame
                     boardDisplay[i, j] = new Button();
                     boardDisplay[i, j].Height = 50;
                     boardDisplay[i, j].Width = 50;
-                    boardDisplay[i, j].Image = new Bitmap(b[i, j].OnCell.ImageLocation);
+                    boardDisplay[i, j].Image = b[i, j].OnCell.PieceImage;
                     //setting colours
                     if (i % 2 == 0)
                     {
@@ -131,6 +131,10 @@ namespace chessGame
         private void timer_tick(object sender, EventArgs e)
         {
             TextBox timerShow = new TextBox();
+        }
+        private void promotion()
+        {
+
         }
         private void resetColours()
         {

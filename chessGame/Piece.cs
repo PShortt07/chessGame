@@ -12,19 +12,19 @@ namespace chessGame
         private int posX;
         private int posY;
         private bool captured;
-        private Bitmap imageLocation = new Bitmap(@"C:\Users\patri\Downloads\bishop.png");
         private bool isWhite;
         private string pieceName;
         private bool hasMoved;
+        private Image pieceImage;
 
         protected int Value { get => value; set => this.value = value; }
         protected int PosX { get => posX; set => posX = value; }
         protected int PosY { get => posY; set => posY = value; }
         protected bool Captured { get => captured; set => captured = value; }
-        public Bitmap ImageLocation { get => imageLocation; set => imageLocation = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }
         public string PieceName { get => pieceName; set => pieceName = value; }
         public bool HasMoved { get => hasMoved; set => hasMoved = value; }
+        public Image PieceImage { get => pieceImage; set => pieceImage = value; }
 
         public virtual void move()
         {
@@ -40,7 +40,6 @@ namespace chessGame
         }
         public Piece()
         {
-            isWhite = false;
             HasMoved = false;
         }
     }

@@ -9,6 +9,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\bishop.png" />
+    <None Remove="Images\BLANK_ICON.png" />
+    <None Remove="Images\king.png" />
+    <None Remove="Images\knight.png" />
+    <None Remove="Images\pawn.png" />
+    <None Remove="Images\queen.png" />
+    <None Remove="Images\rook.png" />
+    <None Remove="Images\Wbishop.png" />
+    <None Remove="Images\Wking.png" />
+    <None Remove="Images\Wknight.png" />
+    <None Remove="Images\Wpawn.png" />
+    <None Remove="Images\Wqueen.png" />
+    <None Remove="Images\Wrook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Images\bishop.png" />
+    <EmbeddedResource Include="Images\BLANK_ICON.png" />
+    <EmbeddedResource Include="Images\king.png" />
+    <EmbeddedResource Include="Images\knight.png" />
+    <EmbeddedResource Include="Images\pawn.png" />
+    <EmbeddedResource Include="Images\queen.png" />
+    <EmbeddedResource Include="Images\rook.png" />
+    <EmbeddedResource Include="Images\Wbishop.png" />
+    <EmbeddedResource Include="Images\Wking.png" />
+    <EmbeddedResource Include="Images\Wknight.png" />
+    <EmbeddedResource Include="Images\Wpawn.png" />
+    <EmbeddedResource Include="Images\Wqueen.png" />
+    <EmbeddedResource Include="Images\Wrook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -21,6 +53,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>

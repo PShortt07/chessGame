@@ -8,25 +8,18 @@ namespace chessGame
 {
     internal class Pawn:Piece
     {
-        public Pawn()
+        public Pawn(bool white)
         {
-            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\pawn.png");
-            PieceName = "pawn";
-        }
-        public static void promote(Piece p)
-        {
-
-        }
-        public override void move()
-        {
-            if (canCapture())
+            IsWhite = white;
+            if (IsWhite)
             {
-
+                PieceImage = Properties.Resources.Wpawn;
             }
-        }
-        public override bool canCapture()
-        {
-            return false;
+            else
+            {
+                PieceImage = Properties.Resources.pawn;
+            }
+            PieceName = "pawn";
         }
     }
 }

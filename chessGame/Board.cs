@@ -21,26 +21,25 @@ namespace chessGame
             }
             for (int i = 0; i < 8; i++)
             {
-                board[i, 1].OnCell = new Pawn(); 
-                board[i, 6].OnCell = new Pawn();
-                board[i, 6].OnCell.IsWhite = true;
+                board[i, 1].OnCell = new Pawn(false); //black pawns
+                board[i, 6].OnCell = new Pawn(true); //white pawns
             }
-            board[0, 0].OnCell = new Rook();
-            board[0, 7].OnCell = new Rook();
-            board[7, 0].OnCell = new Rook();
-            board[7, 7].OnCell = new Rook();
-            board[1, 0].OnCell = new Knight();
-            board[6, 0].OnCell = new Knight();
-            board[1, 7].OnCell = new Knight();
-            board[6, 7].OnCell = new Knight();
-            board[2, 0].OnCell = new Bishop();
-            board[5, 0].OnCell = new Bishop();
-            board[2, 7].OnCell = new Bishop();
-            board[5, 7].OnCell = new Bishop();
-            board[3, 0].OnCell = new Queen();
-            board[3, 7].OnCell = new Queen();
-            board[4, 0].OnCell = new King();
-            board[4, 7].OnCell = new King();
+            board[0, 0].OnCell = new Rook(false);
+            board[0, 7].OnCell = new Rook(true);
+            board[7, 0].OnCell = new Rook(false);
+            board[7, 7].OnCell = new Rook(true);
+            board[1, 0].OnCell = new Knight(false);
+            board[6, 0].OnCell = new Knight(false);
+            board[1, 7].OnCell = new Knight(true);
+            board[6, 7].OnCell = new Knight(true);
+            board[2, 0].OnCell = new Bishop(false);
+            board[5, 0].OnCell = new Bishop(false);
+            board[2, 7].OnCell = new Bishop(true);
+            board[5, 7].OnCell = new Bishop(true);
+            board[3, 0].OnCell = new Queen(false);
+            board[3, 7].OnCell = new Queen(true);
+            board[4, 0].OnCell = new King(false);
+            board[4, 7].OnCell = new King(true);
         }
         //checks occupation status of a cell
         public string SpaceOccupied(int posX, int posY)
@@ -57,7 +56,7 @@ namespace chessGame
                 }
                 else if (board[posX, posY].OnCell.IsWhite)
                 {
-                    return "ownpiece";
+                    return "own piece";
                 }
                 else
                 {
@@ -66,12 +65,16 @@ namespace chessGame
             }
         }
         //updates board array when a piece is moved
+        //needs to be updated for taking pieces
         public void movePiece(int newX, int newY, int pastX, int pastY)
         {
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
+            if (!board[newX, newY].OnCell.HasMoved)
+            {
+                board[newX, newY].OnCell.HasMoved = true;
+            }
             board[pastX, pastY].OnCell = new Empty();
         }
-        //exception handling not done
         //finds all available moves
         public void LegalMoves(int posX, int posY)
         {
@@ -98,7 +101,7 @@ namespace chessGame
                     }
                     if (SpaceOccupied(posX-1, posY-1) == "piece")
                     {
-                        board[posX-1, posY - 1].LegalMove = true;
+                        board[posX - 1, posY - 1].LegalMove = true;
                     }
                     if (SpaceOccupied(posX + 1, posY - 1) == "piece")
                     {

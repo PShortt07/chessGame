@@ -8,9 +8,17 @@ namespace chessGame
 {
     internal class Queen:Piece
     {
-        public Queen()
+        public Queen(bool white)
         {
-            ImageLocation = new Bitmap(@"C:\Users\patri\Downloads\queen.png");
+            IsWhite = white;
+            if (IsWhite)
+            {
+                PieceImage = Properties.Resources.Wqueen;
+            }
+            else
+            {
+                PieceImage = Properties.Resources.queen;
+            }
             PieceName = "queen";
         }
     }
