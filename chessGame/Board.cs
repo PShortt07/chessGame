@@ -78,19 +78,12 @@ namespace chessGame
         //finds all available moves
         public void FindLegalMoves(int posX, int posY)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    board[i, j].LegalMove = false;
-                }
-            }
             switch (board[posX, posY].OnCell.PieceName)
             {
                 case ("pawn"):
                     if (!board[posX, posY].OnCell.HasMoved)
                     {
-                        if (SpaceOccupied(posX, posY - 2) == "free")
+                        if (SpaceOccupied(posX, posY - 2) == "free" && SpaceOccupied(posX, posY - 1) == "free")
                         {
                             board[posX, posY - 2].LegalMove = true;
                         }
@@ -109,9 +102,73 @@ namespace chessGame
                     }
                     break;
                 case ("rook"):
-                    for (int i = posY; i >= 0; i--)
+                    //up
+                    for (int i = posY-1; i >= 0; i--)
                     {
-                        checkLegal(posX, i);
+                        if (SpaceOccupied(posX, i) == "free")
+                        {
+                            board[posX, i].LegalMove = true;
+                        }
+                        else if (SpaceOccupied(posX, i) == "piece")
+                        {
+                            board[posX, i].LegalMove = true;
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //down
+                    for (int i = posY + 1; i <= 8; i++)
+                    {
+                        if (SpaceOccupied(posX, i) == "free")
+                        {
+                            board[posX, i].LegalMove = true;
+                        }
+                        else if (SpaceOccupied(posX, i) == "piece")
+                        {
+                            board[posX, i].LegalMove = true;
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //left
+                    for (int i = posX-1; i >= 0; i--)
+                    {
+                        if (SpaceOccupied(i, posY) == "free")
+                        {
+                            board[i, posY].LegalMove = true;
+                        }
+                        else if (SpaceOccupied(i, posY) == "piece")
+                        {
+                            board[i, posY].LegalMove = true;
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //right
+                    for (int i = posX + 1; i <= 8; i++)
+                    {
+                        if (SpaceOccupied(i, posY) == "free")
+                        {
+                            board[i, posY].LegalMove = true;
+                        }
+                        else if (SpaceOccupied(i, posY) == "piece")
+                        {
+                            board[i, posY].LegalMove = true;
+                            break;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     break;
                 case ("knight"):
@@ -127,7 +184,7 @@ namespace chessGame
                 case ("bishop"):
                     for (int i = 1; SpaceOccupied(posX-i, posY-i) != "outside"; i++)
                     {
-                        //left side
+                        //left side up
                         if (SpaceOccupied(posX - i, posY - i) == "own piece")
                         {
                             board[posX - i, posY - i].LegalMove = false;
@@ -145,7 +202,7 @@ namespace chessGame
                     }
                     for (int i = 1; SpaceOccupied(posX + i, posY - i) != "outside"; i++)
                     {
-                        //right side
+                        //right side up
                         if (SpaceOccupied(posX + i, posY - i) == "own piece")
                         {
                             board[posX + i, posY - i].LegalMove = false;
@@ -166,6 +223,16 @@ namespace chessGame
                     break;
                 case ("king"):
                     break;
+            }
+        }
+        public void resetLegal()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    board[i, j].LegalMove = false;
+                }
             }
         }
         private void checkLegal(int posX, int posY)

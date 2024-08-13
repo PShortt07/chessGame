@@ -23,6 +23,7 @@ namespace chessGame
             int currentY = 0;
             int pastX = 0;
             int pastY = 0;
+            //finds location of the last button clicked and the current button
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -48,6 +49,7 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
+                b.resetLegal();
             }
             else
             {
@@ -56,6 +58,7 @@ namespace chessGame
                 //changes all legal move position background colours to light green
                 if (b.board[currentX, currentY].OnCell.IsWhite)
                 {
+                    b.resetLegal();
                     b.FindLegalMoves(currentX, currentY);
                     for (int i = 0; i < 8; i++)
                     {
