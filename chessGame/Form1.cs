@@ -49,7 +49,7 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
-                b.resetLegal();
+                b.endOfMove();
             }
             else
             {

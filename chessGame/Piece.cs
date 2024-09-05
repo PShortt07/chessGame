@@ -18,8 +18,8 @@ namespace chessGame
         private Image pieceImage;
 
         protected int Value { get => value; set => this.value = value; }
-        protected int PosX { get => posX; set => posX = value; }
-        protected int PosY { get => posY; set => posY = value; }
+        public int PosX { get => posX; set => posX = value; }
+        public int PosY { get => posY; set => posY = value; }
         protected bool Captured { get => captured; set => captured = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }
         public string PieceName { get => pieceName; set => pieceName = value; }
