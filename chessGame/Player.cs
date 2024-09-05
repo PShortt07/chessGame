@@ -16,13 +16,13 @@ namespace chessGame
 
         public bool MyMove { get => myMove; set => myMove = value; }
         public int Score { get => score; set => score = value; }
-        internal List<Piece> MyPieces { get => myPieces; set => myPieces = value; }
-        internal List<Piece> TakenPieces { get => takenPieces; set => takenPieces = value; }
+        public List<Piece> MyPieces { get => myPieces; set => myPieces = value; }
+        public List<Piece> TakenPieces { get => takenPieces; set => takenPieces = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }
 
         public Player()
         {
-            IsWhite = true;
+            
         }
     }
 }

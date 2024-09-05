@@ -10,6 +10,7 @@ namespace chessGame
     {
         public Knight(bool white)
         {
+            Value = 3;
             IsWhite = white;
             if (IsWhite)
             {

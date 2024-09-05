@@ -10,6 +10,7 @@ namespace chessGame
     {
         public Bishop(bool white)
         {
+            Value = 3;
             IsWhite = white;
             if (IsWhite)
             {

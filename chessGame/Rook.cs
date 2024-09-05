@@ -10,6 +10,7 @@ namespace chessGame
     {
         public Rook(bool white)
         {
+            Value = 5;
             IsWhite = white;
             if (IsWhite)
             {

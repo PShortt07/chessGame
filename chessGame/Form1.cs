@@ -4,11 +4,13 @@ namespace chessGame
     public partial class Form1 : Form
     {
         Board b = new Board();
+        Player human = new Player();
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
         public Form1()
         {
             InitializeComponent();
+            human.IsWhite = true;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -43,6 +45,11 @@ namespace chessGame
             //moves piece if one has been selected and the clicked button is a legal move
             if (b.board[currentX, currentY].LegalMove)
             {
+                if (b.board[currentX, currentY].OnCell.PieceName != "empty" && b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
+                {
+                    human.Score += b.board[currentX, currentY].OnCell.Value;
+                    human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                }
                 b.movePiece(currentX, currentY, pastX, pastY);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
@@ -56,7 +63,7 @@ namespace chessGame
                 resetColours();
                 //assumes player is white
                 //changes all legal move position background colours to light green
-                if (b.board[currentX, currentY].OnCell.IsWhite)
+                if (b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
                 {
                     b.resetLegal();
                     b.FindLegalMoves(currentX, currentY);

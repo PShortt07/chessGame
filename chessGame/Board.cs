@@ -8,11 +8,12 @@ namespace chessGame
 {
     internal class Board
     {
+        //all code assumes player is white side
         private bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
         private Piece pieceBefore;
         private Piece pieceAfter;
-        private bool escapeCheck = false;
+        public bool escapeCheck = false;
         private int bKingX = 4;
         private int bKingY = 0;
         private int wKingX = 4;
@@ -319,6 +320,7 @@ namespace chessGame
         {
 
         }
+        //to be run at the end of every move
         public void endOfMove()
         {
             //checks if king is in check for the next move

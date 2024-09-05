@@ -17,7 +17,7 @@ namespace chessGame
         private bool hasMoved;
         private Image pieceImage;
 
-        protected int Value { get => value; set => this.value = value; }
+        public int Value { get => value; set => this.value = value; }
         public int PosX { get => posX; set => posX = value; }
         public int PosY { get => posY; set => posY = value; }
         protected bool Captured { get => captured; set => captured = value; }

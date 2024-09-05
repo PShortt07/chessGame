@@ -10,6 +10,7 @@ namespace chessGame
     {
         public Pawn(bool colour)
         {
+            Value = 1;
             IsWhite = colour;
             if (IsWhite)
             {
