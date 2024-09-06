@@ -9,6 +9,8 @@ namespace chessGame
     abstract class Piece
     {
         private int value;
+        private int lastPosX;
+        private int lastPosY;
         private int posX;
         private int posY;
         private bool captured;
@@ -26,18 +28,6 @@ namespace chessGame
         public bool HasMoved { get => hasMoved; set => hasMoved = value; }
         public Image PieceImage { get => pieceImage; set => pieceImage = value; }
 
-        public virtual void move()
-        {
-
-        }
-        public static void capture()
-        {
-
-        }
-        public virtual bool canCapture()
-        {
-            return false;
-        }
         public Piece()
         {
             HasMoved = false;

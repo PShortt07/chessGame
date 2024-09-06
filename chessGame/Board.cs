@@ -52,6 +52,10 @@ namespace chessGame
             board[4, 0].OnCell = new King(false);
             board[4, 7].OnCell = new King(true);
         }
+        private void setLastPosition (int x, int y, Piece p)
+        {
+            
+        }
         //checks occupation status of a cell
         public string SpaceStatus(int posX, int posY)
         {
@@ -183,7 +187,7 @@ namespace chessGame
         {
             if (!board[posX, posY].OnCell.HasMoved)
             {
-                if (SpaceStatus(posX, posY - 2) == "free" && SpaceOccupied(posX, posY - 1) == "free")
+                if (SpaceStatus(posX, posY - 2) == "free" && SpaceStatus(posX, posY - 1) == "free")
                 {
                     allowedMoves.Add(board[posX, posY - 2]);
                 }
@@ -484,11 +488,11 @@ namespace chessGame
             {
                 board[posX, posY].LegalMove = true;
             }
-            else if (SpaceOccupied(posX, posY) == "own piece")
+            else if (SpaceStatus(posX, posY) == "own piece")
             {
                 board[posX, posY].LegalMove = false;
             }
-            else if (SpaceOccupied(posX, posY) == "piece")
+            else if (SpaceStatus(posX, posY) == "piece")
             {
                 board[posX, posY].LegalMove = true;
             }
