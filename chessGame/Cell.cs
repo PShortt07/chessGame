@@ -27,6 +27,7 @@ namespace chessGame
 
         public Cell(int xPos, int yPos)
         {
+            onCell = new Empty();
             OnCell = new Empty();
             row = xPos;
             col = yPos;

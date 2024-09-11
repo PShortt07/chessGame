@@ -11,8 +11,6 @@ namespace chessGame
         //all code assumes player is white side
         private bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
-        private Piece pieceBefore;
-        private Piece pieceAfter;
         public bool wInCheck = false;
         public bool bInCheck = false;
         private int bKingX = 4;
@@ -52,10 +50,6 @@ namespace chessGame
             board[4, 0].OnCell = new King(false);
             board[4, 7].OnCell = new King(true);
         }
-        private void setLastPosition (int x, int y, Piece p)
-        {
-            
-        }
         //checks occupation status of a cell
         public string SpaceStatus(int posX, int posY)
         {
@@ -79,18 +73,22 @@ namespace chessGame
                 }
             }
         }
-        public bool doesTakeOutOfCheck(Cell c, int newX, int newY)
+        public bool doesTakeOutOfCheck(Cell c, int nowX, int nowY)
         {
-            Piece p = c.OnCell;
+            int newX = c.OnCell.PosX;
+            int newY = c.OnCell.PosY;
             //records past coordinates so the move can be reverted
-            int pastX = p.PosX;
-            int pastY = p.PosY;
             //makes the move, finds which spaces are covered by which colour, then reverts the move
-            movePiece(newX, newY, pastX, pastY);
-            findSpacesCovered();
-            movePiece(pastX, pastY, newX, newY);
+            movePiece(newX, newY, nowX, nowY);
+            findSpacesCovered(!whiteTurn);
             //checks if the player whose turn it is has been taken out of check
-            if (findIfInCheck(whiteTurn))
+            findIfInCheck(whiteTurn);
+            movePiece(nowX, nowY, newX, newY);
+            if (whiteTurn && wInCheck)
+            {
+                return false;
+            }
+            else if (!whiteTurn && bInCheck)
             {
                 return false;
             }
@@ -146,25 +144,32 @@ namespace chessGame
                     showLegalKing(posX, posY);
                     break;
             }
-            allowMovesThatTakeOutOfCheck();
-        }
-        private void allowMovesThatTakeOutOfCheck()
-        {
-            if (whiteTurn && wInCheck)
+            if (wInCheck || bInCheck)
             {
-                foreach (Cell c in allowedMoves)
-                {
-                    if (!doesTakeOutOfCheck(c))
-                    {
-                        allowedMoves.Remove(c);
-                    }
-                }
+                allowMovesThatTakeOutOfCheck(board[posX, posY]);
             }
             else
             {
                 foreach (Cell c in allowedMoves)
                 {
                     c.LegalMove = true;
+                }
+            }
+        }
+        private void allowMovesThatTakeOutOfCheck(Cell current)
+        {
+            if (whiteTurn)
+            {
+                foreach (Cell newPos in allowedMoves)
+                {
+                    if (doesTakeOutOfCheck(newPos, current.OnCell.PosX, current.OnCell.PosY))
+                    {
+                        newPos.LegalMove = true;
+                    }
+                    else
+                    {
+                        allowedMoves.Remove(newPos);
+                    }
                 }
             }
         }
@@ -355,23 +360,22 @@ namespace chessGame
         }
         private void showLegalKing(int posX, int posY)
         {
-
+            checkLegal(posX - 1, posY);
+            checkLegal(posX - 1, posY + 1);
+            checkLegal(posX - 1, posY - 1);
+            checkLegal(posX, posY - 1);
+            checkLegal(posX, posY + 1);
+            checkLegal(posX + 1, posY);
+            checkLegal(posX + 1, posY - 1);
+            checkLegal(posX + 1, posY + 1);
         }
-        //to be run at the end of every move
+        //to be run at the end of every move, bool = who is being assessed for check
         private void findIfInCheck(bool white)
         {
+            //find spaces covered by opponent
+            findSpacesCovered(!white);
+            //check if white's king can be taken by black
             if (white)
-            {
-                if (board[bKingX, bKingY].CoveredByWhite)
-                {
-                    bInCheck = true;
-                }
-                else
-                {
-                    bInCheck = false;
-                }
-            }
-            else
             {
                 if (board[wKingX, wKingY].CoveredByBlack)
                 {
@@ -380,6 +384,18 @@ namespace chessGame
                 else
                 {
                     wInCheck = false;
+                }
+            }
+            //check opposite
+            else
+            {
+                if (board[bKingX, bKingY].CoveredByWhite)
+                {
+                    bInCheck = true;
+                }
+                else
+                {
+                    bInCheck = false;
                 }
             }
         }
@@ -415,6 +431,7 @@ namespace chessGame
         {
             foreach (Cell c in board)
             {
+                //runs if piece in space and the piece is the aim colour
                 if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == forWhite)
                 {
                     int x = c.OnCell.PosX;
@@ -437,6 +454,7 @@ namespace chessGame
                             showLegalQueen(x, y);
                             break;
                         case ("king"):
+                            showLegalKing(x, y);
                             break;
                     }
                 }
@@ -445,7 +463,7 @@ namespace chessGame
             {
                 if (forWhite)
                 {
-                    if (c.LegalMove)
+                    if (allowedMoves.Contains(c))
                     {
                         c.CoveredByWhite = true;
                     }
@@ -456,7 +474,7 @@ namespace chessGame
                 }
                 else
                 {
-                    if (c.LegalMove)
+                    if (allowedMoves.Contains(c))
                     {
                         c.CoveredByBlack = true;
                     }

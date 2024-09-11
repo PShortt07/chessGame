@@ -51,7 +51,7 @@ namespace chessGame
                     human.Score += b.board[currentX, currentY].OnCell.Value;
                     human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
                 }
-                else if (b.board[currentX,currentY.OnCell.PieceName != "empty"])
+                else if (b.board[currentX,currentY].OnCell.PieceName != "empty")
                 {
                     AI.Score += b.board[currentX, currentY].OnCell.Value;
                     AI.TakenPieces.Add(b.board[currentX, currentY].OnCell);
@@ -138,10 +138,10 @@ namespace chessGame
                 }
             }
             //timer for the players
-            System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
-            t.Interval = 600000;
-            t.Start();
-            t.Tick += new EventHandler(timer_tick);
+            //System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
+            //t.Interval = 600000;
+            //t.Start();
+            //t.Tick += new EventHandler(timer_tick);
         }
         //updates text box with timer value each second
         private void timer_tick(object sender, EventArgs e)
