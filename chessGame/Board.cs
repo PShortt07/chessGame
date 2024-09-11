@@ -79,21 +79,26 @@ namespace chessGame
                 }
             }
         }
-        public bool doesTakeOutOfCheck(Piece p, int newX, int newY)
+        public bool doesTakeOutOfCheck(Cell c, int newX, int newY)
         {
+            Piece p = c.OnCell;
+            //records past coordinates so the move can be reverted
             int pastX = p.PosX;
             int pastY = p.PosY;
+            //makes the move, finds which spaces are covered by which colour, then reverts the move
             movePiece(newX, newY, pastX, pastY);
             findSpacesCovered();
+            movePiece(pastX, pastY, newX, newY);
+            //checks if the player whose turn it is has been taken out of check
             if (findIfInCheck(whiteTurn))
             {
-                movePiece(pastX, pastY, newX, newY);
                 return false;
             }
             return true;
         }
         //updates board array when a piece is moved
         //needs to be updated for taking pieces
+        //keeps track of kings
         public void movePiece(int newX, int newY, int pastX, int pastY)
         {
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
@@ -141,27 +146,7 @@ namespace chessGame
                     showLegalKing(posX, posY);
                     break;
             }
-            if (whiteTurn && wInCheck)
-            {
-                foreach (Cell c in allowedMoves)
-                {
-                    if (!doesTakeOutOfCheck(c))
-                    {
-                        allowedMoves.Remove(c);
-                    }
-                    else
-                    {
-                        c.LegalMove = true;
-                    }
-                }
-            }
-            else
-            {
-                foreach (Cell c in allowedMoves)
-                {
-                    c.LegalMove = true;
-                }
-            }
+            allowMovesThatTakeOutOfCheck();
         }
         private void allowMovesThatTakeOutOfCheck()
         {

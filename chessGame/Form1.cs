@@ -5,6 +5,7 @@ namespace chessGame
     {
         Board b = new Board();
         Player human = new Player();
+        AI AI = new AI();
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
         public Form1()
@@ -49,6 +50,11 @@ namespace chessGame
                 {
                     human.Score += b.board[currentX, currentY].OnCell.Value;
                     human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                }
+                else if (b.board[currentX,currentY.OnCell.PieceName != "empty"])
+                {
+                    AI.Score += b.board[currentX, currentY].OnCell.Value;
+                    AI.TakenPieces.Add(b.board[currentX, currentY].OnCell);
                 }
                 b.movePiece(currentX, currentY, pastX, pastY);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
