@@ -44,14 +44,15 @@ namespace chessGame
                 }
             }
             //moves piece if one has been selected and the clicked button is a legal move
-            if (b.board[currentX, currentY].LegalMove)
+            Cell location = b.board[currentX, currentY];
+            if (location.LegalMove)
             {
-                if (b.board[currentX, currentY].OnCell.PieceName != "empty" && b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
+                if (location.OnCell.PieceName != "empty" && location.OnCell.IsWhite == !human.IsWhite)
                 {
-                    human.Score += b.board[currentX, currentY].OnCell.Value;
-                    human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                    human.Score += location.OnCell.Value;
+                    human.TakenPieces.Add(location.OnCell);
                 }
-                else if (b.board[currentX,currentY].OnCell.PieceName != "empty")
+                else if (location.OnCell.PieceName != "empty" && location.OnCell.IsWhite == !AI.IsWhite)
                 {
                     AI.Score += b.board[currentX, currentY].OnCell.Value;
                     AI.TakenPieces.Add(b.board[currentX, currentY].OnCell);

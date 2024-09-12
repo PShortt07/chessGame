@@ -8,6 +8,10 @@ namespace chessGame
 {
     internal class AI:Player
     {
-
+        public AI()
+        {
+            IsWhite = false;
+            TakenPieces = new List<Piece>();
+        }
     }
 }

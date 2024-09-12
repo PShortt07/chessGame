@@ -22,7 +22,7 @@ namespace chessGame
 
         public Player()
         {
-            
+            TakenPieces = new List<Piece>();
         }
     }
 }
