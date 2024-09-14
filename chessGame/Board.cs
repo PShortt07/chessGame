@@ -148,9 +148,16 @@ namespace chessGame
             }
             else
             {
-                foreach (Cell c in allowedMoves)
+                foreach (Cell c in board)
                 {
-                    c.LegalMove = true;
+                    if (allowedMoves.Contains(c))
+                    {
+                        c.LegalMove = true;
+                    }
+                    else
+                    {
+                        c.LegalMove = false;
+                    }
                 }
             }
         }
@@ -279,17 +286,12 @@ namespace chessGame
             //left side up
             for (int i = 1; SpaceStatus(posX - i, posY - i) != "outside"; i++)
             {
-                if (SpaceStatus(posX - i, posY - i) == "own piece")
-                {
-                    board[posX - i, posY - i].LegalMove = false;
-                    break;
-                }
-                else if (SpaceStatus(posX - i, posY - i) == "piece")
+                if (SpaceStatus(posX - i, posY - i) == "piece")
                 {
                     allowedMoves.Add(board[posX - i, posY - i]);
                     break;
                 }
-                else
+                else if (SpaceStatus(posX - i, posY - i) == "empty")
                 {
                     allowedMoves.Add(board[posX - i, posY - i]);
                 }
@@ -297,17 +299,12 @@ namespace chessGame
             //right side up
             for (int i = 1; SpaceStatus(posX + i, posY - i) != "outside"; i++)
             {
-                if (SpaceStatus(posX + i, posY - i) == "own piece")
-                {
-                    board[posX + i, posY - i].LegalMove = false;
-                    break;
-                }
-                else if (SpaceStatus(posX + i, posY - i) == "piece")
+                if (SpaceStatus(posX + i, posY - i) == "piece")
                 {
                     allowedMoves.Add(board[posX + i, posY - i]);
                     break;
                 }
-                else
+                else if (SpaceStatus(posX + i, posY - i) == "empty")
                 {
                     allowedMoves.Add(board[posX + i, posY - i]);
                 }
@@ -315,17 +312,12 @@ namespace chessGame
             //left side down
             for (int i = 1; SpaceStatus(posX - i, posY + i) != "outside"; i++)
             {
-                if (SpaceStatus(posX - i, posY + i) == "own piece")
-                {
-                    board[posX - i, posY + i].LegalMove = false;
-                    break;
-                }
-                else if (SpaceStatus(posX - i, posY + i) == "piece")
+                if (SpaceStatus(posX - i, posY + i) == "piece")
                 {
                     allowedMoves.Add(board[posX - i, posY + i]);
                     break;
                 }
-                else
+                else if (SpaceStatus(posX - i, posY + i) == "empty")
                 {
                     allowedMoves.Add(board[posX - i, posY + i]);
                 }
@@ -333,17 +325,12 @@ namespace chessGame
             //right side down
             for (int i = 1; SpaceStatus(posX + i, posY + i) != "outside"; i++)
             {
-                if (SpaceStatus(posX + i, posY + i) == "own piece")
-                {
-                    board[posX + i, posY + i].LegalMove = false;
-                    break;
-                }
-                else if (SpaceStatus(posX + i, posY + i) == "piece")
+                if (SpaceStatus(posX + i, posY + i) == "piece")
                 {
                     allowedMoves.Add(board[posX + i, posY + i]);
                     break;
                 }
-                else
+                else if (SpaceStatus(posX + i, posY + i) == "empty")
                 {
                     allowedMoves.Add(board[posX + i, posY + i]);
                 }
@@ -370,6 +357,7 @@ namespace chessGame
         {
             //find spaces covered by opponent
             findSpacesCovered(!white);
+            findSpacesCovered(white);
             //check if white's king can be taken by black
             if (white)
             {
@@ -422,7 +410,7 @@ namespace chessGame
                 }
             }
         }
-        //checks if a player is in check
+        //finds spaces covered by a player
         private void findSpacesCovered(bool byWhite)
         {
             List<Cell> spaces = new List<Cell>();
@@ -484,15 +472,7 @@ namespace chessGame
         }
         private void checkLegal(int posX, int posY, ref List<Cell> allowedMoves)
         {
-            if (SpaceStatus(posX, posY) == "free")
-            {
-                allowedMoves.Add(board[posX, posY]);
-            }
-            else if (SpaceStatus(posX, posY) == "own piece")
-            {
-                board[posX, posY].LegalMove = false;
-            }
-            else if (SpaceStatus(posX, posY) == "piece")
+            if (SpaceStatus(posX, posY) == "free" || SpaceStatus(posX, posY) == "piece")
             {
                 allowedMoves.Add(board[posX, posY]);
             }
