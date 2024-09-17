@@ -11,15 +11,21 @@ namespace chessGame
         //all code assumes player is white side
         private bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
-        public bool wInCheck = false;
-        public bool bInCheck = false;
-        private int bKingX = 4;
-        private int bKingY = 0;
-        private int wKingX = 4;
-        private int wKingY = 7;
+        public bool wInCheck;
+        public bool bInCheck;
+        private int bKingX;
+        private int bKingY;
+        private int wKingX;
+        private int wKingY;
         //constructor - sets up chess board
         public Board()
         {
+            wInCheck = false;
+            bInCheck = false;
+            bKingX = 4;
+            bKingY = 0;
+            wKingX = 4;
+            wKingY = 7;
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -72,16 +78,17 @@ namespace chessGame
                 }
             }
         }
-        public bool doesTakeOutOfCheck(Cell c, int nowX, int nowY)
+        public bool doesTakeOutOfCheck(Cell c, int currentX, int currentY)
         {
             int newX = c.OnCell.PosX;
             int newY = c.OnCell.PosY;
             //records past coordinates so the move can be reverted
             //makes the move, finds which spaces are covered by which colour, then reverts the move
-            movePiece(newX, newY, nowX, nowY);
+            movePiece(newX, newY, currentX, currentY);
             //checks if the player whose turn it is has been taken out of check
-            findIfInCheck(whiteTurn);
-            movePiece(nowX, nowY, newX, newY);
+            wInCheck = findIfInCheck(whiteTurn);
+            bInCheck = findIfInCheck(!whiteTurn);
+            movePiece(currentX, currentY, newX, newY);
             if (whiteTurn && wInCheck)
             {
                 return false;
@@ -102,9 +109,9 @@ namespace chessGame
             {
                 board[newX, newY].OnCell.HasMoved = true;
             }
-            if (board[newX, newY].OnCell.PieceName == "king")
+            if (board[pastX, pastY].OnCell.PieceName == "king")
             {
-                if (board[newX, newY].OnCell.IsWhite)
+                if (board[pastX, pastY].OnCell.IsWhite)
                 {
                     wKingX = newX;
                     wKingY = newY;
@@ -116,6 +123,8 @@ namespace chessGame
                 }
             }
             board[pastX, pastY].OnCell = new Empty();
+            wInCheck = findIfInCheck(true);
+            bInCheck = findIfInCheck(false);
         }
         //finds all available moves
         public void FindLegalMoves(int posX, int posY)
@@ -353,7 +362,7 @@ namespace chessGame
             checkLegal(posX + 1, posY + 1, ref allowedMoves);
         }
         //to be run at the end of every move, bool = who is being assessed for check
-        private void findIfInCheck(bool white)
+        private bool findIfInCheck(bool white)
         {
             //find spaces covered by opponent
             findSpacesCovered(!white);
@@ -363,11 +372,11 @@ namespace chessGame
             {
                 if (board[wKingX, wKingY].CoveredByBlack)
                 {
-                    wInCheck = true;
+                    return true;
                 }
                 else
                 {
-                    wInCheck = false;
+                    return false;
                 }
             }
             //check opposite
@@ -375,20 +384,18 @@ namespace chessGame
             {
                 if (board[bKingX, bKingY].CoveredByWhite)
                 {
-                    bInCheck = true;
+                    return true;
                 }
                 else
                 {
-                    bInCheck = false;
+                    return false;
                 }
             }
         }
-        public void endOfMove()
+        //public void endOfMove()
         {
             //checks if king is in check for the next move
-            findIfInCheck(true);
-            findIfInCheck(false);
-            resetLegal();
+            //resetLegal();
             //keeps track of whose turn it is
             //if (whiteTurn)
             //{
