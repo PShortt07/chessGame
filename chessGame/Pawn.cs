@@ -8,8 +8,10 @@ namespace chessGame
 {
     internal class Pawn:Piece
     {
-        public Pawn(bool colour)
+        public Pawn(bool colour, int x, int y)
         {
+            PosX = x;
+            PosY = y;
             Value = 1;
             IsWhite = colour;
             if (IsWhite)

@@ -8,8 +8,10 @@ namespace chessGame
 {
     internal class Bishop:Piece
     {
-        public Bishop(bool white)
+        public Bishop(bool white, int x, int y)
         {
+            PosX = x;
+            PosY = y;
             Value = 3;
             IsWhite = white;
             if (IsWhite)

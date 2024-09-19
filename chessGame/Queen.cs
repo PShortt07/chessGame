@@ -8,8 +8,10 @@ namespace chessGame
 {
     internal class Queen:Piece
     {
-        public Queen(bool white)
+        public Queen(bool white, int x, int y)
         {
+            PosX = x;
+            PosY = y;
             Value = 9;
             IsWhite = white;
             if (IsWhite)

@@ -8,8 +8,10 @@ namespace chessGame
 {
     internal class Rook:Piece
     {
-        public Rook(bool white)
+        public Rook(bool white, int x, int y)
         {
+            PosX = x;
+            PosY = y;
             Value = 5;
             IsWhite = white;
             if (IsWhite)
