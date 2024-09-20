@@ -83,7 +83,6 @@ namespace chessGame
             int newX = c.OnCell.PosX;
             int newY = c.OnCell.PosY;
             bool result = false;
-            //records past coordinates so the move can be reverted
             //makes the move, finds which spaces are covered by which colour, then reverts the move
             movePiece(newX, newY, currentX, currentY);
             //checks if the player whose turn it is has been taken out of check
@@ -139,14 +138,14 @@ namespace chessGame
             wInCheck = findIfInCheck(true);
             bInCheck = findIfInCheck(false);
             Cell current = board[posX, posY];
-            List<Cell> allowedMoves = new List<Cell>();
-            addMovesToList(posX, posY, ref allowedMoves, current);
             if (wInCheck || bInCheck)
             {
-                allowMovesThatTakeOutOfCheck(board[posX, posY], ref allowedMoves);
+                allowMovesThatTakeOutOfCheck(board[posX, posY], whiteTurn);
             }
             else
             {
+                List<Cell> allowedMoves = new List<Cell>();
+                addMovesToList(ref allowedMoves, current);
                 foreach (Cell c in board)
                 {
                     if (allowedMoves.Contains(c))
@@ -161,17 +160,22 @@ namespace chessGame
             }
         }
         //error
-        private void allowMovesThatTakeOutOfCheck(Cell current, ref List<Cell> allowedMoves)
+        private void allowMovesThatTakeOutOfCheck(Cell current, bool forWhite)
         {
-            foreach (Cell newPos in allowedMoves)
+            if (current.OnCell.PieceName != "empty" && current.OnCell.IsWhite == forWhite)   
             {
-                if (doesTakeOutOfCheck(newPos, current.OnCell.PosX, current.OnCell.PosY))
+                List<Cell> possibleMoves = new List<Cell>();
+                addMovesToList(ref possibleMoves, current);
+                foreach (Cell newPos in possibleMoves)
                 {
-                    newPos.LegalMove = true;
-                }
-                else
-                {
-                    newPos.LegalMove = false;
+                    if (doesTakeOutOfCheck(newPos, current.OnCell.PosX, current.OnCell.PosY))
+                    {
+                        newPos.LegalMove = true;
+                    }
+                    else
+                    {
+                        newPos.LegalMove = false;
+                    }
                 }
             }
         }
@@ -412,9 +416,7 @@ namespace chessGame
                 //runs if piece in space and the piece is the aim colour
                 if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
                 {
-                    int x = c.OnCell.PosX;
-                    int y = c.OnCell.PosY;
-                    addMovesToList(x, y, ref allowedMoves, c);
+                    addMovesToList(ref allowedMoves, c);
                 }
             }
             foreach (Cell c in board)
@@ -450,27 +452,27 @@ namespace chessGame
                 allowedMoves.Add(board[posX, posY]);
             }
         }
-        private void addMovesToList(int x, int y, ref List<Cell> allowedMoves, Cell c)
+        private void addMovesToList(ref List<Cell> allowedMoves, Cell c)
         {
             switch (c.OnCell.PieceName)
             {
                 case ("pawn"):
-                    showLegalPawn(x, y, ref allowedMoves, c.OnCell.IsWhite);
+                    showLegalPawn(c.OnCell.PosX, c.OnCell.PosY, ref allowedMoves, c.OnCell.IsWhite);
                     break;
                 case ("rook"):
-                    showLegalRook(x, y, ref allowedMoves, c.OnCell.IsWhite);
+                    showLegalRook(c.OnCell.PosX, c.OnCell.PosY, ref allowedMoves, c.OnCell.IsWhite);
                     break;
                 case ("knight"):
-                    showLegalKnight(x, y, ref allowedMoves, c.OnCell.IsWhite);
+                    showLegalKnight(c.OnCell.PosX, c.OnCell.PosY, ref allowedMoves, c.OnCell.IsWhite);
                     break;
                 case ("bishop"):
-                    showLegalBishop(x, y, ref allowedMoves, c.OnCell.IsWhite);
+                    showLegalBishop(c.OnCell.PosX, c.OnCell.PosY, ref allowedMoves, c.OnCell.IsWhite);
                     break;
                 case ("queen"):
-                    showLegalQueen(x, y, ref allowedMoves, c.OnCell.IsWhite);
+                    showLegalQueen(c.OnCell.PosX, c.OnCell.PosY, ref allowedMoves, c.OnCell.IsWhite);
                     break;
                 case ("king"):
-                    showLegalKing(x, y, ref allowedMoves, c.OnCell.IsWhite);
+                    showLegalKing(c.OnCell.PosX, c.OnCell.PosY, ref allowedMoves, c.OnCell.IsWhite);
                     break;
             }
         }
