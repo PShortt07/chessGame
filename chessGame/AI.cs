@@ -23,7 +23,6 @@ namespace chessGame
         private void findAllLegalMoves()
         {
             List<Cell> legalMoves = new List<Cell>();
-
         }
     }
 }

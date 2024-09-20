@@ -86,9 +86,9 @@ namespace chessGame
                         }
                     }
                 }
-                else
+                else if (b.board[currentX, currentY].OnCell.IsWhite == AI.IsWhite)
                 {
-
+                    
                 }
                 lastClicked = clicked;
             }
