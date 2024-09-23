@@ -78,11 +78,8 @@ namespace chessGame
                 }
             }
         }
-        public bool doesTakeOutOfCheck(Cell c, int currentX, int currentY)
+        public void doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
         {
-            int newX = c.OnCell.PosX;
-            int newY = c.OnCell.PosY;
-            bool result = false;
             //makes the move, finds which spaces are covered by which colour, then reverts the move
             movePiece(newX, newY, currentX, currentY);
             //checks if the player whose turn it is has been taken out of check
@@ -94,16 +91,7 @@ namespace chessGame
             {
                 bInCheck = findIfInCheck(false);
             }
-            if (whiteTurn && !wInCheck)
-            {
-                result = true;
-            }
-            else if (!whiteTurn && !bInCheck)
-            {
-                result = true;
-            }
             movePiece(currentX, currentY, newX, newY);
-            return result;
         }
         //updates board array when a piece is moved
         //needs to be updated for taking pieces
@@ -131,6 +119,17 @@ namespace chessGame
                 board[newX, newY].OnCell.HasMoved = true;
             }
             board[pastX, pastY].OnCell = new Empty();
+        }
+        public void endOfTurn()
+        {
+            if (whiteTurn)
+            {
+                whiteTurn = false;
+            }
+            else
+            {
+                whiteTurn = true;
+            }
         }
         //finds all available moves
         public void FindLegalMoves(int posX, int posY, bool whitePiece)
@@ -162,20 +161,22 @@ namespace chessGame
         //error
         private void allowMovesThatTakeOutOfCheck(Cell current, bool forWhite)
         {
-            if (current.OnCell.PieceName != "empty" && current.OnCell.IsWhite == forWhite)   
+            List<Cell> possibleMoves = new List<Cell>();
+            addMovesToList(ref possibleMoves, current);
+            List<Cell> takeOutOfCheck = new List<Cell>();
+            foreach (Cell newPos in possibleMoves)
             {
-                List<Cell> possibleMoves = new List<Cell>();
-                addMovesToList(ref possibleMoves, current);
-                foreach (Cell newPos in possibleMoves)
+                doesTakeOutOfCheck(newPos.OnCell.PosX, newPos.OnCell.PosY, current.OnCell.PosX, current.OnCell.PosY);
+                if (!wInCheck)
                 {
-                    if (doesTakeOutOfCheck(newPos, current.OnCell.PosX, current.OnCell.PosY))
-                    {
-                        newPos.LegalMove = true;
-                    }
-                    else
-                    {
-                        newPos.LegalMove = false;
-                    }
+                    takeOutOfCheck.Add(newPos);
+                }
+            }
+            foreach (Cell c in board)
+            {
+                if (takeOutOfCheck.Contains(c))
+                {
+                    c.LegalMove = true;
                 }
             }
         }

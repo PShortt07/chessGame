@@ -64,6 +64,7 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
                 b.resetLegal();
+                //b.endOfTurn();
             }
             else
             {
