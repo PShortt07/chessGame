@@ -56,7 +56,7 @@ namespace chessGame
             board[4, 7].OnCell = new King(true, 4, 7);
         }
         //checks occupation status of a cell
-        public string SpaceStatus(int posX, int posY, bool whitePiece)
+        public string SpaceStatus(int posX, int posY, bool forWhite)
         {
             if (posX > 7 || posY > 7 || posX < 0 || posY < 0)
             {
@@ -66,9 +66,9 @@ namespace chessGame
             {
                 if (board[posX, posY].OnCell.PieceName == "empty")
                 {
-                    return "free";
+                    return "empty";
                 }
-                else if (board[posX, posY].OnCell.IsWhite == whitePiece)
+                else if (board[posX, posY].OnCell.IsWhite == forWhite)
                 {
                     return "own piece";
                 }
@@ -78,20 +78,22 @@ namespace chessGame
                 }
             }
         }
-        public void doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
+        public bool doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
         {
             //makes the move, finds which spaces are covered by which colour, then reverts the move
             movePiece(newX, newY, currentX, currentY);
             //checks if the player whose turn it is has been taken out of check
+            bool outOfCheck = false;
             if (whiteTurn)
             {
-                wInCheck = findIfInCheck(true);
+                outOfCheck = findIfInCheck(true);
             }
             else
             {
-                bInCheck = findIfInCheck(false);
+                outOfCheck = findIfInCheck(false);
             }
             movePiece(currentX, currentY, newX, newY);
+            return outOfCheck;
         }
         //updates board array when a piece is moved
         //needs to be updated for taking pieces
@@ -166,8 +168,7 @@ namespace chessGame
             List<Cell> takeOutOfCheck = new List<Cell>();
             foreach (Cell newPos in possibleMoves)
             {
-                doesTakeOutOfCheck(newPos.OnCell.PosX, newPos.OnCell.PosY, current.OnCell.PosX, current.OnCell.PosY);
-                if (!wInCheck)
+                if (doesTakeOutOfCheck(newPos.OnCell.PosX, newPos.OnCell.PosY, current.OnCell.PosX, current.OnCell.PosY))
                 {
                     takeOutOfCheck.Add(newPos);
                 }
@@ -186,12 +187,12 @@ namespace chessGame
             {
                 if (!board[posX, posY].OnCell.HasMoved)
                 {
-                    if (SpaceStatus(posX, posY - 2, whitePiece) == "free" && SpaceStatus(posX, posY - 1, whitePiece) == "free")
+                    if (SpaceStatus(posX, posY - 2, whitePiece) == "empty" && SpaceStatus(posX, posY - 1, whitePiece) == "empty")
                     {
                         allowedMoves.Add(board[posX, posY - 2]);
                     }
                 }
-                if (SpaceStatus(posX, posY - 1, whitePiece) == "free")
+                if (SpaceStatus(posX, posY - 1, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[posX, posY - 1]);
                 }
@@ -208,12 +209,12 @@ namespace chessGame
             {
                 if (!board[posX, posY].OnCell.HasMoved)
                 {
-                    if (SpaceStatus(posX, posY + 2, whitePiece) == "free" && SpaceStatus(posX, posY + 1, whitePiece) == "free")
+                    if (SpaceStatus(posX, posY + 2, whitePiece) == "empty" && SpaceStatus(posX, posY + 1, whitePiece) == "empty")
                     {
                         allowedMoves.Add(board[posX, posY + 2]);
                     }
                 }
-                if (SpaceStatus(posX, posY + 1, whitePiece) == "free")
+                if (SpaceStatus(posX, posY + 1, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[posX, posY + 1]);
                 }
@@ -232,7 +233,7 @@ namespace chessGame
             //up
             for (int i = posY - 1; i >= 0; i--)
             {
-                if (SpaceStatus(posX, i, whitePiece) == "free")
+                if (SpaceStatus(posX, i, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[posX, i]);
                 }
@@ -249,7 +250,7 @@ namespace chessGame
             //down
             for (int i = posY + 1; i <= 8; i++)
             {
-                if (SpaceStatus(posX, i, whitePiece) == "free")
+                if (SpaceStatus(posX, i, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[posX, i]);
                 }
@@ -266,7 +267,7 @@ namespace chessGame
             //left
             for (int i = posX - 1; i >= 0; i--)
             {
-                if (SpaceStatus(i, posY, whitePiece) == "free")
+                if (SpaceStatus(i, posY, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[i, posY]);
                 }
@@ -283,7 +284,7 @@ namespace chessGame
             //right
             for (int i = posX + 1; i <= 8; i++)
             {
-                if (SpaceStatus(i, posY, whitePiece) == "free")
+                if (SpaceStatus(i, posY, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[i, posY]);
                 }
@@ -324,6 +325,10 @@ namespace chessGame
                 {
                     allowedMoves.Add(board[posX - i, posY - i]);
                 }
+                else
+                {
+                    break;
+                }
             }
             //right side up
             for (int i = 1; SpaceStatus(posX + i, posY - i, whitePiece) != "outside"; i++)
@@ -336,6 +341,10 @@ namespace chessGame
                 else if (SpaceStatus(posX + i, posY - i, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[posX + i, posY - i]);
+                }
+                else
+                {
+                    break;
                 }
             }
             //left side down
@@ -350,6 +359,10 @@ namespace chessGame
                 {
                     allowedMoves.Add(board[posX - i, posY + i]);
                 }
+                else
+                {
+                    break;
+                }
             }
             //right side down
             for (int i = 1; SpaceStatus(posX + i, posY + i, whitePiece) != "outside"; i++)
@@ -362,6 +375,10 @@ namespace chessGame
                 else if (SpaceStatus(posX + i, posY + i, whitePiece) == "empty")
                 {
                     allowedMoves.Add(board[posX + i, posY + i]);
+                }
+                else
+                {
+                    break;
                 }
             }
         }
@@ -448,7 +465,7 @@ namespace chessGame
         }
         private void checkLegal(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
-            if (SpaceStatus(posX, posY, whitePiece) == "free" || SpaceStatus(posX, posY, whitePiece) == "piece")
+            if (SpaceStatus(posX, posY, whitePiece) == "empty" || SpaceStatus(posX, posY, whitePiece) == "piece")
             {
                 allowedMoves.Add(board[posX, posY]);
             }
