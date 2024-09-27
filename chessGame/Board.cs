@@ -9,14 +9,14 @@ namespace chessGame
     internal class Board
     {
         //all code assumes player is white side
-        private bool whiteTurn = true;
+        public bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
         private bool wInCheck;
         private bool bInCheck;
-        private int bKingX;
-        private int bKingY;
-        private int wKingX;
-        private int wKingY;
+        public int bKingX;
+        public int bKingY;
+        public int wKingX;
+        public int wKingY;
         //constructor - sets up chess board
         public Board()
         {
@@ -86,11 +86,11 @@ namespace chessGame
             bool outOfCheck = false;
             if (whiteTurn)
             {
-                outOfCheck = findIfInCheck(true);
+                outOfCheck = !findIfInCheck(true);
             }
             else
             {
-                outOfCheck = findIfInCheck(false);
+                outOfCheck = !findIfInCheck(false);
             }
             movePiece(currentX, currentY, newX, newY);
             return outOfCheck;
@@ -120,7 +120,20 @@ namespace chessGame
             {
                 board[newX, newY].OnCell.HasMoved = true;
             }
-            board[pastX, pastY].OnCell = new Empty();
+            board[pastX, pastY].OnCell = new Empty(pastX, pastY);
+        }
+        public void castle(int rookX, int rookY)
+        {
+            if (rookX == 0)
+            {
+                movePiece(wKingX + 1, rookY, rookX, rookY);
+                movePiece(wKingX - 2, wKingY, wKingX, wKingY);
+            }
+            else
+            {
+                movePiece(wKingX - 1, rookY, rookX, rookY);
+                movePiece(wKingX + 2, wKingY, wKingX, wKingY);
+            }
         }
         public void endOfTurn()
         {
@@ -141,7 +154,7 @@ namespace chessGame
             Cell current = board[posX, posY];
             if (wInCheck || bInCheck)
             {
-                allowMovesThatTakeOutOfCheck(board[posX, posY], whiteTurn);
+                allowMovesThatTakeOutOfCheck(board[posX, posY]);
             }
             else
             {
@@ -161,24 +174,21 @@ namespace chessGame
             }
         }
         //error
-        private void allowMovesThatTakeOutOfCheck(Cell current, bool forWhite)
+        private void allowMovesThatTakeOutOfCheck(Cell selected)
         {
             List<Cell> possibleMoves = new List<Cell>();
-            addMovesToList(ref possibleMoves, current);
+            addMovesToList(ref possibleMoves, selected);
             List<Cell> takeOutOfCheck = new List<Cell>();
             foreach (Cell newPos in possibleMoves)
             {
-                if (doesTakeOutOfCheck(newPos.OnCell.PosX, newPos.OnCell.PosY, current.OnCell.PosX, current.OnCell.PosY))
+                if (doesTakeOutOfCheck(newPos.OnCell.PosX, newPos.OnCell.PosY, selected.OnCell.PosX, selected.OnCell.PosY))
                 {
                     takeOutOfCheck.Add(newPos);
                 }
             }
-            foreach (Cell c in board)
+            foreach (Cell c in takeOutOfCheck)
             {
-                if (takeOutOfCheck.Contains(c))
-                {
-                    c.LegalMove = true;
-                }
+                c.LegalMove = true;
             }
         }
         private void showLegalPawn(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
@@ -230,6 +240,59 @@ namespace chessGame
         }
         private void showLegalRook(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
+            //determines whether castling is legal
+            bool canCastle = true;
+            if (!board[posX, posY].OnCell.HasMoved && !board[wKingX, wKingY].OnCell.HasMoved)
+            {
+                if (posX == 0)
+                {
+                    for (int i = 1; i < wKingX; i++)
+                    {
+                        if (whitePiece)
+                        {
+                            if (board[i, 7].OnCell.PieceName != "empty" || board[i, 7].CoveredByBlack)
+                            {
+                                canCastle = false;
+                            }
+                        }
+                        else
+                        {
+                            if (board[i, 0].OnCell.PieceName != "empty" || board[i, 7].CoveredByWhite)
+                            {
+                                canCastle = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 6; i > wKingX; i--)
+                    {
+                        if (whitePiece)
+                        {
+                            if (board[i, 7].OnCell.PieceName != "empty" || board[i, 7].CoveredByBlack)
+                            {
+                                canCastle = false;
+                            }
+                        }
+                        else
+                        {
+                            if (board[i, 0].OnCell.PieceName != "empty" || board[i, 7].CoveredByWhite)
+                            {
+                                canCastle = false;
+                            }
+                        }
+                    }
+                }
+            }
+            if (canCastle && whiteTurn)
+            {
+                allowedMoves.Add(board[4, 7]);
+            }
+            else if (canCastle && !whiteTurn)
+            {
+                allowedMoves.Add(board[4, 0]);
+            }
             //up
             for (int i = posY - 1; i >= 0; i--)
             {

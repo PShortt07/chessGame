@@ -8,10 +8,12 @@ namespace chessGame
 {
     internal class Empty:Piece
     {
-        public Empty()
+        public Empty(int x, int y)
         {
             PieceImage = Properties.Resources.BLANK_ICON;
             PieceName = "empty";
+            PosX = x;
+            PosY = y;
         }
     }
 }

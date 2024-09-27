@@ -57,7 +57,14 @@ namespace chessGame
                     AI.Score += b.board[currentX, currentY].OnCell.Value;
                     AI.TakenPieces.Add(b.board[currentX, currentY].OnCell);
                 }
-                b.movePiece(currentX, currentY, pastX, pastY);
+                if ((b.board[currentX, currentY] == b.board[b.wKingX, b.wKingY]) && b.whiteTurn)
+                {
+                    b.castle(pastX, pastY);
+                }
+                else
+                {
+                    b.movePiece(currentX, currentY, pastX, pastY);
+                }
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
