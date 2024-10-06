@@ -5,9 +5,10 @@ namespace chessGame
     {
         Board b = new Board();
         Player human = new Player();
-        AI AI = new AI();
+        AI AI;
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
+
         public Form1()
         {
             InitializeComponent();
@@ -51,11 +52,6 @@ namespace chessGame
                 {
                     human.Score += location.OnCell.Value;
                     human.TakenPieces.Add(location.OnCell);
-                }
-                else if (location.OnCell.PieceName != "empty" && location.OnCell.IsWhite == !AI.IsWhite)
-                {
-                    AI.Score += b.board[currentX, currentY].OnCell.Value;
-                    AI.TakenPieces.Add(b.board[currentX, currentY].OnCell);
                 }
                 if ((b.board[currentX, currentY] == b.board[b.wKingX, b.wKingY]) && b.whiteTurn)
                 {
@@ -107,6 +103,7 @@ namespace chessGame
             label1.Hide();
             button1.Hide();
             DrawBoard(b.board);
+            AI = new AI(b, 1, human);
         }
         //displaying game board
         private void DrawBoard(Cell[,] b)
@@ -161,9 +158,9 @@ namespace chessGame
         {
             TextBox timerShow = new TextBox();
         }
-        private void promotion()
+        private void promotion(Pawn p, Piece toBecome)
         {
-
+            b.board[p.PosX, p.PosY].OnCell = toBecome;
         }
         private void resetColours()
         {
