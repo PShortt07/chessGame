@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             button1 = new Button();
             label1 = new Label();
+            comboBox1 = new ComboBox();
+            label2 = new Label();
             SuspendLayout();
             // 
             // button1
@@ -55,12 +57,32 @@
             label1.Text = "CHESS GAME";
             label1.Click += label1_Click;
             // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(653, 33);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(121, 23);
+            comboBox1.TabIndex = 2;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(685, 15);
+            label2.Name = "label2";
+            label2.Size = new Size(58, 15);
+            label2.TabIndex = 3;
+            label2.Text = "Difficulty:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(800, 450);
+            Controls.Add(label2);
+            Controls.Add(comboBox1);
             Controls.Add(button1);
             Controls.Add(label1);
             Name = "Form1";
@@ -73,5 +95,7 @@
 
         private Button button1;
         private Label label1;
+        private ComboBox comboBox1;
+        private Label label2;
     }
 }

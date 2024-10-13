@@ -23,6 +23,7 @@ namespace chessGame
         public Player()
         {
             TakenPieces = new List<Piece>();
+            MyPieces = new List<Piece>();
         }
     }
 }

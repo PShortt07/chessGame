@@ -18,6 +18,7 @@ namespace chessGame
         private string pieceName;
         private bool hasMoved;
         private Image pieceImage;
+        private bool empty;
 
         public int Value { get => value; set => this.value = value; }
         public int PosX { get => posX; set => posX = value; }
@@ -27,10 +28,12 @@ namespace chessGame
         public string PieceName { get => pieceName; set => pieceName = value; }
         public bool HasMoved { get => hasMoved; set => hasMoved = value; }
         public Image PieceImage { get => pieceImage; set => pieceImage = value; }
+        public bool Empty { get => empty; set => empty = value; }
 
         public Piece()
         {
             HasMoved = false;
+            Empty = false;
         }
     }
 }

@@ -8,11 +8,17 @@ namespace chessGame
         AI AI;
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
+        int AIDepth;
 
         public Form1()
         {
             InitializeComponent();
             human.IsWhite = true;
+            AIDepth = 1;
+            for (int i = 1; i <= 5; i++)
+            {
+                comboBox1.Items.Add(i);
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -37,7 +43,7 @@ namespace chessGame
                         currentX = i;
                         currentY = j;
                     }
-                    if (boardDisplay[i,j] == lastClicked)
+                    if (boardDisplay[i, j] == lastClicked)
                     {
                         pastX = i;
                         pastY = j;
@@ -52,6 +58,7 @@ namespace chessGame
                 {
                     human.Score += location.OnCell.Value;
                     human.TakenPieces.Add(location.OnCell);
+                    AI.MyPieces.Remove(location.OnCell);
                 }
                 if ((b.board[currentX, currentY] == b.board[b.wKingX, b.wKingY]) && b.whiteTurn)
                 {
@@ -67,7 +74,9 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
                 b.resetLegal();
-                //b.endOfTurn();
+                b.whiteTurn = false;
+                AI.makeMove();
+                b.whiteTurn = true;
             }
             else
             {
@@ -92,7 +101,7 @@ namespace chessGame
                 }
                 else if (b.board[currentX, currentY].OnCell.IsWhite == AI.IsWhite)
                 {
-                    
+
                 }
                 lastClicked = clicked;
             }
@@ -103,7 +112,8 @@ namespace chessGame
             label1.Hide();
             button1.Hide();
             DrawBoard(b.board);
-            AI = new AI(b, 1, human);
+            AI = new AI(b, AIDepth, human);
+            b.refreshLists(ref human, ref AI);
         }
         //displaying game board
         private void DrawBoard(Cell[,] b)
@@ -166,7 +176,7 @@ namespace chessGame
         {
             for (int i = 0; i < 8; i++)
             {
-                for(int j = 0; j < 8; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     if (i % 2 == 0)
                     {
@@ -190,9 +200,14 @@ namespace chessGame
                             boardDisplay[i, j].BackColor = Color.White;
                         }
                     }
-                    boardDisplay[i,j].Refresh();
+                    boardDisplay[i, j].Refresh();
                 }
             }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            AIDepth = comboBox1.SelectedIndex;
         }
     }
 }

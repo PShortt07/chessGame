@@ -14,6 +14,8 @@ namespace chessGame
             PieceName = "empty";
             PosX = x;
             PosY = y;
+            IsWhite = false;
+            Empty = true;
         }
     }
 }

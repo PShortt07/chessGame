@@ -55,6 +55,39 @@ namespace chessGame
             board[4, 0].OnCell = new King(false, 4, 0);
             board[4, 7].OnCell = new King(true, 4, 7);
         }
+        public void refreshLists(ref Player human, ref AI AI)
+        {
+            human.MyPieces = new List<Piece>();
+            AI.MyPieces = new List<Piece>();
+            foreach (Cell c in board)
+            {
+                Piece assessing = c.OnCell;
+                if (assessing.IsWhite == human.IsWhite && !assessing.Empty)
+                {
+                    human.MyPieces.Add(assessing);
+                }
+                else if (assessing.IsWhite == AI.IsWhite && !assessing.Empty)
+                {
+                    AI.MyPieces.Add(assessing);
+                }
+            }
+        }
+        public bool isGameOver()
+        {
+            List<Cell> moves = new List<Cell>();
+            showLegalKing(wKingX, wKingY, ref moves, true);
+            if (moves.Count > 0)
+            {
+                return false;
+            }
+            moves = new List<Cell>();
+            showLegalKing(bKingX, bKingY, ref moves, false);
+            if (moves.Count > 0)
+            {
+                return false;
+            }
+            return true;
+        }
         //checks occupation status of a cell
         public string SpaceStatus(int posX, int posY, bool forWhite)
         {
