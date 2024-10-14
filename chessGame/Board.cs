@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -128,6 +129,21 @@ namespace chessGame
             movePiece(currentX, currentY, newX, newY);
             return outOfCheck;
         }
+        public void changeScores(int newX, int newY, int oldX, int oldY, ref Player human, ref AI AI)
+        {
+            if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == true)
+            {
+                human.Score += board[newX, newY].OnCell.Value;
+                human.TakenPieces.Add(board[newX, newY].OnCell);
+                AI.MyPieces.Remove(board[newX, newY].OnCell);
+            }
+            else if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == false)
+            {
+                AI.Score += board[newX, newY].OnCell.Value;
+                AI.TakenPieces.Add(board[newX, newY].OnCell);
+                human.MyPieces.Remove(board[newX, newY].OnCell);
+            }
+        }
         //updates board array when a piece is moved
         public void movePiece(int newX, int newY, int pastX, int pastY)
         {
@@ -145,6 +161,7 @@ namespace chessGame
                     bKingY = newY;
                 }
             }
+            //assumes human player is white
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
             board[newX, newY].OnCell.PosX = newX;
             board[newX, newY].OnCell.PosY = newY;

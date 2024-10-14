@@ -54,20 +54,7 @@ namespace chessGame
             Cell location = b.board[currentX, currentY];
             if (location.LegalMove)
             {
-                if (location.OnCell.PieceName != "empty" && location.OnCell.IsWhite == !human.IsWhite)
-                {
-                    human.Score += location.OnCell.Value;
-                    human.TakenPieces.Add(location.OnCell);
-                    AI.MyPieces.Remove(location.OnCell);
-                }
-                if ((b.board[currentX, currentY] == b.board[b.wKingX, b.wKingY]) && b.whiteTurn)
-                {
-                    b.castle(pastX, pastY);
-                }
-                else
-                {
-                    b.movePiece(currentX, currentY, pastX, pastY);
-                }
+                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AI);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
@@ -75,7 +62,7 @@ namespace chessGame
                 resetColours();
                 b.resetLegal();
                 b.whiteTurn = false;
-                AI.makeMove();
+                AI.makeMove(ref human, b);
                 b.whiteTurn = true;
             }
             else
