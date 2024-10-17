@@ -34,6 +34,7 @@ namespace chessGame
             {
                 storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref chessBoard, ref human));
             }
+            //resets to current board status
             Score = origScore;
             MyPieces = origPieces;
             human.Score = origHScore;
@@ -66,7 +67,16 @@ namespace chessGame
                 human.MyPieces.Remove(bestMove.newCell.OnCell);
             }
             //makes move
-            chessBoard.movePiece(bestMove.newCell.OnCell.PosX, bestMove.newCell.OnCell.PosX, bestMove.p.PosX, bestMove.p.PosY);
+            int newX = bestMove.newCell.OnCell.PosX;
+            int newY = bestMove.newCell.OnCell.PosY;
+            int oldX = bestMove.p.PosX;
+            int oldY = bestMove.p.PosY;
+            //creates new AI object to pass in to changeScores() then assigns changed qualities to current object
+            AI meAgain = this;
+            chessBoard.changeScores(newX, newY, oldX, oldY, ref human, ref meAgain);
+            Score = meAgain.Score;
+            MyPieces = meAgain.MyPieces;
+            chessBoard.movePiece(newX, newY, oldX, oldY);
         }
         //https://www.youtube.com/watch?v=l-hh51ncgDI used as reference for this method
         private PotentialMove valueMove(Piece p, int depth, bool maxPlayer, ref int bestX, ref int bestY, ref Board chessBoard, ref Player human)
@@ -104,8 +114,18 @@ namespace chessGame
                     chessBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
                 }
                 goodMoves.Sort();
-                PotentialMove pM = new PotentialMove(maxEvaluation, p, goodMoves.Last());
-                return pM;
+                if (goodMoves.Count > 0)
+                {
+                    goodMoves.Sort();
+                    PotentialMove pM = new PotentialMove(maxEvaluation, p, goodMoves.Last());
+                    return pM;
+                }
+                else
+                {
+                    Random RNG = new Random();
+                    PotentialMove pM = new PotentialMove(maxEvaluation, p, possibleMoves[RNG.Next(possibleMoves.Count)]);
+                    return pM;
+                }
             }
             //minimising player
             else
@@ -125,9 +145,18 @@ namespace chessGame
                     MyPieces = meAgain.MyPieces;
                     chessBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
                 }
-                goodMoves.Sort();
-                PotentialMove pM = new PotentialMove(minEvaluation, p, goodMoves.First());
-                return pM;
+                if (goodMoves.Count > 0)
+                {
+                    goodMoves.Sort();
+                    PotentialMove pM = new PotentialMove(minEvaluation, p, goodMoves.First());
+                    return pM;
+                }
+                else
+                {
+                    Random RNG = new Random();
+                    PotentialMove pM = new PotentialMove(minEvaluation, p, possibleMoves[RNG.Next(possibleMoves.Count)]);
+                    return pM;
+                }
             }
         }
     }

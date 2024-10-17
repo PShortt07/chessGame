@@ -55,6 +55,7 @@ namespace chessGame
             if (location.LegalMove)
             {
                 b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AI);
+                b.movePiece(currentX, currentY, pastX, pastY);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
@@ -63,6 +64,7 @@ namespace chessGame
                 b.resetLegal();
                 b.whiteTurn = false;
                 AI.makeMove(ref human, b);
+                refreshBoard();
                 b.whiteTurn = true;
             }
             else
@@ -98,9 +100,22 @@ namespace chessGame
         {
             label1.Hide();
             button1.Hide();
+            label2.Hide();
+            comboBox1.Hide();
             DrawBoard(b.board);
             AI = new AI(b, AIDepth, human);
             b.refreshLists(ref human, ref AI);
+        }
+        public void refreshBoard()
+        {
+            for(int i = 0; i < 8; i++)
+            {
+                for(int j = 0; j < 8; j++)
+                {
+                    boardDisplay[i, j].Image = b.board[i, j].OnCell.PieceImage;
+                    boardDisplay[i, j].Refresh();
+                }
+            }
         }
         //displaying game board
         private void DrawBoard(Cell[,] b)
