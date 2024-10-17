@@ -13,7 +13,7 @@ namespace chessGame
             PosX = x;
             PosY = y;
             IsWhite = white;
-            Value = int.MaxValue;
+            Value = 1000;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wking;

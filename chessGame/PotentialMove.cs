@@ -10,8 +10,8 @@ namespace chessGame
     {
         public Piece p;
         public Cell newCell;
-        public int value;
-        public PotentialMove(int value, Piece p, Cell newCell)
+        public double value;
+        public PotentialMove(double value, Piece p, Cell newCell)
         {
             this.value = value;
             this.p = p;

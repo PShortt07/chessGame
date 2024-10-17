@@ -9,8 +9,6 @@ namespace chessGame
     abstract class Piece
     {
         private int value;
-        private int lastPosX;
-        private int lastPosY;
         private int posX;
         private int posY;
         private bool captured;

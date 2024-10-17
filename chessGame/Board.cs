@@ -171,20 +171,6 @@ namespace chessGame
             }
             board[pastX, pastY].OnCell = new Empty(pastX, pastY);
         }
-        //problem
-        public void castle(int rookX, int rookY)
-        {
-            if (rookX == 0)
-            {
-                movePiece(wKingX + 1, rookY, rookX, rookY);
-                movePiece(wKingX - 2, wKingY, wKingX, wKingY);
-            }
-            else
-            {
-                movePiece(wKingX - 1, rookY, rookX, rookY);
-                movePiece(wKingX + 2, wKingY, wKingX, wKingY);
-            }
-        }
         //keeps track of turns
         public void endOfTurn()
         {
@@ -296,59 +282,6 @@ namespace chessGame
         }
         private void showLegalRook(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
-            //determines whether castling is legal
-            bool canCastle = true;
-            if (!board[posX, posY].OnCell.HasMoved && !board[wKingX, wKingY].OnCell.HasMoved)
-            {
-                if (posX == 0)
-                {
-                    for (int i = 1; i < wKingX; i++)
-                    {
-                        if (whitePiece)
-                        {
-                            if (board[i, 7].OnCell.PieceName != "empty" || board[i, 7].CoveredByBlack)
-                            {
-                                canCastle = false;
-                            }
-                        }
-                        else
-                        {
-                            if (board[i, 0].OnCell.PieceName != "empty" || board[i, 7].CoveredByWhite)
-                            {
-                                canCastle = false;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 6; i > wKingX; i--)
-                    {
-                        if (whitePiece)
-                        {
-                            if (board[i, 7].OnCell.PieceName != "empty" || board[i, 7].CoveredByBlack)
-                            {
-                                canCastle = false;
-                            }
-                        }
-                        else
-                        {
-                            if (board[i, 0].OnCell.PieceName != "empty" || board[i, 7].CoveredByWhite)
-                            {
-                                canCastle = false;
-                            }
-                        }
-                    }
-                }
-            }
-            if (canCastle && whiteTurn)
-            {
-                allowedMoves.Add(board[4, 7]);
-            }
-            else if (canCastle && !whiteTurn)
-            {
-                allowedMoves.Add(board[4, 0]);
-            }
             //up
             for (int i = posY - 1; i >= 0; i--)
             {
