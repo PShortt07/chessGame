@@ -24,7 +24,8 @@ namespace chessGame
             List<PotentialMove> storedMoves = new List<PotentialMove>();
             int bestX = 0;
             int bestY = 0;
-            Board originalBoard = chessBoard;
+            Board tempBoard = chessBoard;
+            Board origBoard = chessBoard;
             int origHScore = human.Score;
             List<Piece> origHPieces = human.MyPieces;
             int origScore = Score;
@@ -32,12 +33,20 @@ namespace chessGame
             //adds best move for each piece to a list
             foreach (Piece piece in MyPieces)
             {
-                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref chessBoard, ref human));
-                chessBoard = originalBoard;
+                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref tempBoard, ref human));
+                tempBoard = chessBoard;
             }
             //resets to current board status
             Score = origScore;
             MyPieces = origPieces;
+            for (int i = 0; i < MyPieces.Count; i++)
+            {
+                MyPieces[i] = origPieces[i];
+            }
+            for (int i = 0; i < human.MyPieces.Count; i++)
+            {
+                human.MyPieces[i] = origHPieces[i];
+            }
             human.Score = origHScore;
             human.MyPieces = origHPieces;
             double highestValue = 0;
