@@ -75,17 +75,26 @@ namespace chessGame
         }
         public bool isGameOver()
         {
-            List<Cell> moves = new List<Cell>();
-            showLegalKing(wKingX, wKingY, ref moves, true);
-            if (moves.Count > 0)
+            foreach (Cell c in board)
             {
-                return false;
-            }
-            moves = new List<Cell>();
-            showLegalKing(bKingX, bKingY, ref moves, false);
-            if (moves.Count > 0)
-            {
-                return false;
+                if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite)
+                {
+                    List<Cell> moves = new List<Cell>();
+                    moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                    if (moves.Count > 0)
+                    {
+                        return false;
+                    }
+                }
+                else if (c.OnCell.PieceName != "empty" && !c.OnCell.IsWhite)
+                {
+                    List<Cell> moves = new List<Cell>();
+                    moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                    if (moves.Count > 0)
+                    {
+                        return false;
+                    }
+                }
             }
             return true;
         }
@@ -185,7 +194,7 @@ namespace chessGame
         }
         //finds all available moves
         //ASSUMES PLAYER = WHITE
-        public List<Cell> FindLegalMoves(int posX, int posY, bool whitePiece)
+        public List<Cell> FindLegalMoves(int posX, int posY)
         {
             wInCheck = findIfInCheck(true);
             bInCheck = findIfInCheck(false);

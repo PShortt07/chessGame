@@ -25,15 +25,13 @@ namespace chessGame
             int bestX = 0;
             int bestY = 0;
             Board tempBoard = chessBoard;
-            Board origBoard = chessBoard;
-            int origHScore = human.Score;
-            List<Piece> origHPieces = human.MyPieces;
+            Player tempHuman = human;
             int origScore = Score;
             List<Piece> origPieces = MyPieces;
             //adds best move for each piece to a list
             foreach (Piece piece in MyPieces)
             {
-                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref tempBoard, ref human));
+                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref tempBoard, ref tempHuman));
                 tempBoard = chessBoard;
             }
             //resets to current board status
@@ -43,29 +41,33 @@ namespace chessGame
             {
                 MyPieces[i] = origPieces[i];
             }
-            for (int i = 0; i < human.MyPieces.Count; i++)
-            {
-                human.MyPieces[i] = origHPieces[i];
-            }
-            human.Score = origHScore;
-            human.MyPieces = origHPieces;
             double highestValue = 0;
             PotentialMove bestMove = null;
-            //finds the move with the best result
+            //finds the highest possible score result of a move
             foreach(PotentialMove potentialMove in storedMoves)
             {
                 if (potentialMove.value > highestValue)
                 {
                     highestValue = potentialMove.value;
-                    bestMove = potentialMove;
                 }
             }
+            //adds all moves with that value to a list
+            List<PotentialMove> highestValueMoves = new List<PotentialMove>();
+            foreach(PotentialMove potentialMove in storedMoves)
+            {
+                if (potentialMove.value == highestValue)
+                {
+                    highestValueMoves.Add(potentialMove);
+                }
+            }
+            //chooses a random move from highest value list
+            Random RNG = new Random();
+            bestMove = highestValueMoves[RNG.Next(highestValueMoves.Count)];
             //if no move has a score then a random move is played
             if (bestMove == null)
             {
-                Random RNG = new Random();
                 Piece p = MyPieces[RNG.Next(MyPieces.Count)];
-                List<Cell> possibleMoves = chessBoard.FindLegalMoves(p.PosX, p.PosY, IsWhite);
+                List<Cell> possibleMoves = chessBoard.FindLegalMoves(p.PosX, p.PosY);
                 bestMove = new PotentialMove(0, p, possibleMoves[RNG.Next(possibleMoves.Count)]);
             }
             //accounts for taken pieces
@@ -108,15 +110,15 @@ namespace chessGame
             return total;
         }
         //https://www.youtube.com/watch?v=l-hh51ncgDI used as reference for this method
-        private PotentialMove valueMove(Piece p, int depth, bool maxPlayer, ref int bestX, ref int bestY, ref Board chessBoard, ref Player human)
+        private PotentialMove valueMove(Piece p, int depth, bool maxPlayer, ref int bestX, ref int bestY, ref Board tempBoard, ref Player human)
         {
             //move returned if out of depth or the game is over
-            if (depth == 0 || chessBoard.isGameOver())
+            if (depth == 0 || tempBoard.isGameOver())
             {
-                PotentialMove pM = new PotentialMove(scoreThisMove(human, p), p, chessBoard.board[bestX, bestY]);
+                PotentialMove pM = new PotentialMove(scoreThisMove(human, p), p, tempBoard.board[bestX, bestY]);
                 return pM;
             }
-            List<Cell> possibleMoves = chessBoard.FindLegalMoves(p.PosX, p.PosY, !maxPlayer);
+            List<Cell> possibleMoves = tempBoard.FindLegalMoves(p.PosX, p.PosY);
             List<Cell> goodMoves = new List<Cell>();
             double evaluation;
             //maximising player
@@ -128,7 +130,7 @@ namespace chessGame
                 foreach (Cell move in possibleMoves)
                 {
                     //evaluates possible moves from a possible move until out of depth
-                    evaluation = valueMove(p, depth - 1, false, ref bestX, ref bestY, ref chessBoard, ref human).value;
+                    evaluation = valueMove(p, depth - 1, false, ref bestX, ref bestY, ref tempBoard, ref human).value;
                     //adds better moves to goodMoves
                     if (evaluation > maxEvaluation)
                     {
@@ -137,21 +139,23 @@ namespace chessGame
                     maxEvaluation = Math.Max(maxEvaluation, evaluation);
                     //makes move
                     AI meAgain = this;
-                    chessBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref meAgain);
+                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref meAgain);
                     Score = meAgain.Score;
                     MyPieces = meAgain.MyPieces;
-                    chessBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
+                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
                 }
                 goodMoves.Sort();
                 if (goodMoves.Count > 0)
                 {
                     goodMoves.Sort();
                     PotentialMove pM = new PotentialMove(maxEvaluation, p, goodMoves.Last());
+                    bestX = goodMoves.Last().OnCell.PosX;
+                    bestY = goodMoves.Last().OnCell.PosY;
                     return pM;
                 }
                 else
                 {
-                    PotentialMove pM = new PotentialMove(0, p, chessBoard.board[5,4]);
+                    PotentialMove pM = new PotentialMove(0, p, tempBoard.board[5,4]);
                     return pM;
                 }
             }
@@ -161,22 +165,24 @@ namespace chessGame
                 double minEvaluation = double.MaxValue;
                 foreach (Cell move in possibleMoves)
                 {
-                    evaluation = valueMove(p, depth - 1, true, ref bestX, ref bestY, ref chessBoard, ref human).value;
+                    evaluation = valueMove(p, depth - 1, true, ref bestX, ref bestY, ref tempBoard, ref human).value;
                     if (evaluation < minEvaluation)
                     {
                         goodMoves.Add(move);
                     }
                     minEvaluation = Math.Min(minEvaluation, evaluation);
                     AI meAgain = this;
-                    chessBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref meAgain);
+                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref meAgain);
                     Score = meAgain.Score;
                     MyPieces = meAgain.MyPieces;
-                    chessBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
+                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
                 }
                 if (goodMoves.Count > 0)
                 {
                     goodMoves.Sort();
                     PotentialMove pM = new PotentialMove(minEvaluation, p, goodMoves.First());
+                    bestX = goodMoves.Last().OnCell.PosX;
+                    bestY = goodMoves.Last().OnCell.PosY;
                     return pM;
                 }
                 else
