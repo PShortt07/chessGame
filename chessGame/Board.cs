@@ -9,7 +9,6 @@ namespace chessGame
 {
     internal class Board
     {
-        //all code assumes player is white side
         public bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
         private bool wInCheck;
@@ -138,18 +137,16 @@ namespace chessGame
             movePiece(currentX, currentY, newX, newY);
             return outOfCheck;
         }
-        public void changeScores(int newX, int newY, int oldX, int oldY, ref Player human, ref AI AI)
+        public void changeScores(int newX, int newY, int oldX, int oldY, ref Player human, ref List<Piece> AIPieces, ref double AIScore)
         {
             if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == true)
             {
                 human.Score += board[newX, newY].OnCell.Value;
-                human.TakenPieces.Add(board[newX, newY].OnCell);
-                AI.MyPieces.Remove(board[newX, newY].OnCell);
+                AIPieces.Remove(board[newX, newY].OnCell);
             }
             else if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == false)
             {
-                AI.Score += board[newX, newY].OnCell.Value;
-                AI.TakenPieces.Add(board[newX, newY].OnCell);
+                AIScore += board[newX, newY].OnCell.Value;
                 human.MyPieces.Remove(board[newX, newY].OnCell);
             }
         }
@@ -170,7 +167,6 @@ namespace chessGame
                     bKingY = newY;
                 }
             }
-            //assumes human player is white
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
             board[newX, newY].OnCell.PosX = newX;
             board[newX, newY].OnCell.PosY = newY;

@@ -19,27 +19,21 @@ namespace chessGame
             TakenPieces = new List<Piece>();
         }
         //makes AI decide and make its move
-        public void makeMove(ref Player human, Board chessBoard)
+        public void makeMove(ref Player human, ref Board chessBoard)
         {
             List<PotentialMove> storedMoves = new List<PotentialMove>();
             int bestX = 0;
             int bestY = 0;
+            //makes a second board, human player object, pieces list and score to pass into the minimax algorithm so that they can be changed without affecting their real values
             Board tempBoard = chessBoard;
             Player tempHuman = human;
-            int origScore = Score;
-            List<Piece> origPieces = MyPieces;
-            //adds best move for each piece to a list
-            foreach (Piece piece in MyPieces)
+            List<Piece> tempPieces = MyPieces;
+            double tempScore = Score;
+            //adds best move for each piece to a list then resets the second board for the next piece analysis
+            foreach (Piece piece in tempPieces)
             {
-                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref tempBoard, ref tempHuman));
+                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref tempBoard, ref tempHuman, ref tempPieces, ref tempScore));
                 tempBoard = chessBoard;
-            }
-            //resets to current board status
-            Score = origScore;
-            MyPieces = origPieces;
-            for (int i = 0; i < MyPieces.Count; i++)
-            {
-                MyPieces[i] = origPieces[i];
             }
             double highestValue = 0;
             PotentialMove bestMove = null;
@@ -83,10 +77,11 @@ namespace chessGame
             int oldX = bestMove.p.PosX;
             int oldY = bestMove.p.PosY;
             //creates new AI object to pass in to changeScores() then assigns changed qualities to current object
-            AI meAgain = this;
-            chessBoard.changeScores(newX, newY, oldX, oldY, ref human, ref meAgain);
-            Score = meAgain.Score;
-            MyPieces = meAgain.MyPieces;
+            List<Piece> myPiecesPassIn = MyPieces;
+            double scorePassIn = Score;
+            chessBoard.changeScores(newX, newY, oldX, oldY, ref human, ref myPiecesPassIn, ref scorePassIn);
+            Score = scorePassIn;
+            MyPieces = myPiecesPassIn;
             chessBoard.movePiece(newX, newY, oldX, oldY);
         }
         private double scoreThisMove(Player human, Piece thisPiece)
@@ -109,8 +104,8 @@ namespace chessGame
             }
             return total;
         }
-        //https://www.youtube.com/watch?v=l-hh51ncgDI used as reference for this method
-        private PotentialMove valueMove(Piece p, int depth, bool maxPlayer, ref int bestX, ref int bestY, ref Board tempBoard, ref Player human)
+        //https://www.youtube.com/watch?v=l-hh51ncgDI used as a reference for this method
+        private PotentialMove valueMove(Piece p, int depth, bool maxPlayer, ref int bestX, ref int bestY, ref Board tempBoard, ref Player human, ref List<Piece> tempPieces, ref double tempScore)
         {
             //move returned if out of depth or the game is over
             if (depth == 0 || tempBoard.isGameOver())
@@ -129,20 +124,20 @@ namespace chessGame
                 //evaluates possible moves
                 foreach (Cell move in possibleMoves)
                 {
+                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore);
+                    int lastPosX = p.PosX;
+                    int lastPosY = p.PosY;
+                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
                     //evaluates possible moves from a possible move until out of depth
-                    evaluation = valueMove(p, depth - 1, false, ref bestX, ref bestY, ref tempBoard, ref human).value;
+                    evaluation = valueMove(p, depth - 1, false, ref bestX, ref bestY, ref tempBoard, ref human, ref tempPieces, ref tempScore).value;
                     //adds better moves to goodMoves
                     if (evaluation > maxEvaluation)
                     {
                         goodMoves.Add(move);
                     }
                     maxEvaluation = Math.Max(maxEvaluation, evaluation);
-                    //makes move
-                    AI meAgain = this;
-                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref meAgain);
-                    Score = meAgain.Score;
-                    MyPieces = meAgain.MyPieces;
-                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
+                    //reverts move
+                    tempBoard.movePiece(lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
                 }
                 goodMoves.Sort();
                 if (goodMoves.Count > 0)
@@ -165,17 +160,18 @@ namespace chessGame
                 double minEvaluation = double.MaxValue;
                 foreach (Cell move in possibleMoves)
                 {
-                    evaluation = valueMove(p, depth - 1, true, ref bestX, ref bestY, ref tempBoard, ref human).value;
+                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore);
+                    int lastPosX = p.PosX;
+                    int lastPosY = p.PosY;
+                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
+                    evaluation = valueMove(p, depth - 1, true, ref bestX, ref bestY, ref tempBoard, ref human, ref tempPieces, ref tempScore).value;
                     if (evaluation < minEvaluation)
                     {
                         goodMoves.Add(move);
                     }
                     minEvaluation = Math.Min(minEvaluation, evaluation);
-                    AI meAgain = this;
-                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref meAgain);
-                    Score = meAgain.Score;
-                    MyPieces = meAgain.MyPieces;
-                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
+                    //reverts move
+                    tempBoard.movePiece(lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
                 }
                 if (goodMoves.Count > 0)
                 {

@@ -1,4 +1,5 @@
 using System.Linq;
+using static System.Formats.Asn1.AsnWriter;
 namespace chessGame
 {
     public partial class Form1 : Form
@@ -54,7 +55,11 @@ namespace chessGame
             Cell location = b.board[currentX, currentY];
             if (location.LegalMove)
             {
-                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AI);
+                List<Piece> AIPiecesPassIn = AI.MyPieces;
+                double AIScorePassIn = AI.Score;
+                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn);
+                AI.MyPieces = AIPiecesPassIn;
+                AI.Score = AIScorePassIn;
                 b.movePiece(currentX, currentY, pastX, pastY);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
@@ -63,7 +68,7 @@ namespace chessGame
                 resetColours();
                 b.resetLegal();
                 b.whiteTurn = false;
-                AI.makeMove(ref human, b);
+                AI.makeMove(ref human, ref b);
                 refreshBoard();
                 b.whiteTurn = true;
             }
