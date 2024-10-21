@@ -19,7 +19,7 @@ namespace chessGame
             TakenPieces = new List<Piece>();
         }
         //makes AI decide and make its move
-        public void makeMove(ref Player human, ref Board chessBoard)
+        public PotentialMove findMove(ref Player human, Board chessBoard)
         {
             List<PotentialMove> storedMoves = new List<PotentialMove>();
             int bestX = 0;
@@ -64,25 +64,7 @@ namespace chessGame
                 List<Cell> possibleMoves = chessBoard.FindLegalMoves(p.PosX, p.PosY);
                 bestMove = new PotentialMove(0, p, possibleMoves[RNG.Next(possibleMoves.Count)]);
             }
-            //accounts for taken pieces
-            if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == !human.IsWhite)
-            {
-                Score += bestMove.newCell.OnCell.Value;
-                TakenPieces.Add(bestMove.newCell.OnCell);
-                human.MyPieces.Remove(bestMove.newCell.OnCell);
-            }
-            //makes move
-            int newX = bestMove.newCell.OnCell.PosX;
-            int newY = bestMove.newCell.OnCell.PosY;
-            int oldX = bestMove.p.PosX;
-            int oldY = bestMove.p.PosY;
-            //creates new AI object to pass in to changeScores() then assigns changed qualities to current object
-            List<Piece> myPiecesPassIn = MyPieces;
-            double scorePassIn = Score;
-            chessBoard.changeScores(newX, newY, oldX, oldY, ref human, ref myPiecesPassIn, ref scorePassIn);
-            Score = scorePassIn;
-            MyPieces = myPiecesPassIn;
-            chessBoard.movePiece(newX, newY, oldX, oldY);
+            return bestMove;
         }
         private double scoreThisMove(Player human, Piece thisPiece)
         {

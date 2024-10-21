@@ -16,6 +16,7 @@ namespace chessGame
             PosY = y;
             IsWhite = false;
             Empty = true;
+            Value = 0;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using static System.Formats.Asn1.AsnWriter;
 namespace chessGame
@@ -30,8 +31,8 @@ namespace chessGame
         private void board_Click(object sender, EventArgs e)
         {
             Button clicked = (Button)sender;
-            int currentX = 0;
-            int currentY = 0;
+            int newX = 0;
+            int newY = 0;
             int pastX = 0;
             int pastY = 0;
             //finds location of the last button clicked and the current button
@@ -41,8 +42,8 @@ namespace chessGame
                 {
                     if (boardDisplay[i, j] == clicked)
                     {
-                        currentX = i;
-                        currentY = j;
+                        newX = i;
+                        newY = j;
                     }
                     if (boardDisplay[i, j] == lastClicked)
                     {
@@ -52,24 +53,34 @@ namespace chessGame
                 }
             }
             //moves piece if one has been selected and the clicked button is a legal move
-            Cell location = b.board[currentX, currentY];
+            Cell location = b.board[newX, newY];
             if (location.LegalMove)
             {
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 double AIScorePassIn = AI.Score;
-                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn);
+                b.changeScores(newX, newY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn);
                 AI.MyPieces = AIPiecesPassIn;
                 AI.Score = AIScorePassIn;
-                b.movePiece(currentX, currentY, pastX, pastY);
-                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
-                boardDisplay[currentX, currentY].Refresh();
-                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
-                boardDisplay[pastX, pastY].Refresh();
+                b.movePiece(newX, newY, pastX, pastY);
+                refreshCells(newX, newY, pastX, pastY);
                 resetColours();
                 b.resetLegal();
                 b.whiteTurn = false;
-                AI.makeMove(ref human, ref b);
-                refreshBoard();
+                PotentialMove AIMove = AI.findMove(ref human, b);
+                List<Piece> myPiecesPassIn = AI.MyPieces;
+                double scorePassIn = AI.Score;
+                Cell nextCell = AIMove.newCell;
+                Piece pieceToMove = AIMove.p;
+                newX = nextCell.Row;
+                newY = nextCell.Col;
+                pastX = pieceToMove.PosX;
+                pastY = pieceToMove.PosY;
+                //will need to change for castling
+                AI.Score += AIMove.value;
+                b.movePiece(newX, newY, pastX, pastY);
+                AI.Score = scorePassIn;
+                AI.MyPieces = myPiecesPassIn;
+                refreshCells(newX, newY, pastX, pastY);
                 b.whiteTurn = true;
             }
             else
@@ -77,10 +88,10 @@ namespace chessGame
                 resetColours();
                 //assumes player is white
                 //changes all legal move position background colours to light green
-                if (b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
+                if (b.board[newX, newY].OnCell.IsWhite == human.IsWhite)
                 {
                     b.resetLegal();
-                    b.FindLegalMoves(currentX, currentY);
+                    b.FindLegalMoves(newX, newY);
                     for (int i = 0; i < 8; i++)
                     {
                         for (int j = 0; j < 8; j++)
@@ -92,10 +103,6 @@ namespace chessGame
                             }
                         }
                     }
-                }
-                else if (b.board[currentX, currentY].OnCell.IsWhite == AI.IsWhite)
-                {
-
                 }
                 lastClicked = clicked;
             }
@@ -111,16 +118,12 @@ namespace chessGame
             AI = new AI(b, AIDepth, human);
             b.refreshLists(ref human, ref AI);
         }
-        public void refreshBoard()
+        public void refreshCells(int newX, int newY, int pastX, int pastY)
         {
-            for(int i = 0; i < 8; i++)
-            {
-                for(int j = 0; j < 8; j++)
-                {
-                    boardDisplay[i, j].Image = b.board[i, j].OnCell.PieceImage;
-                    boardDisplay[i, j].Refresh();
-                }
-            }
+            boardDisplay[newX, newY].Image = b.board[newX, newY].OnCell.PieceImage;
+            boardDisplay[newX, newY].Refresh();
+            boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
+            boardDisplay[pastX, pastY].Refresh();
         }
         //displaying game board
         private void DrawBoard(Cell[,] b)
