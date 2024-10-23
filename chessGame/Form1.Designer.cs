@@ -37,41 +37,45 @@
             // 
             // button1
             // 
-            button1.Location = new Point(331, 292);
+            button1.BackColor = SystemColors.ButtonFace;
+            button1.Font = new Font("Showcard Gothic", 50.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button1.Location = new Point(710, 217);
             button1.Name = "button1";
-            button1.Size = new Size(133, 57);
+            button1.Size = new Size(395, 118);
             button1.TabIndex = 1;
             button1.Text = "PLAY";
-            button1.UseVisualStyleBackColor = true;
+            button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.BackColor = Color.HotPink;
-            label1.Font = new Font("Showcard Gothic", 30F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label1.Location = new Point(268, 33);
+            label1.BackColor = Color.White;
+            label1.Font = new Font("Showcard Gothic", 100F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label1.Location = new Point(470, 19);
             label1.Name = "label1";
-            label1.Size = new Size(256, 50);
+            label1.Size = new Size(849, 167);
             label1.TabIndex = 0;
-            label1.Text = "CHESS GAME";
+            label1.Text = "Chessmas :)";
             label1.Click += label1_Click;
             // 
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(653, 33);
+            comboBox1.Location = new Point(809, 392);
             comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 23);
+            comboBox1.Size = new Size(200, 23);
             comboBox1.TabIndex = 2;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(685, 15);
+            label2.BackColor = SystemColors.ButtonFace;
+            label2.Font = new Font("Segoe UI", 20F);
+            label2.Location = new Point(847, 352);
             label2.Name = "label2";
-            label2.Size = new Size(58, 15);
+            label2.Size = new Size(128, 37);
             label2.TabIndex = 3;
             label2.Text = "Difficulty:";
             // 
@@ -80,13 +84,14 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1784, 993);
             Controls.Add(label2);
             Controls.Add(comboBox1);
             Controls.Add(button1);
             Controls.Add(label1);
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }

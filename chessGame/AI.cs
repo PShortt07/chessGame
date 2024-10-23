@@ -19,21 +19,19 @@ namespace chessGame
             TakenPieces = new List<Piece>();
         }
         //makes AI decide and make its move
-        public PotentialMove findMove(ref Player human, Board chessBoard)
+        public PotentialMove findMove(Player human, Board chessBoard)
         {
             List<PotentialMove> storedMoves = new List<PotentialMove>();
             int bestX = 0;
             int bestY = 0;
             //makes a second board, human player object, pieces list and score to pass into the minimax algorithm so that they can be changed without affecting their real values
-            Board tempBoard = chessBoard;
             Player tempHuman = human;
             List<Piece> tempPieces = MyPieces;
             double tempScore = Score;
             //adds best move for each piece to a list then resets the second board for the next piece analysis
             foreach (Piece piece in tempPieces)
             {
-                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref tempBoard, ref tempHuman, ref tempPieces, ref tempScore));
-                tempBoard = chessBoard;
+                storedMoves.Add(valueMove(piece, depth, true, ref bestX, ref bestY, ref chessBoard, ref tempHuman, ref tempPieces, ref tempScore));
             }
             double highestValue = 0;
             PotentialMove bestMove = null;
@@ -106,10 +104,11 @@ namespace chessGame
                 //evaluates possible moves
                 foreach (Cell move in possibleMoves)
                 {
-                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore);
+                    Piece origPiece = move.OnCell;
+                    tempBoard.changeScores(move.Row, move.Col, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore);
                     int lastPosX = p.PosX;
                     int lastPosY = p.PosY;
-                    tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
+                    tempBoard.movePiece(move.Row, move.Col, p.PosX, p.PosY);
                     //evaluates possible moves from a possible move until out of depth
                     evaluation = valueMove(p, depth - 1, false, ref bestX, ref bestY, ref tempBoard, ref human, ref tempPieces, ref tempScore).value;
                     //adds better moves to goodMoves
@@ -119,15 +118,16 @@ namespace chessGame
                     }
                     maxEvaluation = Math.Max(maxEvaluation, evaluation);
                     //reverts move
-                    tempBoard.movePiece(lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
+                    tempBoard.movePiece(lastPosX, lastPosY, move.Row, move.Col);
+                    tempBoard.placePiece(origPiece.PosX, origPiece.PosY, origPiece);
                 }
                 goodMoves.Sort();
                 if (goodMoves.Count > 0)
                 {
                     goodMoves.Sort();
                     PotentialMove pM = new PotentialMove(maxEvaluation, p, goodMoves.Last());
-                    bestX = goodMoves.Last().OnCell.PosX;
-                    bestY = goodMoves.Last().OnCell.PosY;
+                    bestX = goodMoves.Last().Row;
+                    bestY = goodMoves.Last().Col;
                     return pM;
                 }
                 else
@@ -142,7 +142,8 @@ namespace chessGame
                 double minEvaluation = double.MaxValue;
                 foreach (Cell move in possibleMoves)
                 {
-                    tempBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore);
+                    Piece origPiece = move.OnCell;
+                    tempBoard.changeScores(move.Row, move.Col, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore);
                     int lastPosX = p.PosX;
                     int lastPosY = p.PosY;
                     tempBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY);
@@ -153,14 +154,13 @@ namespace chessGame
                     }
                     minEvaluation = Math.Min(minEvaluation, evaluation);
                     //reverts move
-                    tempBoard.movePiece(lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
+                    tempBoard.movePiece(lastPosX, lastPosY, move.Row, move.Col);
+                    tempBoard.placePiece(origPiece.PosX, origPiece.PosY, origPiece);
                 }
                 if (goodMoves.Count > 0)
                 {
                     goodMoves.Sort();
                     PotentialMove pM = new PotentialMove(minEvaluation, p, goodMoves.First());
-                    bestX = goodMoves.Last().OnCell.PosX;
-                    bestY = goodMoves.Last().OnCell.PosY;
                     return pM;
                 }
                 else
