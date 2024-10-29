@@ -56,23 +56,19 @@ namespace chessGame
             Cell location = b.board[newX, newY];
             if (location.LegalMove)
             {
-                //PLAYER TURN
-                //changes scores appropriately
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 double AIScorePassIn = AI.Score;
                 b.changeScores(newX, newY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn);
                 AI.MyPieces = AIPiecesPassIn;
                 AI.Score = AIScorePassIn;
-                //makes move and refreshes the appropriate cells
                 b.movePiece(newX, newY, pastX, pastY);
                 refreshCells(newX, newY, pastX, pastY);
                 resetColours();
                 b.resetLegal();
                 b.whiteTurn = false;
-                //AI TURN
-                PotentialMove AIMove = AI.findMove(human, b);
-                AIPiecesPassIn = AI.MyPieces;
-                AIScorePassIn = AI.Score;
+                PotentialMove AIMove = AI.findMove(ref human, b);
+                List<Piece> myPiecesPassIn = AI.MyPieces;
+                double scorePassIn = AI.Score;
                 Cell nextCell = AIMove.newCell;
                 Piece pieceToMove = AIMove.p;
                 newX = nextCell.Row;
@@ -82,14 +78,15 @@ namespace chessGame
                 //will need to change for castling
                 AI.Score += AIMove.value;
                 b.movePiece(newX, newY, pastX, pastY);
-                AI.Score = AIScorePassIn;
-                AI.MyPieces = AIPiecesPassIn;
+                AI.Score = scorePassIn;
+                AI.MyPieces = myPiecesPassIn;
                 refreshCells(newX, newY, pastX, pastY);
                 b.whiteTurn = true;
             }
             else
             {
                 resetColours();
+                //assumes player is white
                 //changes all legal move position background colours to light green
                 if (b.board[newX, newY].OnCell.IsWhite == human.IsWhite)
                 {
@@ -121,39 +118,12 @@ namespace chessGame
             AI = new AI(b, AIDepth, human);
             b.refreshLists(ref human, ref AI);
         }
-        private void AITurn()
-        {
-            PotentialMove AIMove = AI.findMove(human, b);
-            List<Piece> AIPiecesPassIn = AI.MyPieces;
-            double AIScorePassIn = AI.Score;
-            Cell nextCell = AIMove.newCell;
-            Piece pieceToMove = AIMove.p;
-            int newX = nextCell.Row;
-            int newY = nextCell.Col;
-            int pastX = pieceToMove.PosX;
-            int pastY = pieceToMove.PosY;
-            //will need to change for castling
-            AI.Score += AIMove.value;
-            b.movePiece(newX, newY, pastX, pastY);
-            AI.Score = AIScorePassIn;
-            AI.MyPieces = AIPiecesPassIn;
-            refreshCells(newX, newY, pastX, pastY);
-            b.whiteTurn = true;
-        }
         public void refreshCells(int newX, int newY, int pastX, int pastY)
         {
             boardDisplay[newX, newY].Image = b.board[newX, newY].OnCell.PieceImage;
             boardDisplay[newX, newY].Refresh();
             boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
             boardDisplay[pastX, pastY].Refresh();
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    boardDisplay[i, j].Image = b.board[i, j].OnCell.PieceImage;
-                    boardDisplay[i, j].Refresh();
-                }
-            }
         }
         //displaying game board
         private void DrawBoard(Cell[,] b)
@@ -163,8 +133,8 @@ namespace chessGame
                 for (int j = 0; j < 8; j++)
                 {
                     boardDisplay[i, j] = new Button();
-                    boardDisplay[i, j].Height = 100;
-                    boardDisplay[i, j].Width = 100;
+                    boardDisplay[i, j].Height = 50;
+                    boardDisplay[i, j].Width = 50;
                     boardDisplay[i, j].Image = b[i, j].OnCell.PieceImage;
                     //setting colours
                     if (i % 2 == 0)
@@ -189,7 +159,7 @@ namespace chessGame
                             boardDisplay[i, j].BackColor = System.Drawing.Color.White;
                         }
                     }
-                    boardDisplay[i, j].Location = new Point((i * 100)+500, (j * 100)+100);
+                    boardDisplay[i, j].Location = new Point(i * 50, j * 50);
                     boardDisplay[i, j].Show();
                     boardDisplay[i, j].BringToFront();
                     //if button clicked starts board_Click
@@ -248,11 +218,6 @@ namespace chessGame
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             AIDepth = comboBox1.SelectedIndex;
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

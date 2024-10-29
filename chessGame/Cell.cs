@@ -16,7 +16,6 @@ namespace chessGame
         private Piece onCell;
         private bool coveredByWhite;
         private bool coveredByBlack;
-        private Piece lastOnCell;
 
         public int Row { get => row; set => row = value; }
         public int Col { get => col; set => col = value; }
@@ -25,7 +24,6 @@ namespace chessGame
         public Piece OnCell { get => onCell; set => onCell = value; }
         public bool CoveredByWhite { get => coveredByWhite; set => coveredByWhite = value; }
         public bool CoveredByBlack { get => coveredByBlack; set => coveredByBlack = value; }
-        internal Piece LastOnCell { get => lastOnCell; set => lastOnCell = value; }
 
         public Cell(int xPos, int yPos)
         {
