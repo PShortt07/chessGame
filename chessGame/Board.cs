@@ -126,7 +126,7 @@ namespace chessGame
             movePiece(newX, newY, currentX, currentY);
             //checks if the player whose turn it is has been taken out of check
             bool outOfCheck = false;
-            if (wInCheck)
+            if (whiteTurn)
             {
                 outOfCheck = !findIfInCheck(true);
             }
@@ -174,10 +174,22 @@ namespace chessGame
             {
                 board[newX, newY].OnCell.HasMoved = true;
             }
-            //empties previous cell
             board[pastX, pastY].OnCell = new Empty(pastX, pastY);
         }
+        //keeps track of turns
+        public void endOfTurn()
+        {
+            if (whiteTurn)
+            {
+                whiteTurn = false;
+            }
+            else
+            {
+                whiteTurn = true;
+            }
+        }
         //finds all available moves
+        //ASSUMES PLAYER = WHITE
         public List<Cell> FindLegalMoves(int posX, int posY)
         {
             wInCheck = findIfInCheck(true);
@@ -208,7 +220,7 @@ namespace chessGame
             }
             return allowedMoves;
         }
-        //allows only moves that will take the in check player out of check
+        //error
         private void allowMovesThatTakeOutOfCheck(Cell selected, ref List<Cell> allowedMoves)
         {
             List<Cell> possibleMoves = new List<Cell>();
