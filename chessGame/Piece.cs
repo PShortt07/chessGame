@@ -17,6 +17,7 @@ namespace chessGame
         private bool hasMoved;
         private Image pieceImage;
         private bool empty;
+        //stack idea inspired by https://github.com/apostolisv/chess-ai
         private Stack<Piece> lastTaken;
 
         public int Value { get => value; set => this.value = value; }
