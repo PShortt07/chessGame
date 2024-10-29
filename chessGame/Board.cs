@@ -11,6 +11,7 @@ namespace chessGame
     {
         public bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
+        public Cell[,] altBoard = new Cell[8, 8]; 
         private bool wInCheck;
         private bool bInCheck;
         public int bKingX;
@@ -54,6 +55,7 @@ namespace chessGame
             board[3, 7].OnCell = new Queen(true, 3, 7);
             board[4, 0].OnCell = new King(false, 4, 0);
             board[4, 7].OnCell = new King(true, 4, 7);
+            altBoard = board;
         }
         public void refreshLists(ref Player human, ref AI AI)
         {
@@ -143,16 +145,22 @@ namespace chessGame
             {
                 human.Score += board[newX, newY].OnCell.Value;
                 AIPieces.Remove(board[newX, newY].OnCell);
+                board[oldX, oldY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
             }
             else if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == false)
             {
                 AIScore += board[newX, newY].OnCell.Value;
                 human.MyPieces.Remove(board[newX, newY].OnCell);
+                board[oldX, oldY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
             }
         }
         //updates board array when a piece is moved
         public void movePiece(int newX, int newY, int pastX, int pastY)
         {
+            if (board[newX, newY].OnCell.PieceName != "empty")
+            {
+                board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
+            }
             //keeps track of kings
             if (board[pastX, pastY].OnCell.PieceName == "king")
             {
@@ -176,6 +184,18 @@ namespace chessGame
             }
             board[pastX, pastY].OnCell = new Empty(pastX, pastY);
         }
+        public void revertMove(Piece piece)
+        {
+            if (piece.LastTaken.Count != 0)
+            {
+                Piece toReplace = piece.LastTaken.Pop();
+                board[toReplace.PosX, toReplace.PosY].OnCell = toReplace;
+            }
+        }
+        public void movePieceAltBoard(int newX, int newy, int pastX, int pastY)
+        {
+
+        }
         //keeps track of turns
         public void endOfTurn()
         {
@@ -188,8 +208,30 @@ namespace chessGame
                 whiteTurn = true;
             }
         }
+        public void placePiece(int x, int y, Piece piece)
+        {
+            Piece replacePiece = new Pawn(piece.IsWhite, piece.PosX, piece.PosY);
+            switch(piece.PieceName)
+            {
+                case ("rook"):
+                    replacePiece = new Rook(piece.IsWhite, piece.PosX, piece.PosY);
+                    break;
+                case ("knight"):
+                    replacePiece = new Knight(piece.IsWhite, piece.PosX, piece.PosY);
+                    break;
+                case ("bishop"):
+                    replacePiece = new Bishop(piece.IsWhite, piece.PosX, piece.PosY);
+                    break;
+                case ("queen"):
+                    replacePiece = new Queen(piece.IsWhite, piece.PosX, piece.PosY);
+                    break;
+                case ("king"):
+                    replacePiece = new King(piece.IsWhite, piece.PosX, piece.PosY);
+                    break;
+            }
+            board[x, y].OnCell = replacePiece;
+        }
         //finds all available moves
-        //ASSUMES PLAYER = WHITE
         public List<Cell> FindLegalMoves(int posX, int posY)
         {
             wInCheck = findIfInCheck(true);

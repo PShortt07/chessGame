@@ -114,7 +114,7 @@ namespace chessGame
                 return pM;
             }
             List<Cell> possibleMoves = tempBoard.FindLegalMoves(p.PosX, p.PosY);
-            List<Cell> goodMoves = new List<Cell>();
+            Cell bestMove = new Cell(0, 0);
             double evaluation;
             //maximising player
             if (maxPlayer)
@@ -133,26 +133,17 @@ namespace chessGame
                     //adds better moves to goodMoves
                     if (evaluation > maxEvaluation)
                     {
-                        goodMoves.Add(move);
+                        bestMove = move;
                     }
                     maxEvaluation = Math.Max(maxEvaluation, evaluation);
                     //reverts move
                     tempBoard.movePiece(lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
+                    tempBoard.revertMove(p);
                 }
-                goodMoves.Sort();
-                if (goodMoves.Count > 0)
-                {
-                    goodMoves.Sort();
-                    PotentialMove pM = new PotentialMove(maxEvaluation, p, goodMoves.Last());
-                    bestX = goodMoves.Last().OnCell.PosX;
-                    bestY = goodMoves.Last().OnCell.PosY;
-                    return pM;
-                }
-                else
-                {
-                    PotentialMove pM = new PotentialMove(0, p, tempBoard.board[5,4]);
-                    return pM;
-                }
+                PotentialMove pM = new PotentialMove(maxEvaluation, p, bestMove);
+                bestX = bestMove.Row;
+                bestY = bestMove.Col;
+                return pM;
             }
             //minimising player
             else
@@ -167,26 +158,16 @@ namespace chessGame
                     evaluation = valueMove(p, depth - 1, true, ref bestX, ref bestY, ref tempBoard, ref human, ref tempPieces, ref tempScore).value;
                     if (evaluation < minEvaluation)
                     {
-                        goodMoves.Add(move);
+                        bestMove = move;
                     }
                     minEvaluation = Math.Min(minEvaluation, evaluation);
                     //reverts move
                     tempBoard.movePiece(lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
                 }
-                if (goodMoves.Count > 0)
-                {
-                    goodMoves.Sort();
-                    PotentialMove pM = new PotentialMove(minEvaluation, p, goodMoves.First());
-                    bestX = goodMoves.Last().OnCell.PosX;
-                    bestY = goodMoves.Last().OnCell.PosY;
-                    return pM;
-                }
-                else
-                {
-                    Random RNG = new Random();
-                    PotentialMove pM = new PotentialMove(minEvaluation, p, possibleMoves[RNG.Next(possibleMoves.Count)]);
-                    return pM;
-                }
+                PotentialMove pM = new PotentialMove(minEvaluation, p, bestMove);
+                bestX = bestMove.Row;
+                bestY = bestMove.Col;
+                return pM;
             }
         }
     }

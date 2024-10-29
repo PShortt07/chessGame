@@ -17,6 +17,7 @@ namespace chessGame
         private bool hasMoved;
         private Image pieceImage;
         private bool empty;
+        private Stack<Piece> lastTaken;
 
         public int Value { get => value; set => this.value = value; }
         public int PosX { get => posX; set => posX = value; }
@@ -27,11 +28,13 @@ namespace chessGame
         public bool HasMoved { get => hasMoved; set => hasMoved = value; }
         public Image PieceImage { get => pieceImage; set => pieceImage = value; }
         public bool Empty { get => empty; set => empty = value; }
+        internal Stack<Piece> LastTaken { get => lastTaken; set => lastTaken = value; }
 
         public Piece()
         {
             HasMoved = false;
             Empty = false;
+            LastTaken = new Stack<Piece>();
         }
     }
 }
