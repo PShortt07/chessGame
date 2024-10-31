@@ -60,7 +60,7 @@ namespace chessGame
                 b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn);
                 AI.MyPieces = AIPiecesPassIn;
                 AI.Score = AIScorePassIn;
-                b.movePiece(currentX, currentY, pastX, pastY);
+                b.movePiece(currentX, currentY, pastX, pastY, true);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;

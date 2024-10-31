@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -125,7 +126,7 @@ namespace chessGame
         public bool doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
         {
             //makes the move, finds which spaces are covered by which colour, then reverts the move
-            movePiece(newX, newY, currentX, currentY);
+            movePiece(newX, newY, currentX, currentY, false);
             //checks if the player whose turn it is has been taken out of check
             bool outOfCheck = false;
             if (whiteTurn)
@@ -136,7 +137,7 @@ namespace chessGame
             {
                 outOfCheck = !findIfInCheck(false);
             }
-            movePiece(currentX, currentY, newX, newY);
+            movePiece(currentX, currentY, newX, newY, false);
             return outOfCheck;
         }
         public void changeScores(int newX, int newY, int oldX, int oldY, ref Player human, ref List<Piece> AIPieces, ref double AIScore)
@@ -145,22 +146,19 @@ namespace chessGame
             {
                 human.Score += board[newX, newY].OnCell.Value;
                 AIPieces.Remove(board[newX, newY].OnCell);
-                board[oldX, oldY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
             }
             else if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == false)
             {
                 AIScore += board[newX, newY].OnCell.Value;
                 human.MyPieces.Remove(board[newX, newY].OnCell);
-                board[oldX, oldY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
             }
         }
         //updates board array when a piece is moved
-        public void movePiece(int newX, int newY, int pastX, int pastY)
+        public void movePiece(int newX, int newY, int pastX, int pastY, bool realMove)
         {
-            if (board[newX, newY].OnCell.PieceName != "empty")
-            {
-                board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
-            }
+            board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
+            //board[pastX, pastY].OnCell.LastCoords.Push(newY);
+            //board[pastX, pastY].OnCell.LastCoords.Push(newX);
             //keeps track of kings
             if (board[pastX, pastY].OnCell.PieceName == "king")
             {
@@ -178,34 +176,21 @@ namespace chessGame
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
             board[newX, newY].OnCell.PosX = newX;
             board[newX, newY].OnCell.PosY = newY;
-            if (!board[newX, newY].OnCell.HasMoved)
+            if (!board[newX, newY].OnCell.HasMoved && realMove == true)
             {
                 board[newX, newY].OnCell.HasMoved = true;
             }
             board[pastX, pastY].OnCell = new Empty(pastX, pastY);
         }
-        public void revertMove(Piece piece)
+        public void revertMove(Piece piece, int revertToX, int revertToY, int currentX, int currentY)
         {
+            board[revertToX, revertToY].OnCell = board[currentX, currentY].OnCell;
+            board[revertToX, revertToY].OnCell.PosX = revertToX;
+            board[revertToX, revertToY].OnCell.PosY = revertToY;
             if (piece.LastTaken.Count != 0)
             {
                 Piece toReplace = piece.LastTaken.Pop();
                 board[toReplace.PosX, toReplace.PosY].OnCell = toReplace;
-            }
-        }
-        public void movePieceAltBoard(int newX, int newy, int pastX, int pastY)
-        {
-
-        }
-        //keeps track of turns
-        public void endOfTurn()
-        {
-            if (whiteTurn)
-            {
-                whiteTurn = false;
-            }
-            else
-            {
-                whiteTurn = true;
             }
         }
         public void placePiece(int x, int y, Piece piece)
@@ -515,9 +500,9 @@ namespace chessGame
         }
         private bool doesThisMovePutInCheck(bool checkingForWhite, Cell currentCell, Cell newCell)
         {
-            movePiece(newCell.OnCell.PosX, newCell.OnCell.PosY, currentCell.OnCell.PosX, currentCell.OnCell.PosY);
+            movePiece(newCell.OnCell.PosX, newCell.OnCell.PosY, currentCell.OnCell.PosX, currentCell.OnCell.PosY, false);
             bool does = findIfInCheck(checkingForWhite);
-            movePiece(currentCell.OnCell.PosX, currentCell.OnCell.PosY, newCell.OnCell.PosX, newCell.OnCell.PosY);
+            movePiece(currentCell.OnCell.PosX, currentCell.OnCell.PosY, newCell.OnCell.PosX, newCell.OnCell.PosY, false);
             return does;
         }
         //resets board for next legal moves to be processed

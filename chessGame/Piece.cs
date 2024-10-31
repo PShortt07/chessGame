@@ -19,6 +19,7 @@ namespace chessGame
         private bool empty;
         //stack idea inspired by https://github.com/apostolisv/chess-ai
         private Stack<Piece> lastTaken;
+        private Stack<int> lastCoords;
 
         public int Value { get => value; set => this.value = value; }
         public int PosX { get => posX; set => posX = value; }
@@ -30,12 +31,14 @@ namespace chessGame
         public Image PieceImage { get => pieceImage; set => pieceImage = value; }
         public bool Empty { get => empty; set => empty = value; }
         internal Stack<Piece> LastTaken { get => lastTaken; set => lastTaken = value; }
+        public Stack<int> LastCoords { get => lastCoords; set => lastCoords = value; }
 
         public Piece()
         {
             HasMoved = false;
             Empty = false;
             LastTaken = new Stack<Piece>();
+            LastCoords = new Stack<int>();
         }
     }
 }
