@@ -8,7 +8,7 @@ namespace chessGame
 {
     internal class Empty:Piece
     {
-        public Empty(int x, int y)
+        public Empty(bool white, int x, int y) : base(white, x, y)
         {
             PieceImage = Properties.Resources.BLANK_ICON;
             PieceName = "empty";

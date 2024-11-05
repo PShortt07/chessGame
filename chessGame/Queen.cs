@@ -8,12 +8,9 @@ namespace chessGame
 {
     internal class Queen:Piece
     {
-        public Queen(bool white, int x, int y)
+        public Queen(bool white, int x, int y) : base(white, x, y)
         {
-            PosX = x;
-            PosY = y;
             Value = 9;
-            IsWhite = white;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wqueen;

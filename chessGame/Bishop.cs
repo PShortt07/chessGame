@@ -8,12 +8,9 @@ namespace chessGame
 {
     internal class Bishop:Piece
     {
-        public Bishop(bool white, int x, int y)
+        public Bishop(bool white, int x, int y) : base(white, x, y)
         {
-            PosX = x;
-            PosY = y;
             Value = 3;
-            IsWhite = white;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wbishop;

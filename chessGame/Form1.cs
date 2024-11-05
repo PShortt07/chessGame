@@ -57,7 +57,7 @@ namespace chessGame
             {
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 double AIScorePassIn = AI.Score;
-                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn);
+                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn, true);
                 AI.MyPieces = AIPiecesPassIn;
                 AI.Score = AIScorePassIn;
                 b.movePiece(currentX, currentY, pastX, pastY, true);
@@ -92,10 +92,6 @@ namespace chessGame
                             }
                         }
                     }
-                }
-                else if (b.board[currentX, currentY].OnCell.IsWhite == AI.IsWhite)
-                {
-
                 }
                 lastClicked = clicked;
             }

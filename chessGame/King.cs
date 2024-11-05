@@ -8,11 +8,8 @@ namespace chessGame
 {
     internal class King:Piece
     {
-        public King(bool white, int x, int y)
+        public King(bool white, int x, int y) : base(white, x, y)
         {
-            PosX = x;
-            PosY = y;
-            IsWhite = white;
             Value = 1000;
             if (IsWhite)
             {

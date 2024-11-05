@@ -8,12 +8,9 @@ namespace chessGame
 {
     internal class Pawn:Piece
     {
-        public Pawn(bool colour, int x, int y)
+        public Pawn(bool white, int x, int y) : base(white, x, y)
         {
-            PosX = x;
-            PosY = y;
             Value = 1;
-            IsWhite = colour;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wpawn;
