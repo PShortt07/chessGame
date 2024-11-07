@@ -140,9 +140,10 @@ namespace chessGame
             revertMove(board[newX, newY].OnCell, currentX, currentY, newX, newY);
             return outOfCheck;
         }
+        //change for castling
         public void changeScores(int newX, int newY, int oldX, int oldY, ref Player human, ref List<Piece> AIPieces, ref double AIScore, bool realMove)
         {
-            if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == true)
+            if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
                 human.Score += board[newX, newY].OnCell.Value;
                 if (realMove)
@@ -150,7 +151,7 @@ namespace chessGame
                     AIPieces.Remove(board[newX, newY].OnCell);
                 }
             }
-            else if (board[newX, newY].OnCell.PieceName != "empty" && board[newX, newY].OnCell.IsWhite == false)
+            else if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == false)
             {
                 AIScore += board[newX, newY].OnCell.Value;
                 if (realMove)
@@ -163,8 +164,6 @@ namespace chessGame
         public void movePiece(int newX, int newY, int pastX, int pastY, bool realMove)
         {
             board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
-            //[pastX, pastY].OnCell.updateLastX(pastX);
-            //board[pastX, pastY].OnCell.updateLastX(pastX);
             //keeps track of kings
             if (board[pastX, pastY].OnCell.PieceName == "king")
             {
@@ -193,11 +192,9 @@ namespace chessGame
             board[revertToX, revertToY].OnCell = board[currentX, currentY].OnCell;
             board[revertToX, revertToY].OnCell.PosX = revertToX;
             board[revertToX, revertToY].OnCell.PosY = revertToY;
-            if (piece.LastTaken.Count != 0)
-            {
-                Piece toReplace = piece.LastTaken.Pop();
-                board[currentX, currentY].OnCell = toReplace;
-            }
+            board[currentX, currentY].OnCell = new Empty(false, currentX, currentY);
+            Piece toReplace = piece.LastTaken.Pop();
+            board[currentX, currentY].OnCell = toReplace;
         }
         //finds all available moves
         public List<Cell> FindLegalMoves(int posX, int posY)
