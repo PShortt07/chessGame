@@ -82,13 +82,13 @@ namespace chessGame
         private double scoreThisMove(Player human, Piece thisPiece, double myScore)
         {
             //calculates difference in score as a base score, makes positive if negative
-            double total = human.Score - myScore;
-            if (total < 0)
-            {
-                total *= -1;
-            }
+            double total = myScore - human.Score;
             //pawns can only move forward - closer to promotion
             if (thisPiece.PieceName == "pawn")
+            {
+                total += 0.2;
+            }
+            else if (thisPiece.PieceName == "knight" || thisPiece.PieceName == "bishop")
             {
                 total += 0.1;
             }

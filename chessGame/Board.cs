@@ -227,23 +227,11 @@ namespace chessGame
             }
             return allowedMoves;
         }
-        //error
         private void allowMovesThatTakeOutOfCheck(Cell selected, ref List<Cell> allowedMoves)
         {
             List<Cell> possibleMoves = new List<Cell>();
             addMovesToList(ref possibleMoves, selected, true);
             List<Cell> takeOutOfCheck = new List<Cell>();
-            foreach (Cell newPos in possibleMoves)
-            {
-                if (doesTakeOutOfCheck(newPos.OnCell.PosX, newPos.OnCell.PosY, selected.OnCell.PosX, selected.OnCell.PosY))
-                {
-                    takeOutOfCheck.Add(newPos);
-                }
-            }
-            foreach (Cell c in takeOutOfCheck)
-            {
-                allowedMoves.Add(c);
-            }
         }
         private void showLegalPawn(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {

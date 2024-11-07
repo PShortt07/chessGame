@@ -9,6 +9,7 @@ namespace chessGame
         AI AI;
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
+        TextBox winMessage = new TextBox();
         int AIDepth;
 
         public Form1()
@@ -16,10 +17,11 @@ namespace chessGame
             InitializeComponent();
             human.IsWhite = true;
             AIDepth = 1;
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 3; i++)
             {
                 comboBox1.Items.Add(i);
             }
+            winMessage.Location = new Point(this.Width / 2, (this.Height / 2) - 25);
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -67,10 +69,25 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
                 b.resetLegal();
-                b.whiteTurn = false;
-                AI.makeMove(ref human, ref b);
-                refreshBoard();
-                b.whiteTurn = true;
+                if (b.isGameOver() == true)
+                {
+                    winMessage.Text = "CHECKMATE - YOU WIN!";
+                    winMessage.BackColor = Color.HotPink;
+                    winMessage.Show();
+                }
+                else
+                {
+                    b.whiteTurn = false;
+                    AI.makeMove(ref human, ref b);
+                    refreshBoard();
+                    b.whiteTurn = true;
+                    if (b.isGameOver() == true)
+                    {
+                        winMessage.Text = "CHECKMATE - AI WINS!";
+                        winMessage.BackColor = Color.HotPink;
+                        winMessage.Show();
+                    }
+                }
             }
             else
             {
@@ -103,8 +120,9 @@ namespace chessGame
             button1.Hide();
             label2.Hide();
             comboBox1.Hide();
+            winMessage.Hide();
             DrawBoard(b.board);
-            AI = new AI(b, AIDepth, human);
+            AI = new AI(b, AIDepth+1, human);
             b.refreshLists(ref human, ref AI);
         }
         public void refreshBoard()
