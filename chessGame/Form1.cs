@@ -69,7 +69,7 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
                 b.resetLegal();
-                if (b.isGameOver() == true)
+                if (b.isGameOver(false) == true)
                 {
                     winMessage.Text = "CHECKMATE - YOU WIN!";
                     winMessage.BackColor = Color.HotPink;
@@ -81,7 +81,7 @@ namespace chessGame
                     AI.makeMove(ref human, ref b);
                     refreshBoard();
                     b.whiteTurn = true;
-                    if (b.isGameOver() == true)
+                    if (b.isGameOver(true) == true)
                     {
                         winMessage.Text = "CHECKMATE - AI WINS!";
                         winMessage.BackColor = Color.HotPink;

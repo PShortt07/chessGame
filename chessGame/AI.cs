@@ -83,28 +83,19 @@ namespace chessGame
         {
             //calculates difference in score as a base score, makes positive if negative
             double total = myScore - human.Score;
-            //pawns can only move forward - closer to promotion
-            if (thisPiece.PieceName == "pawn")
-            {
-                total += 0.2;
-            }
-            else if (thisPiece.PieceName == "knight" || thisPiece.PieceName == "bishop")
-            {
-                total += 0.1;
-            }
             return total;
         }
         //https://www.youtube.com/watch?v=l-hh51ncgDI used as a basis for this method
         private PotentialMove valueMove(Piece p, int depth, bool maxPlayer, int bestX, int bestY, double alpha, double beta, ref Board chessBoard, ref Player human, ref List<Piece> tempPieces, ref double tempScore)
         {
             //move returned if out of depth or the game is over
-            if (depth == 0 || chessBoard.isGameOver())
+            if (depth == 0 || chessBoard.isGameOver(true) || chessBoard.isGameOver(false))
             {
                 PotentialMove pM = new PotentialMove(scoreThisMove(human, p, tempScore), p, chessBoard.board[bestX, bestY]);
                 return pM;
             }
             List<Cell> possibleMoves = chessBoard.FindLegalMoves(p.PosX, p.PosY);
-            Cell bestMove = chessBoard.board[0,0];
+            Cell bestMove = chessBoard.board[0, 0];
             double evaluation;
             //maximising player
             if (maxPlayer)
@@ -119,7 +110,14 @@ namespace chessGame
                     chessBoard.changeScores(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, ref human, ref tempPieces, ref tempScore, false);
                     chessBoard.movePiece(move.OnCell.PosX, move.OnCell.PosY, p.PosX, p.PosY, false);
                     //evaluates possible moves from a possible move until out of depth
-                    evaluation = valueMove(p, depth - 1, false, bestX, bestY, alpha, beta, ref chessBoard, ref human, ref tempPieces, ref tempScore).value;
+                    try
+                    {
+                        evaluation = valueMove(p, depth - 1, false, bestX, bestY, alpha, beta, ref chessBoard, ref human, ref tempPieces, ref tempScore).value;
+                    }
+                    catch
+                    {
+                        break;
+                    }
                     //reverts move
                     chessBoard.revertMove(p, lastPosX, lastPosY, move.OnCell.PosX, move.OnCell.PosY);
                     //adds better moves to goodMoves
@@ -136,8 +134,15 @@ namespace chessGame
                         break;
                     }
                 }
-                PotentialMove pM = new PotentialMove(maxEvaluation, p, bestMove);
-                return pM;
+                if (possibleMoves.Contains(bestMove))
+                {
+                    PotentialMove pM = new PotentialMove(maxEvaluation, p, bestMove);
+                    return pM;
+                }
+                else
+                {
+                    return null;
+                }
             }
             //minimising player
             else
@@ -165,8 +170,15 @@ namespace chessGame
                         break;
                     }
                 }
-                PotentialMove pM = new PotentialMove(minEvaluation, p, chessBoard.board[bestX, bestY]);
-                return pM;
+                if (possibleMoves.Contains(bestMove))
+                {
+                    PotentialMove pM = new PotentialMove(minEvaluation, p, bestMove);
+                    return pM;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
     }
