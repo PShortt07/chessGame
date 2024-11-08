@@ -88,7 +88,10 @@ namespace chessGame
                         return false;
                     }
                 }
-                else if (c.OnCell.PieceName != "empty" && !c.OnCell.IsWhite)
+            }
+            foreach (Cell c in board)
+            {
+                if (c.OnCell.PieceName != "empty" && !c.OnCell.IsWhite)
                 {
                     List<Cell> moves = new List<Cell>();
                     moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
@@ -229,9 +232,8 @@ namespace chessGame
         }
         private void allowMovesThatTakeOutOfCheck(Cell selected, ref List<Cell> allowedMoves)
         {
-            List<Cell> possibleMoves = new List<Cell>();
-            addMovesToList(ref possibleMoves, selected, true);
-            List<Cell> takeOutOfCheck = new List<Cell>();
+            addMovesToList(ref allowedMoves, selected, true);
+
         }
         private void showLegalPawn(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
