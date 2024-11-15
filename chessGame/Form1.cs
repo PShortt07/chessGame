@@ -122,7 +122,7 @@ namespace chessGame
             comboBox1.Hide();
             winMessage.Hide();
             DrawBoard(b.board);
-            AI = new AI(b, AIDepth+1, human);
+            AI = new AI(b, AIDepth, human);
             b.refreshLists(ref human, ref AI);
         }
         public void refreshBoard()
@@ -228,7 +228,18 @@ namespace chessGame
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            AIDepth = comboBox1.SelectedIndex;
+            switch (comboBox1.SelectedIndex)
+            {
+                case '1':
+                    AIDepth = 1;
+                    break;
+                case '2':
+                    AIDepth = 3;
+                    break;
+                case '3':
+                    AIDepth = 5;
+                    break;
+            }
         }
     }
 }
