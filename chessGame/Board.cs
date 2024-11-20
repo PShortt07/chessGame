@@ -197,7 +197,7 @@ namespace chessGame
             bInCheck = findIfInCheck(false);
             Cell current = board[posX, posY];
             List<Cell> allowedMoves = new List<Cell>();
-            addMovesToList(ref allowedMoves, current, true);
+            addMovesToList(ref allowedMoves, current);
             if (!wInCheck && !bInCheck && whiteTurn)
             {
                 foreach (Cell c in board)
@@ -216,7 +216,7 @@ namespace chessGame
         }
         private void allowMovesThatTakeOutOfCheck(Cell selected, ref List<Cell> allowedMoves)
         {
-            addMovesToList(ref allowedMoves, selected, true);
+            addMovesToList(ref allowedMoves, selected);
         }
         private void showLegalPawn(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
@@ -478,7 +478,7 @@ namespace chessGame
                 //runs if piece in space and the piece is the aim colour
                 if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
                 {
-                    addMovesToList(ref allowedMoves, c, false);
+                    addMovesToList(ref allowedMoves, c);
                 }
             }
             foreach (Cell c in board)
@@ -514,7 +514,7 @@ namespace chessGame
                 allowedMoves.Add(board[posX, posY]);
             }
         }
-        private void addMovesToList(ref List<Cell> allowedMoves, Cell current, bool checkforcheck)
+        private void addMovesToList(ref List<Cell> allowedMoves, Cell current)
         {
             switch (current.OnCell.PieceName)
             {
@@ -538,22 +538,19 @@ namespace chessGame
                     break;
             }
             //removes moves that put the player in check
-            if (checkforcheck)
+            List<Cell> notAllowedMoves = new List<Cell>();
+            //adds not allowed moves to new list
+            foreach (Cell allowed in allowedMoves)
             {
-                List<Cell> notAllowedMoves = new List<Cell>();
-                //adds not allowed moves to new list
-                foreach (Cell allowed in allowedMoves)
+                if (doesThisMovePutInCheck(current.OnCell.IsWhite, current, allowed) == true)
                 {
-                    if (doesThisMovePutInCheck(current.OnCell.IsWhite, current, allowed) == true)
-                    {
-                        notAllowedMoves.Add(allowed);
-                    }
+                    notAllowedMoves.Add(allowed);
                 }
-                //removes moves from original list
-                foreach (Cell nA in notAllowedMoves)
-                {
-                    allowedMoves.Remove(nA);
-                }
+            }
+            //removes moves from original list
+            foreach (Cell nA in notAllowedMoves)
+            {
+                allowedMoves.Remove(nA);
             }
         }
     }

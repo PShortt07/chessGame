@@ -77,6 +77,8 @@ namespace chessGame
         }
         private double minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, Player human)
         {
+            double startHScore = human.Score;
+            double startMyScore = human.Score;
             if (depth == 0 || chessBoard.isGameOver(true))
             {
                 return Score - human.Score;
@@ -112,6 +114,8 @@ namespace chessGame
                     }
                 }
                 chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
+                human.Score = startHScore;
+                Score = startMyScore;
                 return maxEvaluation;
             }
             else
@@ -137,6 +141,8 @@ namespace chessGame
                     }
                 }
                 chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
+                human.Score = startHScore;
+                Score = startMyScore;
                 return minEvaluation;
             }
         }

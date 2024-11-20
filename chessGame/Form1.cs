@@ -231,13 +231,13 @@ namespace chessGame
             switch (comboBox1.SelectedIndex)
             {
                 case '1':
-                    AIDepth = 1;
+                    AIDepth = 2;
                     break;
                 case '2':
                     AIDepth = 3;
                     break;
                 case '3':
-                    AIDepth = 5;
+                    AIDepth = 4;
                     break;
             }
         }
