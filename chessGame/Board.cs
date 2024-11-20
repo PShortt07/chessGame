@@ -156,20 +156,6 @@ namespace chessGame
         public void movePiece(int newX, int newY, int pastX, int pastY, bool realMove)
         {
             board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
-            //keeps track of kings
-            if (board[pastX, pastY].OnCell.PieceName == "king")
-            {
-                if (board[pastX, pastY].OnCell.IsWhite)
-                {
-                    wKingX = newX;
-                    wKingY = newY;
-                }
-                else
-                {
-                    bKingX = newX;
-                    bKingY = newY;
-                }
-            }
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
             board[newX, newY].OnCell.PosX = newX;
             board[newX, newY].OnCell.PosY = newY;
@@ -191,6 +177,22 @@ namespace chessGame
         //finds all available moves
         public List<Cell> FindLegalMoves(int posX, int posY)
         {
+            foreach (Cell c in board)
+            {
+                if (c.OnCell.PieceName == "king")
+                {
+                    if (c.OnCell.IsWhite)
+                    {
+                        wKingX = c.OnCell.PosX;
+                        wKingY = c.OnCell.PosY;
+                    }
+                    else
+                    {
+                        bKingX = c.OnCell.PosX;
+                        bKingY = c.OnCell.PosY;
+                    }
+                }
+            }
             wInCheck = findIfInCheck(true);
             bInCheck = findIfInCheck(false);
             Cell current = board[posX, posY];

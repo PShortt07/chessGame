@@ -26,28 +26,22 @@ namespace chessGame
             List<Piece> tempPieces = MyPieces;
             double tempScore = Score;
             //adds best move for each piece to a list then resets the second board for the next piece analysis
-            List<PotentialMove> bestMoves = new List<PotentialMove>();
+            List<PotentialMove> possibleMoves = new List<PotentialMove>();
             foreach (Piece p in tempPieces)
             {
-                List<PotentialMove> moveList = new List<PotentialMove>();
                 foreach (Cell move in chessBoard.FindLegalMoves(p.PosX, p.PosY))
                 {
                     double value = minimax(p, move, false, 0, 0, depth, chessBoard, human);
-                    moveList.Add(new PotentialMove(value, p, move));
-                }
-                if (moveList.Count > 0)
-                {
-                    moveList.OrderBy(o => o.value);
-                    bestMoves.Add(moveList[0]);
+                    possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
             human.Score = prevScore;
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //finds the highest possible score result of a move
-            bestMoves.OrderBy(o => o.value);
-            foreach (PotentialMove move in bestMoves)
+            possibleMoves.OrderBy(o => o.value);
+            foreach (PotentialMove move in possibleMoves)
             {
-                if (bestMoves[0].value == move.value)
+                if (possibleMoves[0].value == move.value)
                 {
                     highestValueMoves.Add(move);
                 }
@@ -83,9 +77,13 @@ namespace chessGame
         }
         private double minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, Player human)
         {
-            if (depth == 0)
+            if (depth == 0 || chessBoard.isGameOver(true))
             {
                 return Score - human.Score;
+            }
+            else if (chessBoard.isGameOver(false))
+            {
+                return double.MinValue;
             }
             if (maxPlayer)
             {
