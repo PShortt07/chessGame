@@ -82,11 +82,38 @@ namespace chessGame
         }
         private double minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, ref double humanScore, ref double myScore)
         {
-            double startHScore = humanScore;
-            double startMyScore = myScore;
-            if (depth == 0 || chessBoard.isGameOver(true))
+            if (depth == 0)
             {
-                return myScore - humanScore;
+                double total = myScore - humanScore;
+                foreach (Cell c in chessBoard.board)
+                {
+                    if (c.CoveredByBlack)
+                    {
+                        total = total + 0.1;
+                        if (c.OnCell.PosY == 3 || c.OnCell.PosY == 4)
+                        {
+                            total += 0.1;
+                        }
+                    }
+                    else
+                    {
+                        total -= 0.1;
+                    }
+                }
+                if (piece.Isolated)
+                {
+                    total -= 0.5;
+                    piece.Isolated = false;
+                }
+                return total;
+            }
+            if (chessBoard.isGameOver(true))
+            {
+                return 500;
+            }
+            else if (chessBoard.isGameOver(false))
+            {
+                return -500;
             }
             else if (chessBoard.isGameOver(false))
             {
@@ -108,8 +135,6 @@ namespace chessGame
                         {
                             double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, ref humanScore, ref myScore);
                             maxEvaluation = Math.Max(maxEvaluation, evaluation);
-                            humanScore = startHScore;
-                            Score = startMyScore;
                             alpha = Math.Max(alpha, evaluation);
                             if (beta <= alpha)
                             {
@@ -135,8 +160,6 @@ namespace chessGame
                         {
                             double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, ref humanScore, ref myScore);
                             minEvaluation = Math.Min(minEvaluation, evaluation);
-                            humanScore = startHScore;
-                            Score = startMyScore;
                             beta = Math.Min(beta, evaluation);
                             if (beta <= alpha)
                             {

@@ -137,7 +137,7 @@ namespace chessGame
         {
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
-                humanScore += board[newX, newY].OnCell.Value;
+                AIScore -= board[newX, newY].OnCell.Value;
                 if (realMove)
                 {
                     AIPieces.Remove(board[newX, newY].OnCell);
@@ -145,7 +145,7 @@ namespace chessGame
             }
             else if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == false)
             {
-                AIScore += board[newX, newY].OnCell.Value;
+                humanScore -= board[newX, newY].OnCell.Value;
                 if (realMove)
                 {
                     humanPieces.Remove(board[newX, newY].OnCell);
@@ -198,6 +198,13 @@ namespace chessGame
             Cell current = board[posX, posY];
             List<Cell> allowedMoves = new List<Cell>();
             addMovesToList(ref allowedMoves, current, true);
+            if (board[posX, posY].OnCell.PieceName == "pawn")
+            {
+                if (allowedMoves.Count != 8)
+                {
+                    board[posX, posY].OnCell.Isolated = true;
+                }
+            }
             if (!wInCheck && !bInCheck && whiteTurn)
             {
                 foreach (Cell c in board)
