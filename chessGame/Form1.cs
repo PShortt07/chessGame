@@ -16,7 +16,6 @@ namespace chessGame
         {
             InitializeComponent();
             human.IsWhite = true;
-            AIDepth = 1;
             for (int i = 1; i <= 3; i++)
             {
                 comboBox1.Items.Add(i);
@@ -59,9 +58,13 @@ namespace chessGame
             {
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 double AIScorePassIn = AI.Score;
-                b.changeScores(currentX, currentY, pastX, pastY, ref human, ref AIPiecesPassIn, ref AIScorePassIn, true);
+                double humanScorePassIn = human.Score;
+                List<Piece> humanPiecesPassIn = human.MyPieces;
+                b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
                 AI.MyPieces = AIPiecesPassIn;
                 AI.Score = AIScorePassIn;
+                human.MyPieces = humanPiecesPassIn;
+                human.Score = humanScorePassIn;
                 b.movePiece(currentX, currentY, pastX, pastY, true);
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
@@ -228,16 +231,16 @@ namespace chessGame
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (comboBox1.SelectedIndex)
+            switch (comboBox1.SelectedItem)
             {
-                case '1':
+                case 1:
+                    AIDepth = 1;
+                    break;
+                case 2:
                     AIDepth = 2;
                     break;
-                case '2':
+                case 3:
                     AIDepth = 3;
-                    break;
-                case '3':
-                    AIDepth = 4;
                     break;
             }
         }

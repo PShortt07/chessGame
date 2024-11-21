@@ -133,11 +133,11 @@ namespace chessGame
             return outOfCheck;
         }
         //change for castling
-        public void changeScores(int newX, int newY, int oldX, int oldY, ref Player human, ref List<Piece> AIPieces, ref double AIScore, bool realMove)
+        public void changeScores(int newX, int newY, int oldX, int oldY, ref double humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref double AIScore, bool realMove)
         {
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
-                human.Score += board[newX, newY].OnCell.Value;
+                humanScore += board[newX, newY].OnCell.Value;
                 if (realMove)
                 {
                     AIPieces.Remove(board[newX, newY].OnCell);
@@ -148,7 +148,7 @@ namespace chessGame
                 AIScore += board[newX, newY].OnCell.Value;
                 if (realMove)
                 {
-                    human.MyPieces.Remove(board[newX, newY].OnCell);
+                    humanPieces.Remove(board[newX, newY].OnCell);
                 }
             }
         }
@@ -197,7 +197,7 @@ namespace chessGame
             bInCheck = findIfInCheck(false);
             Cell current = board[posX, posY];
             List<Cell> allowedMoves = new List<Cell>();
-            addMovesToList(ref allowedMoves, current);
+            addMovesToList(ref allowedMoves, current, true);
             if (!wInCheck && !bInCheck && whiteTurn)
             {
                 foreach (Cell c in board)
@@ -216,7 +216,7 @@ namespace chessGame
         }
         private void allowMovesThatTakeOutOfCheck(Cell selected, ref List<Cell> allowedMoves)
         {
-            addMovesToList(ref allowedMoves, selected);
+            addMovesToList(ref allowedMoves, selected, true);
         }
         private void showLegalPawn(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
@@ -478,7 +478,7 @@ namespace chessGame
                 //runs if piece in space and the piece is the aim colour
                 if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
                 {
-                    addMovesToList(ref allowedMoves, c);
+                    addMovesToList(ref allowedMoves, c, false);
                 }
             }
             foreach (Cell c in board)
@@ -514,7 +514,7 @@ namespace chessGame
                 allowedMoves.Add(board[posX, posY]);
             }
         }
-        private void addMovesToList(ref List<Cell> allowedMoves, Cell current)
+        private void addMovesToList(ref List<Cell> allowedMoves, Cell current, bool checkforcheck)
         {
             switch (current.OnCell.PieceName)
             {
@@ -537,20 +537,23 @@ namespace chessGame
                     showLegalKing(current.OnCell.PosX, current.OnCell.PosY, ref allowedMoves, current.OnCell.IsWhite);
                     break;
             }
-            //removes moves that put the player in check
-            List<Cell> notAllowedMoves = new List<Cell>();
-            //adds not allowed moves to new list
-            foreach (Cell allowed in allowedMoves)
+            if (checkforcheck)
             {
-                if (doesThisMovePutInCheck(current.OnCell.IsWhite, current, allowed) == true)
+                //removes moves that put the player in check
+                List<Cell> notAllowedMoves = new List<Cell>();
+                //adds not allowed moves to new list
+                foreach (Cell allowed in allowedMoves)
                 {
-                    notAllowedMoves.Add(allowed);
+                    if (doesThisMovePutInCheck(current.OnCell.IsWhite, current, allowed) == true)
+                    {
+                        notAllowedMoves.Add(allowed);
+                    }
                 }
-            }
-            //removes moves from original list
-            foreach (Cell nA in notAllowedMoves)
-            {
-                allowedMoves.Remove(nA);
+                //removes moves from original list
+                foreach (Cell nA in notAllowedMoves)
+                {
+                    allowedMoves.Remove(nA);
+                }
             }
         }
     }
