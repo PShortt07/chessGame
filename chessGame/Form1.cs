@@ -10,6 +10,8 @@ namespace chessGame
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
         TextBox winMessage = new TextBox();
+        Label hScore = new Label();
+        Label AIScore = new Label();
         int AIDepth;
 
         public Form1()
@@ -21,6 +23,8 @@ namespace chessGame
                 comboBox1.Items.Add(i);
             }
             winMessage.Location = new Point(this.Width / 2, (this.Height / 2) - 25);
+            hScore.Hide();
+            AIScore.Hide();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -56,6 +60,8 @@ namespace chessGame
             Cell location = b.board[currentX, currentY];
             if (location.LegalMove)
             {
+                hScore.Text = human.Score.ToString();
+                AIScore.Text = AI.Score.ToString();
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 long AIScorePassIn = AI.Score;
                 long humanScorePassIn = human.Score;
@@ -66,6 +72,8 @@ namespace chessGame
                 human.MyPieces = humanPiecesPassIn;
                 human.Score = humanScorePassIn;
                 b.movePiece(currentX, currentY, pastX, pastY, true);
+                hScore.Text = human.Score.ToString();
+                AIScore.Text = AI.Score.ToString();
                 boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                 boardDisplay[currentX, currentY].Refresh();
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
@@ -125,6 +133,10 @@ namespace chessGame
             comboBox1.Hide();
             winMessage.Hide();
             DrawBoard(b.board);
+            hScore.Text = "39";
+            AIScore.Text = "39";
+            hScore.Show();
+            AIScore.Show();
             AI = new AI(b, AIDepth, human);
             b.refreshLists(ref human, ref AI);
         }
@@ -181,6 +193,10 @@ namespace chessGame
                     this.Controls.Add(boardDisplay[i, j]);
                 }
             }
+            hScore.Location = new Point(100, 20);
+            hScore.Size = new Size(20, 10);
+            AIScore.Location = new Point(100, 80);
+            AIScore.Size = new Size(20, 10);
             //timer for the players
             //System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
             //t.Interval = 600000;

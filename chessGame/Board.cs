@@ -205,7 +205,7 @@ namespace chessGame
                     board[posX, posY].OnCell.Isolated = true;
                 }
             }
-            if (!wInCheck && !bInCheck && whiteTurn)
+            if (whiteTurn)
             {
                 foreach (Cell c in board)
                 {
