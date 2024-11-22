@@ -57,8 +57,8 @@ namespace chessGame
             if (location.LegalMove)
             {
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
-                double AIScorePassIn = AI.Score;
-                double humanScorePassIn = human.Score;
+                long AIScorePassIn = AI.Score;
+                long humanScorePassIn = human.Score;
                 List<Piece> humanPiecesPassIn = human.MyPieces;
                 b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
                 AI.MyPieces = AIPiecesPassIn;

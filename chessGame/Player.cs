@@ -11,11 +11,11 @@ namespace chessGame
         private bool myMove;
         private List<Piece> myPieces;
         private List<Piece> takenPieces;
-        private double score;
+        private long score;
         private bool isWhite;
 
         public bool MyMove { get => myMove; set => myMove = value; }
-        public double Score { get => score; set => score = value; }
+        public long Score { get => score; set => score = value; }
         public List<Piece> MyPieces { get => myPieces; set => myPieces = value; }
         public List<Piece> TakenPieces { get => takenPieces; set => takenPieces = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }

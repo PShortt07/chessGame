@@ -22,17 +22,17 @@ namespace chessGame
         public void makeMove(ref Player human, ref Board chessBoard)
         {
             List<PotentialMove> storedMoves = new List<PotentialMove>();
-            double prevScore = human.Score;
+            long prevScore = human.Score;
             List<Piece> tempPieces = MyPieces;
-            double humanScore = human.Score;
-            double myScore = Score;
+            long humanScore = human.Score;
+            long myScore = Score;
             //adds best move for each piece to a list then resets the second board for the next piece analysis
             List<PotentialMove> possibleMoves = new List<PotentialMove>();
             foreach (Piece p in tempPieces)
             {
                 foreach (Cell move in chessBoard.FindLegalMoves(p.PosX, p.PosY))
                 {
-                    double value = minimax(p, move, false, 0, 0, depth, chessBoard, ref humanScore, ref myScore);
+                    double value = minimax(p, move, false, 0, 0, depth, chessBoard, humanScore, myScore);
                     possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
@@ -64,9 +64,9 @@ namespace chessGame
             int oldY = bestMove.p.PosY;
             //creates new variables to pass in to changeScores() then assigns changed qualities to AI
             List<Piece> myPiecesPassIn = MyPieces;
-            double scorePassIn = Score;
+            long scorePassIn = Score;
             List<Piece> humanPiecesPassIn = human.MyPieces;
-            double humanScorePassIn = human.Score;
+            long humanScorePassIn = human.Score;
             chessBoard.changeScores(newX, newY, oldX, oldY, ref humanScorePassIn, ref humanPiecesPassIn, ref myPiecesPassIn, ref scorePassIn, true);
             Score = scorePassIn;
             MyPieces = myPiecesPassIn;
@@ -80,48 +80,42 @@ namespace chessGame
             double total = myScore - human.Score;
             return total;
         }
-        private double minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, ref double humanScore, ref double myScore)
+        private long minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
+            //scoring system
             if (depth == 0)
             {
-                double total = myScore - humanScore;
+                long total = (myScore*10) - (humanScore*10);
                 foreach (Cell c in chessBoard.board)
                 {
                     if (c.CoveredByBlack)
                     {
-                        total = total + 0.1;
+                        total += 1;
                         if (c.OnCell.PosY == 3 || c.OnCell.PosY == 4)
                         {
-                            total += 0.1;
+                            total += 1;
                         }
-                    }
-                    else
-                    {
-                        total -= 0.1;
                     }
                 }
                 if (piece.Isolated)
                 {
-                    total -= 0.5;
+                    total -= 5;
                     piece.Isolated = false;
                 }
                 return total;
             }
             if (chessBoard.isGameOver(true))
             {
-                return 500;
+                return 200;
             }
             else if (chessBoard.isGameOver(false))
             {
-                return -500;
+                return -200;
             }
-            else if (chessBoard.isGameOver(false))
-            {
-                return double.MinValue;
-            }
+            //minimax
             if (maxPlayer)
             {
-                double maxEvaluation = double.MinValue;
+                long maxEvaluation = long.MinValue;
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
@@ -133,8 +127,8 @@ namespace chessGame
                     {
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
                         {
-                            double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, ref humanScore, ref myScore);
-                            maxEvaluation = Math.Max(maxEvaluation, evaluation);
+                            double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            maxEvaluation = (long)Math.Max(maxEvaluation, evaluation);
                             alpha = Math.Max(alpha, evaluation);
                             if (beta <= alpha)
                             {
@@ -148,9 +142,11 @@ namespace chessGame
             }
             else
             {
-                double minEvaluation = double.MaxValue;
+                long minEvaluation = long.MaxValue;
                 int origX = piece.PosX;
                 int origY = piece.PosY;
+                List<Piece> pieces = MyPieces;
+                chessBoard.changeScores(position.Row, position.Col, origX, origY, ref humanScore, ref pieces, ref pieces, ref myScore, false);
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
                 foreach (Cell c in chessBoard.board)
                 {
@@ -158,8 +154,8 @@ namespace chessGame
                     {
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
                         {
-                            double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, ref humanScore, ref myScore);
-                            minEvaluation = Math.Min(minEvaluation, evaluation);
+                            double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            minEvaluation = (long)Math.Min(minEvaluation, evaluation);
                             beta = Math.Min(beta, evaluation);
                             if (beta <= alpha)
                             {

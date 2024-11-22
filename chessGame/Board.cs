@@ -133,7 +133,7 @@ namespace chessGame
             return outOfCheck;
         }
         //change for castling
-        public void changeScores(int newX, int newY, int oldX, int oldY, ref double humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref double AIScore, bool realMove)
+        public void changeScores(int newX, int newY, int oldX, int oldY, ref long humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref long AIScore, bool realMove)
         {
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
