@@ -30,11 +30,8 @@ namespace chessGame
             List<PotentialMove> possibleMoves = new List<PotentialMove>();
             foreach (Piece p in tempPieces)
             {
-                foreach (Cell move in chessBoard.FindLegalMoves(p.PosX, p.PosY))
-                {
-                    double value = minimax(p, move, false, 0, 0, depth, chessBoard, humanScore, myScore);
-                    possibleMoves.Add(new PotentialMove(value, p, move));
-                }
+                double value = minimax(p, true, 0, 0, depth, chessBoard, humanScore, myScore);
+                possibleMoves.Add(new PotentialMove(value, p, move));
             }
             human.Score = prevScore;
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
@@ -74,13 +71,17 @@ namespace chessGame
             human.MyPieces = humanPiecesPassIn;
             chessBoard.movePiece(newX, newY, oldX, oldY, true);
         }
+        private PotentialMove findBestMove()
+        {
+
+        }
         private double scoreThisMove(Player human, Piece thisPiece, double myScore)
         {
             //calculates difference in score as a base score, makes positive if negative
             double total = myScore - human.Score;
             return total;
         }
-        private long minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
+        private long minimax(Piece piece, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
             //scoring system
             if (depth == 0)
@@ -90,7 +91,6 @@ namespace chessGame
                 {
                     if (c.CoveredByBlack)
                     {
-                        total += 1;
                         if (c.OnCell.PosY == 3 || c.OnCell.PosY == 4)
                         {
                             total += 1;
@@ -119,18 +119,16 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                if (position.OnCell.Value == 9)
-                {
-                    myScore -= position.OnCell.Value;
-                }
-                chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
                 foreach(Cell c in chessBoard.board)
                 {
                     if (c.OnCell.PieceName != "empty" && !c.OnCell.IsWhite)
                     {
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
                         {
-                            double evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            humanScore -= move.OnCell.Value;
+                            chessBoard.movePiece(move.Row, move.Col, piece.PosX, piece.PosY, false);
+                            double evaluation = minimax(piece, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
                             maxEvaluation = (long)Math.Max(maxEvaluation, evaluation);
                             alpha = Math.Max(alpha, evaluation);
                             if (beta <= alpha)
@@ -140,7 +138,6 @@ namespace chessGame
                         }
                     }
                 }
-                chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
                 return maxEvaluation;
             }
             else
@@ -149,18 +146,16 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                if (position.OnCell.Value != 0)
-                {
-                    humanScore -= position.OnCell.Value;
-                }
-                chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
                 foreach (Cell c in chessBoard.board)
                 {
                     if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite)
                     {
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
                         {
-                            double evaluation = minimax(piece, move, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            myScore -= move.OnCell.Value;
+                            chessBoard.movePiece(move.Row, move.Col, piece.PosX, piece.PosY, false);
+                            double evaluation = minimax(piece, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
                             minEvaluation = (long)Math.Min(minEvaluation, evaluation);
                             beta = Math.Min(beta, evaluation);
                             if (beta <= alpha)
@@ -170,7 +165,6 @@ namespace chessGame
                         }
                     }
                 }
-                chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
                 return minEvaluation;
             }
         }
