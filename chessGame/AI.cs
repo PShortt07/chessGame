@@ -11,12 +11,16 @@ namespace chessGame
     internal class AI:Player
     {
         private int depth;
+        private int bestX;
+        private int bestY;
 
         public AI(Board b, int depth, Player human)
         {
             this.depth = depth;
             IsWhite = false;
             TakenPieces = new List<Piece>();
+            bestX = 0;
+            bestY = 0;
         }
         //makes AI decide and make its move
         public void makeMove(ref Player human, ref Board chessBoard)
@@ -26,27 +30,19 @@ namespace chessGame
             List<Piece> tempPieces = MyPieces;
             long humanScore = human.Score;
             long myScore = Score;
+            List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //adds best move for each piece to a list then resets the second board for the next piece analysis
-            List<PotentialMove> possibleMoves = new List<PotentialMove>();
-            foreach (Piece p in tempPieces)
+            foreach (Piece piece in tempPieces)
             {
-                double value = minimax(p, true, 0, 0, depth, chessBoard, humanScore, myScore);
-                possibleMoves.Add(new PotentialMove(value, p, move));
+                long moveValue = minimax(piece, true, 0, 0, depth, chessBoard, humanScore, myScore);
+                highestValueMoves.Add(new PotentialMove(moveValue, piece, chessBoard.board[bestX, bestY]));
             }
             human.Score = prevScore;
-            List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //finds the highest possible score result of a move
-            possibleMoves.OrderBy(o => o.value);
-            foreach (PotentialMove move in possibleMoves)
-            {
-                if (possibleMoves[0].value == move.value)
-                {
-                    highestValueMoves.Add(move);
-                }
-            }
+            highestValueMoves.OrderBy(o => o.value);
             PotentialMove bestMove = null;
             Random RNG = new Random();
-            bestMove = highestValueMoves[RNG.Next(highestValueMoves.Count)];
+            bestMove = highestValueMoves[0];
             //accounts for taken pieces
             if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == !human.IsWhite)
             {
@@ -70,10 +66,6 @@ namespace chessGame
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             chessBoard.movePiece(newX, newY, oldX, oldY, true);
-        }
-        private PotentialMove findBestMove()
-        {
-
         }
         private double scoreThisMove(Player human, Piece thisPiece, double myScore)
         {
@@ -127,8 +119,14 @@ namespace chessGame
                         {
                             humanScore -= move.OnCell.Value;
                             chessBoard.movePiece(move.Row, move.Col, piece.PosX, piece.PosY, false);
-                            double evaluation = minimax(piece, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            long evaluation = minimax(piece, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
+                            if (evaluation > maxEvaluation)
+                            {
+                                maxEvaluation = evaluation;
+                                bestX = move.Row;
+                                bestY = move.Col;
+                            }
                             maxEvaluation = (long)Math.Max(maxEvaluation, evaluation);
                             alpha = Math.Max(alpha, evaluation);
                             if (beta <= alpha)
@@ -154,9 +152,14 @@ namespace chessGame
                         {
                             myScore -= move.OnCell.Value;
                             chessBoard.movePiece(move.Row, move.Col, piece.PosX, piece.PosY, false);
-                            double evaluation = minimax(piece, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            long evaluation = minimax(piece, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
-                            minEvaluation = (long)Math.Min(minEvaluation, evaluation);
+                            if (evaluation < minEvaluation)
+                            {
+                                minEvaluation = evaluation;
+                                bestX = move.Row;
+                                bestY = move.Col;
+                            }
                             beta = Math.Min(beta, evaluation);
                             if (beta <= alpha)
                             {
