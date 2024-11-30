@@ -13,7 +13,6 @@ namespace chessGame
     {
         public bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
-        public Cell[,] altBoard = new Cell[8, 8]; 
         private bool wInCheck;
         private bool bInCheck;
         public int bKingX;
@@ -57,7 +56,6 @@ namespace chessGame
             board[3, 7].OnCell = new Queen(true, 3, 7);
             board[4, 0].OnCell = new King(false, 4, 0);
             board[4, 7].OnCell = new King(true, 4, 7);
-            altBoard = board;
         }
         public void refreshLists(ref Player human, ref AI AI)
         {

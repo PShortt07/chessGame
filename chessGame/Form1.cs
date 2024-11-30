@@ -23,6 +23,7 @@ namespace chessGame
                 comboBox1.Items.Add(i);
             }
             winMessage.Location = new Point(this.Width / 2, (this.Height / 2) - 25);
+            winMessage.BringToFront();
             hScore.Hide();
             AIScore.Hide();
         }
