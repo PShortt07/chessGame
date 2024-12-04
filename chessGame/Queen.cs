@@ -10,7 +10,7 @@ namespace chessGame
     {
         public Queen(bool white, int x, int y) : base(white, x, y)
         {
-            Value = 9;
+            Value = 90;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wqueen;

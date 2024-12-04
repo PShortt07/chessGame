@@ -10,7 +10,7 @@ namespace chessGame
     {
         public Knight(bool white, int x, int y) : base(white, x, y)
         {
-            Value = 3;
+            Value = 30;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wknight;

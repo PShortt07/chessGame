@@ -10,7 +10,7 @@ namespace chessGame
     {
         public Rook(bool white, int x, int y) : base(white, x, y)
         {
-            Value = 5;
+            Value = 50;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wrook;

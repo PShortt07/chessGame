@@ -24,7 +24,7 @@ namespace chessGame
         {
             TakenPieces = new List<Piece>();
             MyPieces = new List<Piece>();
-            Score = 39;
+            Score = 390;
         }
     }
 }

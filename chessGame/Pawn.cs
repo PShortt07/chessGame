@@ -10,7 +10,7 @@ namespace chessGame
     {
         public Pawn(bool white, int x, int y) : base(white, x, y)
         {
-            Value = 1;
+            Value = 10;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wpawn;

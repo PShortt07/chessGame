@@ -92,10 +92,13 @@ namespace chessGame
             //scoring system
             if (depth == 0)
             {
-                long total = (myScore*10) - (humanScore*10);
-                if (total > 0)
+                long total = myScore - humanScore;
+                foreach (Cell c in chessBoard.board)
                 {
-
+                    if (c.CoveredByBlack)
+                    {
+                        total += 1;
+                    }
                 }
                 return total;
             }
