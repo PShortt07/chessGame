@@ -22,8 +22,15 @@ namespace chessGame
             {
                 comboBox1.Items.Add(i);
             }
-            winMessage.Location = new Point(this.Width / 2, (this.Height / 2) - 25);
+            winMessage.Location = new Point(150, (this.Height / 2)-50);
             winMessage.BringToFront();
+            winMessage.Multiline = true;
+            winMessage.Font = new Font("Showcard Gothic", 30);
+            winMessage.MinimumSize = new Size(500, 70);
+            winMessage.Size = new Size(500, 70);
+            winMessage.Multiline = false;
+            Controls.Add(winMessage);
+            winMessage.Hide();
             hScore.Hide();
             AIScore.Hide();
         }
@@ -72,6 +79,16 @@ namespace chessGame
                 AI.Score = AIScorePassIn;
                 human.MyPieces = humanPiecesPassIn;
                 human.Score = humanScorePassIn;
+                if (b.board[currentX, currentY].OnCell.PieceName != "empty")
+                {
+                    human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                    PictureBox pB = new PictureBox();
+                    pB.BackColor = Color.Transparent;
+                    pB.Size = new Size(50, 50);
+                    pB.Image = b.board[currentX, currentY].OnCell.PieceImage;
+                    pB.Location = new Point(350 + human.TakenPieces.Count * 50, 10);
+                    Controls.Add(pB);
+                }
                 b.movePiece(currentX, currentY, pastX, pastY, true);
                 hScore.Text = human.Score.ToString();
                 AIScore.Text = AI.Score.ToString();
@@ -85,12 +102,24 @@ namespace chessGame
                 {
                     winMessage.Text = "CHECKMATE - YOU WIN!";
                     winMessage.BackColor = Color.HotPink;
+                    winMessage.Height = 50;
+                    winMessage.Width = 100;
                     winMessage.Show();
                 }
                 else
                 {
                     b.whiteTurn = false;
+                    int pieces = AI.TakenPieces.Count;
                     AI.makeMove(ref human, ref b);
+                    if (AI.TakenPieces.Count  > pieces)
+                    {
+                        PictureBox pB = new PictureBox();
+                        pB.BackColor = Color.Transparent;
+                        pB.Size = new Size(50, 50);
+                        pB.Image = b.board[currentX, currentY].OnCell.PieceImage;
+                        pB.Location = new Point(350 + AI.TakenPieces.Count * 50, 100);
+                        Controls.Add(pB);
+                    }
                     refreshBoard();
                     b.whiteTurn = true;
                     if (b.isGameOver(true) == true)

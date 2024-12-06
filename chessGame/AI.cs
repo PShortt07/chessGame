@@ -58,11 +58,10 @@ namespace chessGame
             Random RNG = new Random();
             bestMove = highestValueMoves[RNG.Next(highestValueMoves.Count)];
             //accounts for taken pieces
-            if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == !human.IsWhite)
+            if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == human.IsWhite)
             {
                 Score += bestMove.newCell.OnCell.Value;
                 TakenPieces.Add(bestMove.newCell.OnCell);
-                human.MyPieces.Remove(bestMove.newCell.OnCell);
             }
             //makes move
             int newX = bestMove.newCell.OnCell.PosX;
@@ -93,13 +92,6 @@ namespace chessGame
             if (depth == 0)
             {
                 long total = myScore - humanScore;
-                foreach (Cell c in chessBoard.board)
-                {
-                    if (c.CoveredByBlack)
-                    {
-                        total += 1;
-                    }
-                }
                 return total;
             }
             if (chessBoard.isGameOver(true))
@@ -113,14 +105,14 @@ namespace chessGame
             //minimax
             if (maxPlayer)
             {
-                chessBoard.whiteTurn = false;
-                long maxEvaluation = -1000;
+                long maxEvaluation = -10000;
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
                 myScore -= position.OnCell.Value;
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
-                foreach(Cell c in chessBoard.board)
+                chessBoard.whiteTurn = false;
+                foreach (Cell c in chessBoard.board)
                 {
                     if (c.OnCell.PieceName != "empty" && !c.OnCell.IsWhite)
                     {
@@ -141,13 +133,13 @@ namespace chessGame
             }
             else
             {
-                chessBoard.whiteTurn = true;
-                long minEvaluation = 1000;
+                long minEvaluation = 10000;
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
                 humanScore -= position.OnCell.Value;
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
+                chessBoard.whiteTurn = true;
                 foreach (Cell c in chessBoard.board)
                 {
                     if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite)

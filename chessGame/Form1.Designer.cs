@@ -1,4 +1,6 @@
-﻿namespace chessGame
+﻿using System.Runtime.CompilerServices;
+
+namespace chessGame
 {
     partial class Form1
     {

@@ -10,7 +10,7 @@ namespace chessGame
     {
         public King(bool white, int x, int y) : base(white, x, y)
         {
-            Value = 150;
+            Value = 0;
             if (IsWhite)
             {
                 PieceImage = Properties.Resources.Wking;
