@@ -76,16 +76,48 @@ namespace chessGame
         }
         public bool isGameOver(bool checkingWhite)
         {
-            foreach (Cell c in board)
+            if (checkingWhite)
             {
-                if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
+                if (wInCheck)
                 {
-                    List<Cell> moves = new List<Cell>();
-                    moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
-                    if (moves.Count > 0)
+                    foreach (Cell c in board)
                     {
-                        return false;
+                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
+                        {
+                            List<Cell> moves = new List<Cell>();
+                            moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                            if (moves.Count > 0)
+                            {
+                                return false;
+                            }
+                        }
                     }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (bInCheck)
+                {
+                    foreach (Cell c in board)
+                    {
+                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
+                        {
+                            List<Cell> moves = new List<Cell>();
+                            moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                            if (moves.Count > 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
             return true;

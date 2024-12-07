@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading;
 using static System.Formats.Asn1.AsnWriter;
 namespace chessGame
 {
@@ -82,12 +83,7 @@ namespace chessGame
                 if (b.board[currentX, currentY].OnCell.PieceName != "empty")
                 {
                     human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
-                    PictureBox pB = new PictureBox();
-                    pB.BackColor = Color.Transparent;
-                    pB.Size = new Size(50, 50);
-                    pB.Image = b.board[currentX, currentY].OnCell.PieceImage;
-                    pB.Location = new Point(350 + human.TakenPieces.Count * 50, 10);
-                    Controls.Add(pB);
+                    updateTakenPieces(currentX, currentY, true);
                 }
                 b.movePiece(currentX, currentY, pastX, pastY, true);
                 hScore.Text = human.Score.ToString();
@@ -110,16 +106,7 @@ namespace chessGame
                 {
                     b.whiteTurn = false;
                     int pieces = AI.TakenPieces.Count;
-                    AI.makeMove(ref human, ref b);
-                    if (AI.TakenPieces.Count  > pieces)
-                    {
-                        PictureBox pB = new PictureBox();
-                        pB.BackColor = Color.Transparent;
-                        pB.Size = new Size(50, 50);
-                        pB.Image = b.board[currentX, currentY].OnCell.PieceImage;
-                        pB.Location = new Point(350 + AI.TakenPieces.Count * 50, 100);
-                        Controls.Add(pB);
-                    }
+                    AI.makeMove(ref human, ref b, this);
                     refreshBoard();
                     b.whiteTurn = true;
                     if (b.isGameOver(true) == true)
@@ -153,6 +140,22 @@ namespace chessGame
                 }
                 lastClicked = clicked;
             }
+        }
+        public void updateTakenPieces(int newX, int newY, bool player)
+        {
+            PictureBox pB = new PictureBox();
+            pB.BackColor = Color.Transparent;
+            pB.Size = new Size(50, 50);
+            pB.Image = b.board[newX, newY].OnCell.PieceImage;
+            if (player)
+            {
+                pB.Location = new Point(350 + human.TakenPieces.Count * 50, 10);
+            }
+            else
+            {
+                pB.Location = new Point(350 + AI.TakenPieces.Count * 50, 250);
+            }
+            Controls.Add(pB);
         }
         //start game
         private void button1_Click(object sender, EventArgs e)
@@ -286,7 +289,7 @@ namespace chessGame
                     AIDepth = 2;
                     break;
                 case 3:
-                    AIDepth = 3;
+                    AIDepth = 4;
                     break;
             }
         }
