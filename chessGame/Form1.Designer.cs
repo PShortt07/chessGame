@@ -39,7 +39,7 @@ namespace chessGame
             // 
             // button1
             // 
-            button1.Location = new Point(331, 292);
+            button1.Location = new Point(646, 261);
             button1.Name = "button1";
             button1.Size = new Size(133, 57);
             button1.TabIndex = 1;
@@ -50,19 +50,19 @@ namespace chessGame
             // label1
             // 
             label1.AutoSize = true;
-            label1.BackColor = Color.HotPink;
-            label1.Font = new Font("Showcard Gothic", 30F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label1.Location = new Point(268, 33);
+            label1.BackColor = Color.Thistle;
+            label1.Font = new Font("Century Schoolbook", 50F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            label1.Location = new Point(474, 131);
             label1.Name = "label1";
-            label1.Size = new Size(256, 50);
+            label1.Size = new Size(471, 79);
             label1.TabIndex = 0;
-            label1.Text = "CHESS GAME";
+            label1.Text = "Elegant Chess";
             label1.Click += label1_Click;
             // 
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(653, 33);
+            comboBox1.Location = new Point(1073, 163);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(121, 23);
             comboBox1.TabIndex = 2;
@@ -71,7 +71,7 @@ namespace chessGame
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(685, 15);
+            label2.Location = new Point(1107, 145);
             label2.Name = "label2";
             label2.Size = new Size(58, 15);
             label2.TabIndex = 3;
@@ -81,8 +81,9 @@ namespace chessGame
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(192, 255, 192);
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1330, 693);
             Controls.Add(label2);
             Controls.Add(comboBox1);
             Controls.Add(button1);

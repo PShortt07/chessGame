@@ -228,13 +228,6 @@ namespace chessGame
             Cell current = board[posX, posY];
             List<Cell> allowedMoves = new List<Cell>();
             addMovesToList(ref allowedMoves, current, true);
-            if (board[posX, posY].OnCell.PieceName == "pawn")
-            {
-                if (allowedMoves.Count != 8)
-                {
-                    board[posX, posY].OnCell.Isolated = true;
-                }
-            }
             if (whiteTurn)
             {
                 foreach (Cell c in board)
