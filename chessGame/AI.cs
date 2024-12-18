@@ -81,12 +81,6 @@ namespace chessGame
             human.MyPieces = humanPiecesPassIn;
             chessBoard.movePiece(newX, newY, oldX, oldY, true);
         }
-        private double scoreThisMove(Player human, Piece thisPiece, double myScore)
-        {
-            //calculates difference in score as a base score, makes positive if negative
-            double total = myScore - human.Score;
-            return total;
-        }
         private long minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
             //scoring system

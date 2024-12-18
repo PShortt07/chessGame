@@ -11,9 +11,11 @@ namespace chessGame
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
         TextBox winMessage = new TextBox();
+        TextBox nameInput = new TextBox();
         Label hScore = new Label();
         Label AIScore = new Label();
         int AIDepth;
+        int numOfMoves = 0;
 
         public Form1()
         {
@@ -23,7 +25,9 @@ namespace chessGame
             {
                 comboBox1.Items.Add(i);
             }
-            winMessage.Location = new Point(150, (this.Height / 2)-50);
+            enterName.Hide();
+            //winMessage
+            winMessage.Location = new Point(150, (this.Height / 2) - 50);
             winMessage.BringToFront();
             winMessage.Multiline = true;
             winMessage.Font = new Font("Showcard Gothic", 30);
@@ -32,7 +36,25 @@ namespace chessGame
             winMessage.Multiline = false;
             Controls.Add(winMessage);
             winMessage.Hide();
+            //nameInput
+            nameInput.Location = new Point(300, (this.Height / 2));
+            nameInput.BringToFront();
+            nameInput.Multiline = true;
+            nameInput.Font = new Font("Showcard Gothic", 30);
+            nameInput.MinimumSize = new Size(500, 70);
+            nameInput.Size = new Size(500, 70);
+            nameInput.Multiline = false;
+            Controls.Add(nameInput);
+            nameInput.Hide();
+            //player score
+            hScore.MinimumSize = new Size(50, 30);
+            hScore.Font = new Font("Century Schoolbook", 20);
+            Controls.Add(hScore);
             hScore.Hide();
+            //AI score
+            AIScore.MinimumSize = new Size(50, 30);
+            AIScore.Font = new Font("Century Schoolbook", 20);
+            Controls.Add(AIScore);
             AIScore.Hide();
         }
 
@@ -69,6 +91,7 @@ namespace chessGame
             Cell location = b.board[currentX, currentY];
             if (location.LegalMove)
             {
+                numOfMoves++;
                 hScore.Text = human.Score.ToString();
                 AIScore.Text = AI.Score.ToString();
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
@@ -96,11 +119,14 @@ namespace chessGame
                 b.resetLegal();
                 if (b.isGameOver(false) == true)
                 {
-                    winMessage.Text = "CHECKMATE - YOU WIN!";
+                    winMessage.TextAlign = HorizontalAlignment.Center;
+                    winMessage.Text = "CHECKMATE - YOU WIN! Enter your name below:";
                     winMessage.BackColor = Color.HotPink;
                     winMessage.Height = 50;
                     winMessage.Width = 100;
                     winMessage.Show();
+                    nameInput.Show();
+                    enterName.Show();
                 }
                 else
                 {
@@ -149,11 +175,11 @@ namespace chessGame
             pB.Image = b.board[newX, newY].OnCell.PieceImage;
             if (player)
             {
-                pB.Location = new Point(350 + human.TakenPieces.Count * 50, 10);
+                pB.Location = new Point(350 + human.TakenPieces.Count * 50, 550);
             }
             else
             {
-                pB.Location = new Point(350 + AI.TakenPieces.Count * 50, 250);
+                pB.Location = new Point(350 + AI.TakenPieces.Count * 50, 20);
             }
             Controls.Add(pB);
         }
@@ -175,9 +201,9 @@ namespace chessGame
         }
         public void refreshBoard()
         {
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
             {
-                for(int j = 0; j < 8; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     boardDisplay[i, j].Image = b.board[i, j].OnCell.PieceImage;
                     boardDisplay[i, j].Refresh();
@@ -218,7 +244,7 @@ namespace chessGame
                             boardDisplay[i, j].BackColor = System.Drawing.Color.White;
                         }
                     }
-                    boardDisplay[i, j].Location = new Point(i * 50, j * 50);
+                    boardDisplay[i, j].Location = new Point(470 + i * 50, 120 + j * 50);
                     boardDisplay[i, j].Show();
                     boardDisplay[i, j].BringToFront();
                     //if button clicked starts board_Click
@@ -292,6 +318,13 @@ namespace chessGame
                     AIDepth = 4;
                     break;
             }
+        }
+
+        private void enterName_Click(object sender, EventArgs e)
+        {
+            StreamWriter sR = new StreamWriter("scores.txt", false);
+            sR.WriteLine(nameInput.Text + ", " + numOfMoves);
+            sR.Close();
         }
     }
 }
