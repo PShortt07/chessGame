@@ -25,6 +25,7 @@ namespace chessGame
             List<Piece> tempPieces = MyPieces;
             long humanScore = human.Score;
             long myScore = Score;
+            long prevMyScore = Score;
             //adds best move for each piece to a list then resets the second board for the next piece analysis
             List<PotentialMove> possibleMoves = new List<PotentialMove>();
             foreach (Piece p in tempPieces)
@@ -36,6 +37,7 @@ namespace chessGame
                 }
             }
             human.Score = prevScore;
+            Score = prevMyScore;
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //finds the highest possible score result of a move
             possibleMoves.OrderBy(o => o.value);
@@ -64,7 +66,6 @@ namespace chessGame
             int oldY = bestMove.p.PosY;
             if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == human.IsWhite)
             {
-                Score += bestMove.newCell.OnCell.Value;
                 TakenPieces.Add(bestMove.newCell.OnCell);
                 f.updateTakenPieces(newX, newY, false);
             }

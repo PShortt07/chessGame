@@ -30,7 +30,7 @@ namespace chessGame
             winMessage.Location = new Point(150, (this.Height / 2) - 50);
             winMessage.BringToFront();
             winMessage.Multiline = true;
-            winMessage.Font = new Font("Showcard Gothic", 30);
+            winMessage.Font = new Font("Century Schoolbook", 30);
             winMessage.MinimumSize = new Size(500, 70);
             winMessage.Size = new Size(500, 70);
             winMessage.Multiline = false;
@@ -40,18 +40,20 @@ namespace chessGame
             nameInput.Location = new Point(300, (this.Height / 2));
             nameInput.BringToFront();
             nameInput.Multiline = true;
-            nameInput.Font = new Font("Showcard Gothic", 30);
+            nameInput.Font = new Font("Century Schoolbook", 30);
             nameInput.MinimumSize = new Size(500, 70);
             nameInput.Size = new Size(500, 70);
             nameInput.Multiline = false;
             Controls.Add(nameInput);
             nameInput.Hide();
             //player score
+            hScore.Location = new Point(100, 300);
             hScore.MinimumSize = new Size(50, 30);
             hScore.Font = new Font("Century Schoolbook", 20);
             Controls.Add(hScore);
             hScore.Hide();
             //AI score
+            AIScore.BackColor = System.Drawing.Color.BurlyWood;
             AIScore.MinimumSize = new Size(50, 30);
             AIScore.Font = new Font("Century Schoolbook", 20);
             Controls.Add(AIScore);
@@ -92,8 +94,6 @@ namespace chessGame
             if (location.LegalMove)
             {
                 numOfMoves++;
-                hScore.Text = human.Score.ToString();
-                AIScore.Text = AI.Score.ToString();
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 long AIScorePassIn = AI.Score;
                 long humanScorePassIn = human.Score;
@@ -121,7 +121,6 @@ namespace chessGame
                 {
                     winMessage.TextAlign = HorizontalAlignment.Center;
                     winMessage.Text = "CHECKMATE - YOU WIN! Enter your name below:";
-                    winMessage.BackColor = Color.HotPink;
                     winMessage.Height = 50;
                     winMessage.Width = 100;
                     winMessage.Show();
@@ -142,6 +141,8 @@ namespace chessGame
                         winMessage.Show();
                     }
                 }
+                hScore.Text = (human.Score/10).ToString();
+                AIScore.Text = (AI.Score/10).ToString();
             }
             else
             {

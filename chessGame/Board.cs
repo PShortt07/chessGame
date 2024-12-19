@@ -80,15 +80,19 @@ namespace chessGame
             {
                 if (wInCheck)
                 {
-                    foreach (Cell c in board)
+                    for (int i = 0; i < 8; i++)
                     {
-                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
+                        for (int j = 0; j < 8; j++)
                         {
-                            List<Cell> moves = new List<Cell>();
-                            moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
-                            if (moves.Count > 0)
+                            Cell c = board[i, j];
+                            if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == true)
                             {
-                                return false;
+                                List<Cell> moves = new List<Cell>();
+                                moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                                if (moves.Count > 0)
+                                {
+                                    return false;
+                                }
                             }
                         }
                     }
@@ -104,7 +108,7 @@ namespace chessGame
                 {
                     foreach (Cell c in board)
                     {
-                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
+                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == false)
                         {
                             List<Cell> moves = new List<Cell>();
                             moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
