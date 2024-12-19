@@ -189,6 +189,19 @@ namespace chessGame
         //updates board array when a piece is moved
         public void movePiece(int newX, int newY, int pastX, int pastY, bool realMove)
         {
+            if (board[pastX, pastY].OnCell.PieceName == "king")
+            {
+                if (board[pastX, pastY].OnCell.IsWhite)
+                {
+                    wKingX = newX;
+                    wKingY = newY;
+                }
+                else
+                {
+                    bKingX = newX;
+                    bKingY = newY;
+                }
+            }
             board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
             board[newX, newY].OnCell = board[pastX, pastY].OnCell;
             board[newX, newY].OnCell.PosX = newX;
