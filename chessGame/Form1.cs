@@ -3,6 +3,7 @@ using System.Linq;
 using System.Resources;
 using System.Threading;
 using static System.Formats.Asn1.AsnWriter;
+using 
 namespace chessGame
 {
     public partial class Form1 : Form
@@ -145,8 +146,8 @@ namespace chessGame
                         winMessage.Show();
                     }
                 }
-                hScore.Text = (human.Score/10).ToString();
-                AIScore.Text = (AI.Score/10).ToString();
+                hScore.Text = (human.Score / 10).ToString();
+                AIScore.Text = (AI.Score / 10).ToString();
             }
             else
             {
@@ -327,9 +328,15 @@ namespace chessGame
 
         private void enterName_Click(object sender, EventArgs e)
         {
+
             IResourceWriter resourceWriter = new ResourceWriter("Resources.scores.txt");
             resourceWriter.AddResource(nameInput.Text, numOfMoves);
             resourceWriter.Close();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            SqlConnection 
         }
     }
 }

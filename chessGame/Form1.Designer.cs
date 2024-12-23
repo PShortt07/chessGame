@@ -36,6 +36,7 @@ namespace chessGame
             comboBox1 = new ComboBox();
             label2 = new Label();
             enterName = new Button();
+            button2 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -88,6 +89,16 @@ namespace chessGame
             enterName.UseVisualStyleBackColor = true;
             enterName.Click += enterName_Click;
             // 
+            // button2
+            // 
+            button2.Location = new Point(475, 275);
+            button2.Name = "button2";
+            button2.Size = new Size(85, 23);
+            button2.TabIndex = 5;
+            button2.Text = "Leaderboard";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -95,6 +106,7 @@ namespace chessGame
             BackColor = Color.FromArgb(192, 255, 192);
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1330, 693);
+            Controls.Add(button2);
             Controls.Add(enterName);
             Controls.Add(label2);
             Controls.Add(comboBox1);
@@ -113,5 +125,6 @@ namespace chessGame
         private ComboBox comboBox1;
         private Label label2;
         private Button enterName;
+        private Button button2;
     }
 }
