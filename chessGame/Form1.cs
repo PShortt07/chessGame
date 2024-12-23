@@ -1,4 +1,6 @@
+using chessGame.Properties;
 using System.Linq;
+using System.Resources;
 using System.Threading;
 using static System.Formats.Asn1.AsnWriter;
 namespace chessGame
@@ -27,7 +29,7 @@ namespace chessGame
             }
             enterName.Hide();
             //winMessage
-            winMessage.Location = new Point(150, (this.Height / 2) - 50);
+            winMessage.Location = new Point(415, (this.Height / 2) - 100);
             winMessage.BringToFront();
             winMessage.Multiline = true;
             winMessage.Font = new Font("Century Schoolbook", 30);
@@ -37,7 +39,7 @@ namespace chessGame
             Controls.Add(winMessage);
             winMessage.Hide();
             //nameInput
-            nameInput.Location = new Point(300, (this.Height / 2));
+            nameInput.Location = new Point(415, (this.Height / 2) - 50);
             nameInput.BringToFront();
             nameInput.Multiline = true;
             nameInput.Font = new Font("Century Schoolbook", 30);
@@ -117,10 +119,12 @@ namespace chessGame
                 boardDisplay[pastX, pastY].Refresh();
                 resetColours();
                 b.resetLegal();
+                hScore.Text = (human.Score / 10).ToString();
+                AIScore.Text = (AI.Score / 10).ToString();
                 if (b.isGameOver(false) == true)
                 {
                     winMessage.TextAlign = HorizontalAlignment.Center;
-                    winMessage.Text = "CHECKMATE - YOU WIN! Enter your name below:";
+                    winMessage.Text = "CHECKMATE - YOU WIN!";
                     winMessage.Height = 50;
                     winMessage.Width = 100;
                     winMessage.Show();
@@ -323,9 +327,9 @@ namespace chessGame
 
         private void enterName_Click(object sender, EventArgs e)
         {
-            StreamWriter sR = new StreamWriter("scores.txt", false);
-            sR.WriteLine(nameInput.Text + ", " + numOfMoves);
-            sR.Close();
+            IResourceWriter resourceWriter = new ResourceWriter("Resources.scores.txt");
+            resourceWriter.AddResource(nameInput.Text, numOfMoves);
+            resourceWriter.Close();
         }
     }
 }

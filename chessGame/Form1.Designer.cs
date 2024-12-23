@@ -80,7 +80,7 @@ namespace chessGame
             // 
             // enterName
             // 
-            enterName.Location = new Point(627, 380);
+            enterName.Location = new Point(632, 403);
             enterName.Name = "enterName";
             enterName.Size = new Size(75, 23);
             enterName.TabIndex = 4;

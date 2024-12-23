@@ -78,37 +78,12 @@ namespace chessGame
         {
             if (checkingWhite)
             {
-                if (wInCheck)
+                for (int i = 0; i < 8; i++)
                 {
-                    for (int i = 0; i < 8; i++)
+                    for (int j = 0; j < 8; j++)
                     {
-                        for (int j = 0; j < 8; j++)
-                        {
-                            Cell c = board[i, j];
-                            if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == true)
-                            {
-                                List<Cell> moves = new List<Cell>();
-                                moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
-                                if (moves.Count > 0)
-                                {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (bInCheck)
-                {
-                    foreach (Cell c in board)
-                    {
-                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == false)
+                        Cell c = board[i, j];
+                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == true)
                         {
                             List<Cell> moves = new List<Cell>();
                             moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
@@ -119,9 +94,20 @@ namespace chessGame
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+                foreach (Cell c in board)
                 {
-                    return false;
+                    if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == false)
+                    {
+                        List<Cell> moves = new List<Cell>();
+                        moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                        if (moves.Count > 0)
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
             return true;
