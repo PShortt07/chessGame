@@ -3,7 +3,8 @@ using System.Linq;
 using System.Resources;
 using System.Threading;
 using static System.Formats.Asn1.AsnWriter;
-using 
+using Microsoft.Data.SqlClient;
+using System.Data;
 namespace chessGame
 {
     public partial class Form1 : Form
@@ -328,15 +329,44 @@ namespace chessGame
 
         private void enterName_Click(object sender, EventArgs e)
         {
+            string name = nameInput.Text;
+            int score = numOfMoves;
+            string toInsert = "INSERT INTO [scoreTable] (Name, Moves) VALUES (@name, @score)";
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            scoresCon.Open();
+            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+            cmd.Parameters.AddWithValue("name", name);
+            cmd.Parameters.AddWithValue("score", score);
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch
+            {
 
-            IResourceWriter resourceWriter = new ResourceWriter("Resources.scores.txt");
-            resourceWriter.AddResource(nameInput.Text, numOfMoves);
-            resourceWriter.Close();
+            }
+            scoresCon.Close();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void leaderboardButton_Click(object sender, EventArgs e)
         {
-            SqlConnection 
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            scoresCon.Open();
+            string sql = "SELECT * FROM [scoreTable]";
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);
+            DataTable dt = new DataTable();
+            dataAdapter.Fill(dt);
+            DataGridView leaderboardDisplay = new DataGridView();
+            leaderboardDisplay.Width = 400;
+            leaderboardDisplay.Height = 500;
+            leaderboardDisplay.AutoGenerateColumns = true;
+            leaderboardDisplay.ColumnCount = 2;
+            foreach (DataRow row in dt.Rows)
+            {
+                leaderboardDisplay.Rows.Add(row);
+            }
+            Controls.Add(leaderboardDisplay);
+            scoresCon.Close();
         }
     }
 }
