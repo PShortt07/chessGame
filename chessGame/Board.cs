@@ -76,7 +76,6 @@ namespace chessGame
         }
         public bool isGameOver(bool checkingWhite)
         {
-            return true;
             if (checkingWhite)
             {
                 for (int i = 0; i < 8; i++)

@@ -193,6 +193,7 @@ namespace chessGame
         //start game
         private void button1_Click(object sender, EventArgs e)
         {
+            leaderboardButton.Hide();
             label1.Hide();
             button1.Hide();
             label2.Hide();
@@ -331,28 +332,32 @@ namespace chessGame
         {
             string name = nameInput.Text;
             int score = numOfMoves;
-            string toInsert = "INSERT INTO [scoreTable] (Name, Moves) VALUES (@name, @score)";
+            string check = "SELECT * FROM [users] WHERE Name = @name";
+            string toInsert = "INSERT INTO [users] (UserID, Name, Moves) VALUES (1, @name, @score)";
             SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
-            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+            SqlCommand cmd = new SqlCommand(check, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
-            cmd.Parameters.AddWithValue("score", score);
-            try
+            int affected = cmd.ExecuteNonQuery();
+            if (affected > 0)
             {
-                cmd.ExecuteNonQuery();
+                //add login page text box code
             }
-            catch
+            else
             {
-
+                cmd = new SqlCommand(toInsert, scoresCon);
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("score", score);
+                cmd.ExecuteNonQuery();
             }
             scoresCon.Close();
         }
 
         private void leaderboardButton_Click(object sender, EventArgs e)
         {
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\source\repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
-            string sql = "SELECT * FROM [scoreTable]";
+            string sql = "SELECT * FROM [users]";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);
             DataTable dt = new DataTable();
             dataAdapter.Fill(dt);
