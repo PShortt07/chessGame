@@ -35,7 +35,6 @@ namespace chessGame
             label1 = new Label();
             comboBox1 = new ComboBox();
             label2 = new Label();
-            enterName = new Button();
             leaderboardButton = new Button();
             SuspendLayout();
             // 
@@ -79,16 +78,6 @@ namespace chessGame
             label2.TabIndex = 3;
             label2.Text = "Difficulty:";
             // 
-            // enterName
-            // 
-            enterName.Location = new Point(632, 403);
-            enterName.Name = "enterName";
-            enterName.Size = new Size(75, 23);
-            enterName.TabIndex = 4;
-            enterName.Text = "Done";
-            enterName.UseVisualStyleBackColor = true;
-            enterName.Click += enterName_Click;
-            // 
             // leaderboardButton
             // 
             leaderboardButton.Location = new Point(475, 275);
@@ -107,7 +96,6 @@ namespace chessGame
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1330, 693);
             Controls.Add(leaderboardButton);
-            Controls.Add(enterName);
             Controls.Add(label2);
             Controls.Add(comboBox1);
             Controls.Add(button1);
@@ -124,7 +112,6 @@ namespace chessGame
         private Label label1;
         private ComboBox comboBox1;
         private Label label2;
-        private Button enterName;
         private Button leaderboardButton;
     }
 }

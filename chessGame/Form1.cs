@@ -10,26 +10,26 @@ namespace chessGame
     public partial class Form1 : Form
     {
         Board b = new Board();
-        Player human = new Player();
         AI AI;
+        Player human = new Player();
         Button[,] boardDisplay = new Button[8, 8];
         Button lastClicked = new Button();
         TextBox winMessage = new TextBox();
-        TextBox nameInput = new TextBox();
         Label hScore = new Label();
         Label AIScore = new Label();
         int AIDepth;
         int numOfMoves = 0;
+        string playerUsername;
 
-        public Form1()
+        public Form1(string uName)
         {
+            playerUsername = uName;
             InitializeComponent();
             human.IsWhite = true;
             for (int i = 1; i <= 3; i++)
             {
                 comboBox1.Items.Add(i);
             }
-            enterName.Hide();
             //winMessage
             winMessage.Location = new Point(415, (this.Height / 2) - 100);
             winMessage.BringToFront();
@@ -40,16 +40,6 @@ namespace chessGame
             winMessage.Multiline = false;
             Controls.Add(winMessage);
             winMessage.Hide();
-            //nameInput
-            nameInput.Location = new Point(415, (this.Height / 2) - 50);
-            nameInput.BringToFront();
-            nameInput.Multiline = true;
-            nameInput.Font = new Font("Century Schoolbook", 30);
-            nameInput.MinimumSize = new Size(500, 70);
-            nameInput.Size = new Size(500, 70);
-            nameInput.Multiline = false;
-            Controls.Add(nameInput);
-            nameInput.Hide();
             //player score
             hScore.Location = new Point(100, 300);
             hScore.MinimumSize = new Size(50, 30);
@@ -130,8 +120,17 @@ namespace chessGame
                     winMessage.Height = 50;
                     winMessage.Width = 100;
                     winMessage.Show();
-                    nameInput.Show();
-                    enterName.Show();
+                    string name = playerUsername;
+                    int score = numOfMoves;
+                    //finish this
+                    string toInsert = "UPDATE";
+                    SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+                    scoresCon.Open();
+                    SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+                    cmd.Parameters.AddWithValue("name", name);
+                    cmd.Parameters.AddWithValue("score", score);
+                    cmd.ExecuteNonQuery();
+                    scoresCon.Close();
                 }
                 else
                 {
@@ -257,7 +256,7 @@ namespace chessGame
                     boardDisplay[i, j].BringToFront();
                     //if button clicked starts board_Click
                     boardDisplay[i, j].Click += new EventHandler(board_Click);
-                    this.Controls.Add(boardDisplay[i, j]);
+                    Controls.Add(boardDisplay[i, j]);
                 }
             }
             hScore.Location = new Point(100, 20);
@@ -326,31 +325,6 @@ namespace chessGame
                     AIDepth = 4;
                     break;
             }
-        }
-
-        private void enterName_Click(object sender, EventArgs e)
-        {
-            string name = nameInput.Text;
-            int score = numOfMoves;
-            string check = "SELECT * FROM [users] WHERE Name = @name";
-            string toInsert = "INSERT INTO [users] (UserID, Name, Moves) VALUES (1, @name, @score)";
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
-            scoresCon.Open();
-            SqlCommand cmd = new SqlCommand(check, scoresCon);
-            cmd.Parameters.AddWithValue("name", name);
-            int affected = cmd.ExecuteNonQuery();
-            if (affected > 0)
-            {
-                //add login page text box code
-            }
-            else
-            {
-                cmd = new SqlCommand(toInsert, scoresCon);
-                cmd.Parameters.AddWithValue("name", name);
-                cmd.Parameters.AddWithValue("score", score);
-                cmd.ExecuteNonQuery();
-            }
-            scoresCon.Close();
         }
 
         private void leaderboardButton_Click(object sender, EventArgs e)
