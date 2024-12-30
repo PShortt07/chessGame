@@ -31,13 +31,15 @@ namespace chessGame
                 comboBox1.Items.Add(i);
             }
             //winMessage
-            winMessage.Location = new Point(415, (this.Height / 2) - 100);
             winMessage.BringToFront();
             winMessage.Multiline = true;
             winMessage.Font = new Font("Century Schoolbook", 30);
             winMessage.MinimumSize = new Size(500, 70);
             winMessage.Size = new Size(500, 70);
             winMessage.Multiline = false;
+            winMessage.TextAlign = HorizontalAlignment.Center;
+            winMessage.Height = 50;
+            winMessage.Width = 100;
             Controls.Add(winMessage);
             winMessage.Hide();
             //player score
@@ -115,22 +117,34 @@ namespace chessGame
                 AIScore.Text = (AI.Score / 10).ToString();
                 if (b.isGameOver(false) == true)
                 {
-                    winMessage.TextAlign = HorizontalAlignment.Center;
-                    winMessage.Text = "CHECKMATE - YOU WIN!";
-                    winMessage.Height = 50;
-                    winMessage.Width = 100;
+                    if (b.bInCheck)
+                    {
+                        winMessage.Text = "CHECKMATE - YOU WIN!";
+                        //find currently recorded high score for the user
+                        string name = playerUsername;
+                        string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
+                        SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+                        scoresCon.Open();
+                        SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+                        cmd.Parameters.AddWithValue("name", name);
+                        var hS = cmd.ExecuteScalar();
+                        //updates score if lower than previous high score
+                        if (hS == null || numOfMoves < int.Parse(hS.ToString()))
+                        {
+                            toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
+                            int score = numOfMoves;
+                            cmd = new SqlCommand(toInsert, scoresCon);
+                            cmd.Parameters.AddWithValue("name", name);
+                            cmd.Parameters.AddWithValue("score", score);
+                            cmd.ExecuteNonQuery();
+                        }
+                        scoresCon.Close();
+                    }
+                    else
+                    {
+                        winMessage.Text = "STALEMATE - DRAW";
+                    }
                     winMessage.Show();
-                    string name = playerUsername;
-                    int score = numOfMoves;
-                    //finish this
-                    string toInsert = "UPDATE";
-                    SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
-                    scoresCon.Open();
-                    SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
-                    cmd.Parameters.AddWithValue("name", name);
-                    cmd.Parameters.AddWithValue("score", score);
-                    cmd.ExecuteNonQuery();
-                    scoresCon.Close();
                 }
                 else
                 {
@@ -141,8 +155,14 @@ namespace chessGame
                     b.whiteTurn = true;
                     if (b.isGameOver(true) == true)
                     {
-                        winMessage.Text = "CHECKMATE - AI WINS!";
-                        winMessage.BackColor = Color.HotPink;
+                        if (b.wInCheck)
+                        {
+                            winMessage.Text = "CHECKMATE - AI WINS!";
+                        }
+                        else
+                        {
+                            winMessage.Text = "STALEMATE - DRAW";
+                        }
                         winMessage.Show();
                     }
                 }
@@ -331,7 +351,7 @@ namespace chessGame
         {
             SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\source\repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
-            string sql = "SELECT * FROM [users]";
+            string sql = "SELECT * FROM [highScores]";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);
             DataTable dt = new DataTable();
             dataAdapter.Fill(dt);

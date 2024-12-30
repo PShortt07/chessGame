@@ -13,8 +13,8 @@ namespace chessGame
     {
         public bool whiteTurn = true;
         public Cell[,] board = new Cell[8, 8];
-        private bool wInCheck;
-        private bool bInCheck;
+        public bool wInCheck;
+        public bool bInCheck;
         public int bKingX;
         public int bKingY;
         public int wKingX;
