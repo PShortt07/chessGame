@@ -34,15 +34,15 @@ namespace chessGame
             SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
             //fix this
-            string toInsert = "SELECT * FROM [userLogins] WHERE Username = @u AND Password = @p";
+            string toInsert = "SELECT * FROM [userLogins] WHERE Username = @username AND Password = @password";
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             string username = usernameTextBox.Text;
             string password = passwordTextBox.Text;
-            cmd.Parameters.AddWithValue("u", username);
-            cmd.Parameters.AddWithValue("p", password);
-            int matches = cmd.ExecuteNonQuery();
+            cmd.Parameters.AddWithValue("username", username);
+            cmd.Parameters.AddWithValue("password", password);
+            var found = cmd.ExecuteScalar();
             scoresCon.Close();
-            if (matches > 0)
+            if (found != null)
             {
                 Form1 f1 = new Form1(username);
                 f1.Show();

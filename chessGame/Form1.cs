@@ -129,9 +129,18 @@ namespace chessGame
                         cmd.Parameters.AddWithValue("name", name);
                         var hS = cmd.ExecuteScalar();
                         //updates score if lower than previous high score
-                        if (hS == null || numOfMoves < int.Parse(hS.ToString()))
+                        if (hS != null && numOfMoves < int.Parse(hS.ToString()))
                         {
                             toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
+                            int score = numOfMoves;
+                            cmd = new SqlCommand(toInsert, scoresCon);
+                            cmd.Parameters.AddWithValue("name", name);
+                            cmd.Parameters.AddWithValue("score", score);
+                            cmd.ExecuteNonQuery();
+                        }
+                        else if (hS == null)
+                        {
+                            toInsert = "INSERT INTO [highScores] (Username, Moves) VALUES (@name, @score)";
                             int score = numOfMoves;
                             cmd = new SqlCommand(toInsert, scoresCon);
                             cmd.Parameters.AddWithValue("name", name);
@@ -283,16 +292,6 @@ namespace chessGame
             hScore.Size = new Size(20, 10);
             AIScore.Location = new Point(100, 80);
             AIScore.Size = new Size(20, 10);
-            //timer for the players
-            //System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
-            //t.Interval = 600000;
-            //t.Start();
-            //t.Tick += new EventHandler(timer_tick);
-        }
-        //updates text box with timer value each second
-        private void timer_tick(object sender, EventArgs e)
-        {
-            TextBox timerShow = new TextBox();
         }
         private void promotion(Pawn p, Piece toBecome)
         {
@@ -356,14 +355,10 @@ namespace chessGame
             DataTable dt = new DataTable();
             dataAdapter.Fill(dt);
             DataGridView leaderboardDisplay = new DataGridView();
+            leaderboardDisplay.DataSource = dt;
             leaderboardDisplay.Width = 400;
             leaderboardDisplay.Height = 500;
             leaderboardDisplay.AutoGenerateColumns = true;
-            leaderboardDisplay.ColumnCount = 2;
-            foreach (DataRow row in dt.Rows)
-            {
-                leaderboardDisplay.Rows.Add(row);
-            }
             Controls.Add(leaderboardDisplay);
             scoresCon.Close();
         }
