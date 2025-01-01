@@ -90,6 +90,10 @@ namespace chessGame
             if (location.LegalMove)
             {
                 numOfMoves++;
+                if (location.OnCell.CanPromote)
+                {
+                    promotion(location.OnCell);
+                }
                 List<Piece> AIPiecesPassIn = AI.MyPieces;
                 long AIScorePassIn = AI.Score;
                 long humanScorePassIn = human.Score;
@@ -293,9 +297,22 @@ namespace chessGame
             AIScore.Location = new Point(100, 80);
             AIScore.Size = new Size(20, 10);
         }
-        private void promotion(Pawn p, Piece toBecome)
+        private void promotion(Piece p)
         {
-            b.board[p.PosX, p.PosY].OnCell = toBecome;
+            Button opQ = new Button();
+            opQ.Image = Resources.queen;
+            Button opR = new Button();
+            Button opK = new Button();
+            Button opB = new Button();
+            Button[] options = new Button[4];
+            for (int i = 0; i < options.Length; i++)
+            {
+                options[i].Height = 50;
+                options[i].Width = 50;
+                options[i].BringToFront();
+                options[i].Location = new Point(450, 150 + i * 50);
+                Controls.Add(options[i]);
+            }
         }
         private void resetColours()
         {

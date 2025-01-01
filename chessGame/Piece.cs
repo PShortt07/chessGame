@@ -22,7 +22,7 @@ namespace chessGame
         private Stack<int> lastCoords;
         private Stack<int> lastX;
         private Stack<int> lastY;
-        private bool isolated;
+        private bool canPromote;
 
         public int Value { get => value; set => this.value = value; }
         public int PosX { get => posX; set => posX = value; }
@@ -36,11 +36,11 @@ namespace chessGame
         internal Stack<Piece> LastTaken { get => lastTaken; set => lastTaken = value; }
         public Stack<int> LastX { get => lastX; set => lastX = value; }
         public Stack<int> LastY { get => lastY; set => lastY = value; }
-        public bool Isolated { get => isolated; set => isolated = value; }
+        public bool CanPromote { get => canPromote; set => canPromote = value; }
 
         public Piece(bool white, int x, int y)
         {
-            Isolated = false;
+            CanPromote = false;
             IsWhite = white;
             PosX = x;
             PosY = y;
