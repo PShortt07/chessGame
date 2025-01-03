@@ -20,6 +20,7 @@ namespace chessGame
         int AIDepth;
         int numOfMoves = 0;
         string playerUsername;
+        bool moveInProgress = false;
 
         public Form1(string uName)
         {
@@ -63,114 +64,98 @@ namespace chessGame
         //if player clicks board/button
         private void board_Click(object sender, EventArgs e)
         {
-            Button clicked = (Button)sender;
-            int currentX = 0;
-            int currentY = 0;
-            int pastX = 0;
-            int pastY = 0;
-            //finds location of the last button clicked and the current button
-            for (int i = 0; i < 8; i++)
+            if (!moveInProgress)
             {
-                for (int j = 0; j < 8; j++)
+                moveInProgress = true;
+                Button clicked = (Button)sender;
+                int currentX = 0;
+                int currentY = 0;
+                int pastX = 0;
+                int pastY = 0;
+                //finds location of the last button clicked and the current button
+                for (int i = 0; i < 8; i++)
                 {
-                    if (boardDisplay[i, j] == clicked)
+                    for (int j = 0; j < 8; j++)
                     {
-                        currentX = i;
-                        currentY = j;
-                    }
-                    if (boardDisplay[i, j] == lastClicked)
-                    {
-                        pastX = i;
-                        pastY = j;
-                    }
-                }
-            }
-            //moves piece if one has been selected and the clicked button is a legal move
-            Cell location = b.board[currentX, currentY];
-            if (location.LegalMove)
-            {
-                numOfMoves++;
-                if (location.OnCell.CanPromote)
-                {
-                    promotion(location.OnCell);
-                }
-                List<Piece> AIPiecesPassIn = AI.MyPieces;
-                long AIScorePassIn = AI.Score;
-                long humanScorePassIn = human.Score;
-                List<Piece> humanPiecesPassIn = human.MyPieces;
-                b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
-                AI.MyPieces = AIPiecesPassIn;
-                AI.Score = AIScorePassIn;
-                human.MyPieces = humanPiecesPassIn;
-                human.Score = humanScorePassIn;
-                if (b.board[currentX, currentY].OnCell.PieceName != "empty")
-                {
-                    human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
-                    updateTakenPieces(currentX, currentY, true);
-                }
-                b.movePiece(currentX, currentY, pastX, pastY, true);
-                hScore.Text = human.Score.ToString();
-                AIScore.Text = AI.Score.ToString();
-                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
-                boardDisplay[currentX, currentY].Refresh();
-                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
-                boardDisplay[pastX, pastY].Refresh();
-                resetColours();
-                b.resetLegal();
-                hScore.Text = (human.Score / 10).ToString();
-                AIScore.Text = (AI.Score / 10).ToString();
-                if (b.isGameOver(false) == true)
-                {
-                    if (b.bInCheck)
-                    {
-                        winMessage.Text = "CHECKMATE - YOU WIN!";
-                        //find currently recorded high score for the user
-                        string name = playerUsername;
-                        string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
-                        SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
-                        scoresCon.Open();
-                        SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
-                        cmd.Parameters.AddWithValue("name", name);
-                        var hS = cmd.ExecuteScalar();
-                        //updates score if lower than previous high score
-                        if (hS != null && numOfMoves < int.Parse(hS.ToString()))
+                        if (boardDisplay[i, j] == clicked)
                         {
-                            toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
-                            int score = numOfMoves;
-                            cmd = new SqlCommand(toInsert, scoresCon);
-                            cmd.Parameters.AddWithValue("name", name);
-                            cmd.Parameters.AddWithValue("score", score);
-                            cmd.ExecuteNonQuery();
+                            currentX = i;
+                            currentY = j;
                         }
-                        else if (hS == null)
+                        if (boardDisplay[i, j] == lastClicked)
                         {
-                            toInsert = "INSERT INTO [highScores] (Username, Moves) VALUES (@name, @score)";
-                            int score = numOfMoves;
-                            cmd = new SqlCommand(toInsert, scoresCon);
-                            cmd.Parameters.AddWithValue("name", name);
-                            cmd.Parameters.AddWithValue("score", score);
-                            cmd.ExecuteNonQuery();
+                            pastX = i;
+                            pastY = j;
                         }
-                        scoresCon.Close();
                     }
-                    else
-                    {
-                        winMessage.Text = "STALEMATE - DRAW";
-                    }
-                    winMessage.Show();
                 }
-                else
+                //moves piece if one has been selected and the clicked button is a legal move
+                Cell location = b.board[currentX, currentY];
+                if (location.LegalMove)
                 {
-                    b.whiteTurn = false;
-                    int pieces = AI.TakenPieces.Count;
-                    AI.makeMove(ref human, ref b, this);
-                    refreshBoard();
-                    b.whiteTurn = true;
-                    if (b.isGameOver(true) == true)
+                    numOfMoves++;
+                    //if (location.OnCell.CanPromote)
+                    //{
+                    //promotion(location.OnCell);
+                    //}
+                    List<Piece> AIPiecesPassIn = AI.MyPieces;
+                    long AIScorePassIn = AI.Score;
+                    long humanScorePassIn = human.Score;
+                    List<Piece> humanPiecesPassIn = human.MyPieces;
+                    b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
+                    AI.MyPieces = AIPiecesPassIn;
+                    AI.Score = AIScorePassIn;
+                    human.MyPieces = humanPiecesPassIn;
+                    human.Score = humanScorePassIn;
+                    if (b.board[currentX, currentY].OnCell.PieceName != "empty")
                     {
-                        if (b.wInCheck)
+                        human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                        updateTakenPieces(currentX, currentY, true);
+                    }
+                    b.movePiece(currentX, currentY, pastX, pastY, true);
+                    hScore.Text = human.Score.ToString();
+                    AIScore.Text = AI.Score.ToString();
+                    boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
+                    boardDisplay[currentX, currentY].Refresh();
+                    boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
+                    boardDisplay[pastX, pastY].Refresh();
+                    resetColours();
+                    b.resetLegal();
+                    hScore.Text = (human.Score / 10).ToString();
+                    AIScore.Text = (AI.Score / 10).ToString();
+                    if (b.isGameOver(false) == true)
+                    {
+                        if (b.bInCheck)
                         {
-                            winMessage.Text = "CHECKMATE - AI WINS!";
+                            winMessage.Text = "CHECKMATE - YOU WIN!";
+                            //find currently recorded high score for the user
+                            string name = playerUsername;
+                            string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
+                            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+                            scoresCon.Open();
+                            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+                            cmd.Parameters.AddWithValue("name", name);
+                            var hS = cmd.ExecuteScalar();
+                            //updates score if lower than previous high score
+                            if (hS != null && numOfMoves < int.Parse(hS.ToString()))
+                            {
+                                toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
+                                int score = numOfMoves;
+                                cmd = new SqlCommand(toInsert, scoresCon);
+                                cmd.Parameters.AddWithValue("name", name);
+                                cmd.Parameters.AddWithValue("score", score);
+                                cmd.ExecuteNonQuery();
+                            }
+                            else if (hS == null)
+                            {
+                                toInsert = "INSERT INTO [highScores] (Username, Moves) VALUES (@name, @score)";
+                                int score = numOfMoves;
+                                cmd = new SqlCommand(toInsert, scoresCon);
+                                cmd.Parameters.AddWithValue("name", name);
+                                cmd.Parameters.AddWithValue("score", score);
+                                cmd.ExecuteNonQuery();
+                            }
+                            scoresCon.Close();
                         }
                         else
                         {
@@ -178,32 +163,57 @@ namespace chessGame
                         }
                         winMessage.Show();
                     }
-                }
-                hScore.Text = (human.Score / 10).ToString();
-                AIScore.Text = (AI.Score / 10).ToString();
-            }
-            else
-            {
-                resetColours();
-                //assumes player is white
-                //changes all legal move position background colours to light green
-                if (b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
-                {
-                    b.resetLegal();
-                    b.FindLegalMoves(currentX, currentY);
-                    for (int i = 0; i < 8; i++)
+                    else
                     {
-                        for (int j = 0; j < 8; j++)
+                        b.whiteTurn = false;
+                        int pieces = AI.TakenPieces.Count;
+                        AI.makeMove(ref human, ref b, this);
+                        refreshBoard();
+                        b.whiteTurn = true;
+                        if (b.isGameOver(true) == true)
                         {
-                            if (b.board[i, j].LegalMove)
+                            if (b.wInCheck)
                             {
-                                boardDisplay[i, j].BackColor = Color.LightGreen;
-                                boardDisplay[i, j].Refresh();
+                                winMessage.Text = "CHECKMATE - AI WINS!";
+                            }
+                            else
+                            {
+                                winMessage.Text = "STALEMATE - DRAW";
+                            }
+                            winMessage.Show();
+                        }
+                        else
+                        {
+                            moveInProgress = false;
+                        }
+                    }
+                    hScore.Text = (human.Score / 10).ToString();
+                    AIScore.Text = (AI.Score / 10).ToString();
+                }
+                else
+                {
+                    resetColours();
+                    //assumes player is white
+                    //changes all legal move position background colours to light green
+                    if (b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
+                    {
+                        b.resetLegal();
+                        b.FindLegalMoves(currentX, currentY);
+                        for (int i = 0; i < 8; i++)
+                        {
+                            for (int j = 0; j < 8; j++)
+                            {
+                                if (b.board[i, j].LegalMove)
+                                {
+                                    boardDisplay[i, j].BackColor = Color.LightGreen;
+                                    boardDisplay[i, j].Refresh();
+                                }
                             }
                         }
                     }
+                    lastClicked = clicked;
+                    moveInProgress = false;
                 }
-                lastClicked = clicked;
             }
         }
         public void updateTakenPieces(int newX, int newY, bool player)

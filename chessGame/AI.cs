@@ -32,7 +32,7 @@ namespace chessGame
             {
                 foreach (Cell move in chessBoard.FindLegalMoves(p.PosX, p.PosY))
                 {
-                    long value = minimax(p, move, false, 0, 0, depth, chessBoard, humanScore, myScore);
+                    long value = minimax(p, move, false, 0, 0, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
                     possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
@@ -105,7 +105,6 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                myScore -= position.OnCell.Value;
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
                 chessBoard.whiteTurn = false;
                 foreach (Cell c in chessBoard.board)
@@ -136,7 +135,6 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                humanScore -= position.OnCell.Value;
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
                 chessBoard.whiteTurn = true;
                 foreach (Cell c in chessBoard.board)
