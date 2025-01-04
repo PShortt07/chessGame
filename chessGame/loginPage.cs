@@ -17,6 +17,7 @@ namespace chessGame
         public loginPage()
         {
             InitializeComponent();
+            this.BackColor = Color.FromArgb(64, 61, 58);
         }
 
         private void loginPage_Load(object sender, EventArgs e)

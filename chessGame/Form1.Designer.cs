@@ -31,62 +31,80 @@ namespace chessGame
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            button1 = new Button();
-            label1 = new Label();
-            comboBox1 = new ComboBox();
-            label2 = new Label();
+            playButton = new Button();
+            titleLabel = new Label();
+            difficultySelector = new ComboBox();
+            difficultyLabel = new Label();
             leaderboardButton = new Button();
+            underline = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)underline).BeginInit();
             SuspendLayout();
             // 
-            // button1
+            // playButton
             // 
-            button1.Location = new Point(599, 258);
-            button1.Name = "button1";
-            button1.Size = new Size(133, 57);
-            button1.TabIndex = 1;
-            button1.Text = "PLAY";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            playButton.BackColor = Color.DarkSeaGreen;
+            playButton.Font = new Font("Century Schoolbook", 15.75F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
+            playButton.Location = new Point(589, 269);
+            playButton.Name = "playButton";
+            playButton.Size = new Size(178, 84);
+            playButton.TabIndex = 1;
+            playButton.Text = "Play";
+            playButton.UseVisualStyleBackColor = false;
+            playButton.Click += playButton_Click;
             // 
-            // label1
+            // titleLabel
             // 
-            label1.AutoSize = true;
-            label1.BackColor = Color.Thistle;
-            label1.Font = new Font("Century Schoolbook", 50F, FontStyle.Italic, GraphicsUnit.Point, 0);
-            label1.Location = new Point(441, 131);
-            label1.Name = "label1";
-            label1.Size = new Size(471, 79);
-            label1.TabIndex = 0;
-            label1.Text = "Elegant Chess";
-            label1.Click += label1_Click;
+            titleLabel.AutoSize = true;
+            titleLabel.BackColor = Color.Thistle;
+            titleLabel.Font = new Font("Century Schoolbook", 50F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            titleLabel.Location = new Point(441, 131);
+            titleLabel.Name = "titleLabel";
+            titleLabel.Size = new Size(471, 79);
+            titleLabel.TabIndex = 0;
+            titleLabel.Text = "Elegant Chess";
+            titleLabel.Click += label1_Click;
             // 
-            // comboBox1
+            // difficultySelector
             // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(1073, 163);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 23);
-            comboBox1.TabIndex = 2;
-            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            difficultySelector.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            difficultySelector.FormattingEnabled = true;
+            difficultySelector.Location = new Point(850, 299);
+            difficultySelector.Name = "difficultySelector";
+            difficultySelector.Size = new Size(121, 33);
+            difficultySelector.TabIndex = 2;
+            difficultySelector.SelectedIndexChanged += difficultySelector_SelectedIndexChanged;
             // 
-            // label2
+            // difficultyLabel
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(1107, 145);
-            label2.Name = "label2";
-            label2.Size = new Size(58, 15);
-            label2.TabIndex = 3;
-            label2.Text = "Difficulty:";
+            difficultyLabel.AutoSize = true;
+            difficultyLabel.Font = new Font("Century Schoolbook", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            difficultyLabel.Location = new Point(863, 277);
+            difficultyLabel.Name = "difficultyLabel";
+            difficultyLabel.Size = new Size(93, 19);
+            difficultyLabel.TabIndex = 3;
+            difficultyLabel.Text = "Difficulty:";
             // 
             // leaderboardButton
             // 
-            leaderboardButton.Location = new Point(475, 275);
+            leaderboardButton.BackColor = Color.SeaGreen;
+            leaderboardButton.Font = new Font("Century Schoolbook", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            leaderboardButton.Location = new Point(375, 281);
             leaderboardButton.Name = "leaderboardButton";
-            leaderboardButton.Size = new Size(85, 23);
+            leaderboardButton.Size = new Size(139, 58);
             leaderboardButton.TabIndex = 5;
             leaderboardButton.Text = "Leaderboard";
-            leaderboardButton.UseVisualStyleBackColor = true;
+            leaderboardButton.UseVisualStyleBackColor = false;
             leaderboardButton.Click += leaderboardButton_Click;
+            // 
+            // underline
+            // 
+            underline.BackColor = Color.Transparent;
+            underline.BackgroundImage = Properties.Resources.underline;
+            underline.Location = new Point(327, 325);
+            underline.Name = "underline";
+            underline.Size = new Size(706, 302);
+            underline.TabIndex = 6;
+            underline.TabStop = false;
             // 
             // Form1
             // 
@@ -95,23 +113,27 @@ namespace chessGame
             BackColor = Color.FromArgb(192, 255, 192);
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1330, 693);
+            Controls.Add(underline);
             Controls.Add(leaderboardButton);
-            Controls.Add(label2);
-            Controls.Add(comboBox1);
-            Controls.Add(button1);
-            Controls.Add(label1);
+            Controls.Add(difficultyLabel);
+            Controls.Add(difficultySelector);
+            Controls.Add(playButton);
+            Controls.Add(titleLabel);
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)underline).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private Button button1;
-        private Label label1;
-        private ComboBox comboBox1;
-        private Label label2;
+        private Button playButton;
+        private Label titleLabel;
+        private ComboBox difficultySelector;
+        private Label difficultyLabel;
         private Button leaderboardButton;
+        private PictureBox underline;
     }
 }

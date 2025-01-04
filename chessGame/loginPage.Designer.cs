@@ -40,51 +40,60 @@
             // mainMessage
             // 
             mainMessage.AutoSize = true;
-            mainMessage.Font = new Font("Segoe UI", 30F);
-            mainMessage.Location = new Point(291, 50);
+            mainMessage.Font = new Font("Arial Rounded MT Bold", 30F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            mainMessage.ForeColor = Color.White;
+            mainMessage.Location = new Point(294, 62);
             mainMessage.Name = "mainMessage";
-            mainMessage.Size = new Size(196, 54);
+            mainMessage.Size = new Size(213, 46);
             mainMessage.TabIndex = 0;
             mainMessage.Text = "Welcome!";
             // 
             // logInButton
             // 
-            logInButton.Location = new Point(344, 290);
+            logInButton.BackColor = Color.SeaGreen;
+            logInButton.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            logInButton.Location = new Point(356, 291);
             logInButton.Name = "logInButton";
             logInButton.Size = new Size(75, 23);
             logInButton.TabIndex = 1;
             logInButton.Text = " Log In";
-            logInButton.UseVisualStyleBackColor = true;
+            logInButton.UseVisualStyleBackColor = false;
             logInButton.Click += logInButton_Click;
             // 
             // signUpButton
             // 
-            signUpButton.Location = new Point(344, 339);
+            signUpButton.BackColor = Color.SeaGreen;
+            signUpButton.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            signUpButton.Location = new Point(356, 332);
             signUpButton.Name = "signUpButton";
             signUpButton.Size = new Size(75, 23);
             signUpButton.TabIndex = 2;
             signUpButton.Text = "Sign Up";
-            signUpButton.UseVisualStyleBackColor = true;
+            signUpButton.UseVisualStyleBackColor = false;
             signUpButton.Click += signUpButton_Click;
             // 
             // usernameTextBox
             // 
-            usernameTextBox.Location = new Point(304, 163);
+            usernameTextBox.BackColor = Color.DarkSeaGreen;
+            usernameTextBox.Location = new Point(316, 164);
             usernameTextBox.Name = "usernameTextBox";
             usernameTextBox.Size = new Size(166, 23);
             usernameTextBox.TabIndex = 3;
             // 
             // passwordTextBox
             // 
-            passwordTextBox.Location = new Point(304, 225);
+            passwordTextBox.BackColor = Color.DarkSeaGreen;
+            passwordTextBox.Location = new Point(316, 226);
             passwordTextBox.Name = "passwordTextBox";
             passwordTextBox.Size = new Size(166, 23);
             passwordTextBox.TabIndex = 4;
+            passwordTextBox.UseSystemPasswordChar = true;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(304, 145);
+            label2.ForeColor = Color.White;
+            label2.Location = new Point(316, 146);
             label2.Name = "label2";
             label2.Size = new Size(63, 15);
             label2.TabIndex = 5;
@@ -93,7 +102,8 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(304, 207);
+            label3.ForeColor = Color.White;
+            label3.Location = new Point(316, 208);
             label3.Name = "label3";
             label3.Size = new Size(60, 15);
             label3.TabIndex = 6;
@@ -104,7 +114,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.DarkSeaGreen;
+            BackColor = SystemColors.WindowFrame;
             ClientSize = new Size(800, 450);
             Controls.Add(label3);
             Controls.Add(label2);

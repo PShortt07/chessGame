@@ -29,8 +29,11 @@ namespace chessGame
             human.IsWhite = true;
             for (int i = 1; i <= 3; i++)
             {
-                comboBox1.Items.Add(i);
+                difficultySelector.Items.Add(i);
             }
+            playButton.BringToFront();
+            leaderboardButton.BringToFront();
+            difficultySelector.BringToFront();
             //winMessage
             winMessage.BringToFront();
             winMessage.Multiline = true;
@@ -233,14 +236,15 @@ namespace chessGame
             Controls.Add(pB);
         }
         //start game
-        private void button1_Click(object sender, EventArgs e)
+        private void playButton_Click(object sender, EventArgs e)
         {
             leaderboardButton.Hide();
-            label1.Hide();
-            button1.Hide();
-            label2.Hide();
-            comboBox1.Hide();
+            titleLabel.Hide();
+            playButton.Hide();
+            difficultyLabel.Hide();
+            difficultySelector.Hide();
             winMessage.Hide();
+            underline.Hide();
             DrawBoard(b.board);
             hScore.Text = "39";
             AIScore.Text = "39";
@@ -268,8 +272,8 @@ namespace chessGame
                 for (int j = 0; j < 8; j++)
                 {
                     boardDisplay[i, j] = new Button();
-                    boardDisplay[i, j].Height = 50;
-                    boardDisplay[i, j].Width = 50;
+                    boardDisplay[i, j].Height = 60;
+                    boardDisplay[i, j].Width = 60;
                     boardDisplay[i, j].Image = b[i, j].OnCell.PieceImage;
                     //setting colours
                     if (i % 2 == 0)
@@ -294,7 +298,7 @@ namespace chessGame
                             boardDisplay[i, j].BackColor = System.Drawing.Color.White;
                         }
                     }
-                    boardDisplay[i, j].Location = new Point(470 + i * 50, 120 + j * 50);
+                    boardDisplay[i, j].Location = new Point(460 + i * 60, 110 + j * 60);
                     boardDisplay[i, j].Show();
                     boardDisplay[i, j].BringToFront();
                     //if button clicked starts board_Click
@@ -357,9 +361,9 @@ namespace chessGame
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void difficultySelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (comboBox1.SelectedItem)
+            switch (difficultySelector.SelectedItem)
             {
                 case 1:
                     AIDepth = 1;
@@ -388,6 +392,11 @@ namespace chessGame
             leaderboardDisplay.AutoGenerateColumns = true;
             Controls.Add(leaderboardDisplay);
             scoresCon.Close();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
