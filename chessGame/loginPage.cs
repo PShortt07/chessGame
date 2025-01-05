@@ -51,37 +51,59 @@ namespace chessGame
             }
             else
             {
-                mainMessage.Text = "Account not found";
+                errorMessage.Text = "Account not found";
             }
         }
 
         private void signUpButton_Click(object sender, EventArgs e)
         {
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
-            scoresCon.Open();
-            string toInsert = "INSERT INTO [userLogins] (Username, Password) VALUES (@u, @p)";
-            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
-            string username = usernameTextBox.Text;
-            string password = passwordTextBox.Text;
-            cmd.Parameters.AddWithValue("u", username);
-            cmd.Parameters.AddWithValue("p", password);
-            bool goneThrough = true;
-            try
+            string sChars = @" !#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
+            string nums = "0123456789";
+            string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string proposedPassword = passwordTextBox.Text;
+            bool safe = true;
+            if (proposedPassword.IndexOfAny(sChars.ToCharArray()) == -1)
             {
-                cmd.ExecuteNonQuery();
+                errorMessage.Text = "Password needs at least one special character";
+                safe = false;
             }
-            catch
+            if (proposedPassword.IndexOfAny(nums.ToCharArray()) == -1)
             {
-                mainMessage.Text = "Username taken. Please try another.";
-                mainMessage.TextAlign = ContentAlignment.TopCenter;
-                goneThrough = false;
+                errorMessage.Text = "Password needs at least one number";
+                safe = false;
             }
-            scoresCon.Close();
-            if (goneThrough)
+            if (proposedPassword.IndexOfAny(capLetters.ToCharArray()) == -1)
             {
-                Form1 f1 = new Form1(username);
-                f1.Show();
-                this.Hide();
+                errorMessage.Text = "Password needs at least one capital letter";
+                safe = false;
+            }
+            if (safe)
+            {
+                SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+                scoresCon.Open();
+                string toInsert = "INSERT INTO [userLogins] (Username, Password) VALUES (@u, @p)";
+                SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+                string username = usernameTextBox.Text;
+                string password = passwordTextBox.Text;
+                cmd.Parameters.AddWithValue("u", username);
+                cmd.Parameters.AddWithValue("p", password);
+                bool goneThrough = true;
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch
+                {
+                    errorMessage.Text = "Username taken. Please try another.";
+                    goneThrough = false;
+                }
+                scoresCon.Close();
+                if (goneThrough)
+                {
+                    Form1 f1 = new Form1(username);
+                    f1.Show();
+                    this.Hide();
+                }
             }
         }
     }

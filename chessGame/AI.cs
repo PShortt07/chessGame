@@ -88,7 +88,7 @@ namespace chessGame
                 //try to use lower value pieces earlier in the game
                 if (piece.Value == 1)
                 {
-                    total += 3;
+                    total += 2;
                 }
                 else if (piece.Value == 3)
                 {

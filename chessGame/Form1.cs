@@ -44,6 +44,8 @@ namespace chessGame
             winMessage.TextAlign = HorizontalAlignment.Center;
             winMessage.Height = 50;
             winMessage.Width = 100;
+            winMessage.Left = (this.Width - winMessage.Width) / 2;
+            winMessage.Top = 250;
             Controls.Add(winMessage);
             winMessage.Hide();
             //player score
@@ -110,55 +112,29 @@ namespace chessGame
                     AI.Score = AIScorePassIn;
                     human.MyPieces = humanPiecesPassIn;
                     human.Score = humanScorePassIn;
+                    //updates TakenPieces list if necessary
                     if (b.board[currentX, currentY].OnCell.PieceName != "empty")
                     {
                         human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
                         updateTakenPieces(currentX, currentY, true);
                     }
                     b.movePiece(currentX, currentY, pastX, pastY, true);
-                    hScore.Text = human.Score.ToString();
-                    AIScore.Text = AI.Score.ToString();
+                    //updates images on cells
                     boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
                     boardDisplay[currentX, currentY].Refresh();
                     boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
                     boardDisplay[pastX, pastY].Refresh();
                     resetColours();
                     b.resetLegal();
-                    hScore.Text = (human.Score / 10).ToString();
-                    AIScore.Text = (AI.Score / 10).ToString();
+                    updateScores();
+                    //checks if game is over, and if so displays an appropriate message
                     if (b.isGameOver(false) == true)
                     {
                         if (b.bInCheck)
                         {
                             winMessage.Text = "CHECKMATE - YOU WIN!";
-                            //find currently recorded high score for the user
-                            string name = playerUsername;
-                            string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
-                            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
-                            scoresCon.Open();
-                            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
-                            cmd.Parameters.AddWithValue("name", name);
-                            var hS = cmd.ExecuteScalar();
-                            //updates score if lower than previous high score
-                            if (hS != null && numOfMoves < int.Parse(hS.ToString()))
-                            {
-                                toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
-                                int score = numOfMoves;
-                                cmd = new SqlCommand(toInsert, scoresCon);
-                                cmd.Parameters.AddWithValue("name", name);
-                                cmd.Parameters.AddWithValue("score", score);
-                                cmd.ExecuteNonQuery();
-                            }
-                            else if (hS == null)
-                            {
-                                toInsert = "INSERT INTO [highScores] (Username, Moves) VALUES (@name, @score)";
-                                int score = numOfMoves;
-                                cmd = new SqlCommand(toInsert, scoresCon);
-                                cmd.Parameters.AddWithValue("name", name);
-                                cmd.Parameters.AddWithValue("score", score);
-                                cmd.ExecuteNonQuery();
-                            }
-                            scoresCon.Close();
+                            //checks if leaderboard needs to be updated and if so does so
+                            checkForHighScoreUpdate();
                         }
                         else
                         {
@@ -168,11 +144,13 @@ namespace chessGame
                     }
                     else
                     {
+                        //AI makes its move
                         b.whiteTurn = false;
                         int pieces = AI.TakenPieces.Count;
                         AI.makeMove(ref human, ref b, this);
                         refreshBoard();
                         b.whiteTurn = true;
+                        //checks if game is over, and if so displays an appropriate message
                         if (b.isGameOver(true) == true)
                         {
                             if (b.wInCheck)
@@ -190,8 +168,7 @@ namespace chessGame
                             moveInProgress = false;
                         }
                     }
-                    hScore.Text = (human.Score / 10).ToString();
-                    AIScore.Text = (AI.Score / 10).ToString();
+                    updateScores();
                 }
                 else
                 {
@@ -219,6 +196,44 @@ namespace chessGame
                 }
             }
         }
+        private void updateScores()
+        {
+            hScore.Text = (human.Score / 10).ToString();
+            AIScore.Text = (AI.Score / 10).ToString();
+        }
+        private void checkForHighScoreUpdate()
+        {
+            //find currently recorded high score for the user
+            string name = playerUsername;
+            string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            scoresCon.Open();
+            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+            cmd.Parameters.AddWithValue("name", name);
+            var hS = cmd.ExecuteScalar();
+            //updates score if lower than previous high score
+            if (hS != null && numOfMoves < int.Parse(hS.ToString()))
+            {
+                toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
+                changeHighScores(toInsert, scoresCon);
+            }
+            else if (hS == null)
+            {
+                toInsert = "INSERT INTO [highScores] (Username, Moves, Difficulty) VALUES (@name, @score, @difficulty)";
+                changeHighScores(toInsert, scoresCon);
+            }
+            scoresCon.Close();
+        }
+        private void changeHighScores(string toInsert, SqlConnection scoresCon)
+        {
+            int score = numOfMoves;
+            string name = playerUsername;
+            SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
+            cmd.Parameters.AddWithValue("name", name);
+            cmd.Parameters.AddWithValue("score", score);
+            cmd.Parameters.AddWithValue("difficulty", AIDepth);
+            cmd.ExecuteNonQuery();
+        }
         public void updateTakenPieces(int newX, int newY, bool player)
         {
             PictureBox pB = new PictureBox();
@@ -227,11 +242,11 @@ namespace chessGame
             pB.Image = b.board[newX, newY].OnCell.PieceImage;
             if (player)
             {
-                pB.Location = new Point(350 + human.TakenPieces.Count * 50, 550);
+                pB.Location = new Point(250 + human.TakenPieces.Count * 50, 600);
             }
             else
             {
-                pB.Location = new Point(350 + AI.TakenPieces.Count * 50, 20);
+                pB.Location = new Point(250 + AI.TakenPieces.Count * 50, 20);
             }
             Controls.Add(pB);
         }
@@ -298,7 +313,7 @@ namespace chessGame
                             boardDisplay[i, j].BackColor = System.Drawing.Color.White;
                         }
                     }
-                    boardDisplay[i, j].Location = new Point(460 + i * 60, 110 + j * 60);
+                    boardDisplay[i, j].Location = new Point(430 + i * 60, 100 + j * 60);
                     boardDisplay[i, j].Show();
                     boardDisplay[i, j].BringToFront();
                     //if button clicked starts board_Click
@@ -381,15 +396,20 @@ namespace chessGame
         {
             SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\source\repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
-            string sql = "SELECT * FROM [highScores]";
+            string sql = "SELECT * FROM [highScores] ORDER BY Moves";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);
             DataTable dt = new DataTable();
             dataAdapter.Fill(dt);
             DataGridView leaderboardDisplay = new DataGridView();
             leaderboardDisplay.DataSource = dt;
-            leaderboardDisplay.Width = 400;
-            leaderboardDisplay.Height = 500;
             leaderboardDisplay.AutoGenerateColumns = true;
+            leaderboardDisplay.BackgroundColor = Color.LightSeaGreen;
+            leaderboardDisplay.ReadOnly = true;
+            leaderboardDisplay.Font = new Font("Century Schoolbook", 15);
+            leaderboardDisplay.DefaultCellStyle.BackColor = Color.DarkOliveGreen;
+            leaderboardDisplay.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            leaderboardDisplay.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            leaderboardDisplay.Height = this.Height;
             Controls.Add(leaderboardDisplay);
             scoresCon.Close();
         }

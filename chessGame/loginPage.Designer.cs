@@ -35,6 +35,7 @@
             passwordTextBox = new TextBox();
             label2 = new Label();
             label3 = new Label();
+            errorMessage = new Label();
             SuspendLayout();
             // 
             // mainMessage
@@ -42,7 +43,7 @@
             mainMessage.AutoSize = true;
             mainMessage.Font = new Font("Arial Rounded MT Bold", 30F, FontStyle.Regular, GraphicsUnit.Point, 0);
             mainMessage.ForeColor = Color.White;
-            mainMessage.Location = new Point(294, 62);
+            mainMessage.Location = new Point(296, 82);
             mainMessage.Name = "mainMessage";
             mainMessage.Size = new Size(213, 46);
             mainMessage.TabIndex = 0;
@@ -52,7 +53,7 @@
             // 
             logInButton.BackColor = Color.SeaGreen;
             logInButton.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            logInButton.Location = new Point(356, 291);
+            logInButton.Location = new Point(359, 289);
             logInButton.Name = "logInButton";
             logInButton.Size = new Size(75, 23);
             logInButton.TabIndex = 1;
@@ -64,7 +65,7 @@
             // 
             signUpButton.BackColor = Color.SeaGreen;
             signUpButton.Font = new Font("Arial Rounded MT Bold", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            signUpButton.Location = new Point(356, 332);
+            signUpButton.Location = new Point(359, 330);
             signUpButton.Name = "signUpButton";
             signUpButton.Size = new Size(75, 23);
             signUpButton.TabIndex = 2;
@@ -110,12 +111,22 @@
             label3.Text = "Password:";
             label3.Click += label3_Click;
             // 
+            // errorMessage
+            // 
+            errorMessage.AutoSize = true;
+            errorMessage.ForeColor = Color.White;
+            errorMessage.Location = new Point(33, 172);
+            errorMessage.Name = "errorMessage";
+            errorMessage.Size = new Size(0, 15);
+            errorMessage.TabIndex = 7;
+            // 
             // loginPage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.WindowFrame;
             ClientSize = new Size(800, 450);
+            Controls.Add(errorMessage);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(passwordTextBox);
@@ -139,5 +150,6 @@
         private TextBox passwordTextBox;
         private Label label2;
         private Label label3;
+        private Label errorMessage;
     }
 }
