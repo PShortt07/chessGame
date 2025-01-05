@@ -152,7 +152,6 @@ namespace chessGame
             revertMove(board[newX, newY].OnCell, currentX, currentY, newX, newY);
             return outOfCheck;
         }
-        //change for castling
         public void changeScores(int newX, int newY, int oldX, int oldY, ref long humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref long AIScore, bool realMove)
         {
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
