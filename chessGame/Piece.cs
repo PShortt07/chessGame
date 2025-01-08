@@ -21,6 +21,7 @@ namespace chessGame
         private Stack<int> lastX;
         private Stack<int> lastY;
         private bool canPromote;
+        private int numOfMoves;
 
         public int Value { get => value; set => this.value = value; }
         public int PosX { get => posX; set => posX = value; }

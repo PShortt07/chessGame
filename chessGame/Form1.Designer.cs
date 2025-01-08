@@ -37,6 +37,7 @@ namespace chessGame
             difficultyLabel = new Label();
             leaderboardButton = new Button();
             underline = new PictureBox();
+            returnToMenu = new Button();
             ((System.ComponentModel.ISupportInitialize)underline).BeginInit();
             SuspendLayout();
             // 
@@ -106,6 +107,16 @@ namespace chessGame
             underline.TabIndex = 6;
             underline.TabStop = false;
             // 
+            // returnToMenu
+            // 
+            returnToMenu.Location = new Point(618, 429);
+            returnToMenu.Name = "returnToMenu";
+            returnToMenu.Size = new Size(126, 42);
+            returnToMenu.TabIndex = 7;
+            returnToMenu.Text = "Main Menu";
+            returnToMenu.UseVisualStyleBackColor = true;
+            returnToMenu.Click += returnToMenu_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -113,6 +124,7 @@ namespace chessGame
             BackColor = Color.FromArgb(192, 255, 192);
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1330, 693);
+            Controls.Add(returnToMenu);
             Controls.Add(underline);
             Controls.Add(leaderboardButton);
             Controls.Add(difficultyLabel);
@@ -135,5 +147,6 @@ namespace chessGame
         private Label difficultyLabel;
         private Button leaderboardButton;
         private PictureBox underline;
+        private Button returnToMenu;
     }
 }

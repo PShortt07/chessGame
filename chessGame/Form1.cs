@@ -13,6 +13,7 @@ namespace chessGame
         AI AI;
         Player human = new Player();
         Button[,] boardDisplay = new Button[8, 8];
+        DataGridView leaderboardDisplay = new DataGridView();
         Button lastClicked = new Button();
         TextBox winMessage = new TextBox();
         Label hScore = new Label();
@@ -21,7 +22,8 @@ namespace chessGame
         int numOfMoves = 0;
         string playerUsername;
         bool moveInProgress = false;
-
+        bool leaderboardDefined = false;
+        bool leaderboardShowing = false;
         public Form1(string uName)
         {
             playerUsername = uName;
@@ -48,6 +50,8 @@ namespace chessGame
             winMessage.Top = 250;
             Controls.Add(winMessage);
             winMessage.Hide();
+            //back to menu
+            returnToMenu.Hide();
             //player score
             hScore.Location = new Point(100, 300);
             hScore.MinimumSize = new Size(50, 30);
@@ -141,6 +145,7 @@ namespace chessGame
                             winMessage.Text = "STALEMATE - DRAW";
                         }
                         winMessage.Show();
+                        returnToMenu.Show();
                     }
                     else
                     {
@@ -162,6 +167,7 @@ namespace chessGame
                                 winMessage.Text = "STALEMATE - DRAW";
                             }
                             winMessage.Show();
+                            returnToMenu.Show();
                         }
                         else
                         {
@@ -254,6 +260,8 @@ namespace chessGame
         private void playButton_Click(object sender, EventArgs e)
         {
             leaderboardButton.Hide();
+            leaderboardDisplay.Hide();
+            leaderboardDefined = false;
             titleLabel.Hide();
             playButton.Hide();
             difficultyLabel.Hide();
@@ -394,22 +402,41 @@ namespace chessGame
 
         private void leaderboardButton_Click(object sender, EventArgs e)
         {
+            if (leaderboardShowing)
+            {
+                leaderboardDisplay.Hide();
+                leaderboardShowing = false;
+            }
+            else if (!leaderboardDefined)
+            {
+                leaderboardDefined = true;
+                leaderboardShowing = true;
+                createLeaderboard(leaderboardDisplay);
+            }
+            else
+            {
+                leaderboardDisplay.Show();
+                leaderboardShowing = true;
+            }
+        }
+        private void createLeaderboard(DataGridView leaderboardDisplay)
+        {
             SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\source\repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
             string sql = "SELECT * FROM [highScores] ORDER BY Moves";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);
             DataTable dt = new DataTable();
             dataAdapter.Fill(dt);
-            DataGridView leaderboardDisplay = new DataGridView();
             leaderboardDisplay.DataSource = dt;
             leaderboardDisplay.AutoGenerateColumns = true;
-            leaderboardDisplay.BackgroundColor = Color.LightSeaGreen;
+            leaderboardDisplay.BackgroundColor = Color.Thistle;
             leaderboardDisplay.ReadOnly = true;
             leaderboardDisplay.Font = new Font("Century Schoolbook", 15);
             leaderboardDisplay.DefaultCellStyle.BackColor = Color.DarkOliveGreen;
             leaderboardDisplay.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             leaderboardDisplay.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             leaderboardDisplay.Height = this.Height;
+            leaderboardDisplay.MaximumSize = new Size(250, this.Height);
             Controls.Add(leaderboardDisplay);
             scoresCon.Close();
         }
@@ -417,6 +444,14 @@ namespace chessGame
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void returnToMenu_Click(object sender, EventArgs e)
+        {
+            Form1 newForm = new Form1(playerUsername);
+            newForm.ShowDialog();
+
+            this.Close();
         }
     }
 }
