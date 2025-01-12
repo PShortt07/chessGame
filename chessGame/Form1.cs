@@ -18,7 +18,7 @@ namespace chessGame
         TextBox winMessage = new TextBox();
         Label hScore = new Label();
         Label AIScore = new Label();
-        int AIDepth;
+        int AIDepth = 1;
         int numOfMoves = 0;
         string playerUsername;
         bool moveInProgress = false;
