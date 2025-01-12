@@ -28,11 +28,25 @@ namespace chessGame
             bKingY = 0;
             wKingX = 4;
             wKingY = 7;
+            Random RNG = new Random();
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     board[i, j] = new Cell(i,j);
+                    //assigns each cell a random value for each piece that could be on it for hashing purposes
+                    board[i, j].WPawnV = RNG.Next(1000000);
+                    board[i, j].BPawnV = RNG.Next(1000000);
+                    board[i, j].WRookV = RNG.Next(1000000);
+                    board[i, j].BRookV = RNG.Next(1000000);
+                    board[i, j].WKnightV = RNG.Next(1000000);
+                    board[i, j].BKnightV = RNG.Next(1000000);
+                    board[i, j].WBishopV = RNG.Next(1000000);
+                    board[i, j].BBishopV = RNG.Next(1000000);
+                    board[i, j].WQueenV = RNG.Next(1000000);
+                    board[i, j].BQueenV = RNG.Next(1000000);
+                    board[i, j].WKingV = RNG.Next(1000000);
+                    board[i, j].BKingV = RNG.Next(1000000);
                 }
             }
             for (int i = 0; i < 8; i++)
@@ -210,6 +224,13 @@ namespace chessGame
             Piece toReplace = piece.LastTaken.Pop();
             board[currentX, currentY].OnCell = toReplace;
         }
+        public void resetCaptures()
+        {
+            foreach (Cell c in board)
+            {
+                c.Capture = false;
+            }
+        }
         //finds all available moves
         public List<Cell> FindLegalMoves(int posX, int posY)
         {
@@ -271,10 +292,12 @@ namespace chessGame
                 }
                 if (SpaceStatus(posX - 1, posY - 1, whitePiece) == "piece")
                 {
+                    board[posX-1, posY-1].Capture = true;
                     allowedMoves.Add(board[posX - 1, posY - 1]);
                 }
                 if (SpaceStatus(posX + 1, posY - 1, whitePiece) == "piece")
                 {
+                    board[posX + 1, posY - 1].Capture = true;
                     allowedMoves.Add(board[posX + 1, posY - 1]);
                 }
             }
@@ -293,10 +316,12 @@ namespace chessGame
                 }
                 if (SpaceStatus(posX + 1, posY + 1, whitePiece) == "piece")
                 {
+                    board[posX + 1, posY + 1].Capture = true;
                     allowedMoves.Add(board[posX + 1, posY + 1]);
                 }
                 if (SpaceStatus(posX - 1, posY + 1, whitePiece) == "piece")
                 {
+                    board[posX - 1, posY + 1].Capture = true;
                     allowedMoves.Add(board[posX - 1, posY + 1]);
                 }
             }
@@ -312,6 +337,7 @@ namespace chessGame
                 }
                 else if (SpaceStatus(posX, i, whitePiece) == "piece")
                 {
+                    board[posX, i].Capture = true;
                     allowedMoves.Add(board[posX, i]);
                     break;
                 }
@@ -329,6 +355,7 @@ namespace chessGame
                 }
                 else if (SpaceStatus(posX, i, whitePiece) == "piece")
                 {
+                    board[posX, i].Capture = true;
                     allowedMoves.Add(board[posX, i]);
                     break;
                 }
@@ -346,6 +373,7 @@ namespace chessGame
                 }
                 else if (SpaceStatus(i, posY, whitePiece) == "piece")
                 {
+                    board[i, posY].Capture = true;
                     allowedMoves.Add(board[i, posY]);
                     break;
                 }
@@ -363,6 +391,7 @@ namespace chessGame
                 }
                 else if (SpaceStatus(i, posY, whitePiece) == "piece")
                 {
+                    board[i, posY].Capture = true;
                     allowedMoves.Add(board[i, posY]);
                     break;
                 }
@@ -391,6 +420,7 @@ namespace chessGame
             {
                 if (SpaceStatus(posX - i, posY - i, whitePiece) == "piece")
                 {
+                    board[posX - i, posY - i].Capture = true;
                     allowedMoves.Add(board[posX - i, posY - i]);
                     break;
                 }
@@ -408,6 +438,7 @@ namespace chessGame
             {
                 if (SpaceStatus(posX + i, posY - i, whitePiece) == "piece")
                 {
+                    board[posX + i, posY - i].Capture = true;
                     allowedMoves.Add(board[posX + i, posY - i]);
                     break;
                 }
@@ -425,6 +456,7 @@ namespace chessGame
             {
                 if (SpaceStatus(posX - i, posY + i, whitePiece) == "piece")
                 {
+                    board[posX - i, posY + i].Capture = true;
                     allowedMoves.Add(board[posX - i, posY + i]);
                     break;
                 }
@@ -442,6 +474,7 @@ namespace chessGame
             {
                 if (SpaceStatus(posX + i, posY + i, whitePiece) == "piece")
                 {
+                    board[posX + i, posY + i].Capture = true;
                     allowedMoves.Add(board[posX + i, posY + i]);
                     break;
                 }
@@ -545,8 +578,13 @@ namespace chessGame
         }
         private void checkLegal(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {
-            if (SpaceStatus(posX, posY, whitePiece) == "empty" || SpaceStatus(posX, posY, whitePiece) == "piece")
+            if (SpaceStatus(posX, posY, whitePiece) == "empty")
             {
+                allowedMoves.Add(board[posX, posY]);
+            }
+            else if (SpaceStatus(posX, posY, whitePiece) == "piece")
+            {
+                board[posX, posY].Capture = true;
                 allowedMoves.Add(board[posX, posY]);
             }
         }
