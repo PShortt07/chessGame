@@ -131,6 +131,7 @@ namespace chessGame
             Controls.Add(difficultySelector);
             Controls.Add(playButton);
             Controls.Add(titleLabel);
+            KeyPreview = true;
             Name = "Form1";
             Text = "Form1";
             Load += Form1_Load;

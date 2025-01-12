@@ -26,6 +26,7 @@ namespace chessGame
         bool leaderboardShowing = false;
         public Form1(string uName)
         {
+            KeyDown += Form1_KeyDown2;
             playerUsername = uName;
             InitializeComponent();
             human.IsWhite = true;
@@ -64,6 +65,11 @@ namespace chessGame
             AIScore.Font = new Font("Century Schoolbook", 20);
             Controls.Add(AIScore);
             AIScore.Hide();
+        }
+
+        private void Form1_KeyDown(object? sender, KeyEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -134,7 +140,7 @@ namespace chessGame
                     //checks if game is over, and if so displays an appropriate message
                     if (b.isGameOver(false) == true)
                     {
-                        if (b.bInCheck)
+                        if (true)
                         {
                             winMessage.Text = "CHECKMATE - YOU WIN!";
                             //checks if leaderboard needs to be updated and if so does so
@@ -221,23 +227,26 @@ namespace chessGame
             if (hS != null && numOfMoves < int.Parse(hS.ToString()))
             {
                 toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
-                changeHighScores(toInsert, scoresCon);
+                changeHighScores(toInsert, scoresCon, false);
             }
             else if (hS == null)
             {
                 toInsert = "INSERT INTO [highScores] (Username, Moves, Difficulty) VALUES (@name, @score, @difficulty)";
-                changeHighScores(toInsert, scoresCon);
+                changeHighScores(toInsert, scoresCon, true);
             }
             scoresCon.Close();
         }
-        private void changeHighScores(string toInsert, SqlConnection scoresCon)
+        private void changeHighScores(string toInsert, SqlConnection scoresCon, bool insertQuery)
         {
             int score = numOfMoves;
             string name = playerUsername;
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
             cmd.Parameters.AddWithValue("score", score);
-            cmd.Parameters.AddWithValue("difficulty", AIDepth);
+            if (insertQuery)
+            {
+                cmd.Parameters.AddWithValue("difficulty", AIDepth);
+            }
             cmd.ExecuteNonQuery();
         }
         public void updateTakenPieces(int newX, int newY, bool player)
@@ -436,14 +445,24 @@ namespace chessGame
             leaderboardDisplay.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             leaderboardDisplay.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             leaderboardDisplay.Height = this.Height;
-            leaderboardDisplay.MaximumSize = new Size(250, this.Height);
+            leaderboardDisplay.Width = 380;
             Controls.Add(leaderboardDisplay);
+            leaderboardDisplay.BringToFront();
             scoresCon.Close();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+        private void Form1_KeyDown2(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                quitMenu qM = new quitMenu();
+                qM.Show();
+                e.SuppressKeyPress = true;
+            }
         }
 
         private void returnToMenu_Click(object sender, EventArgs e)
