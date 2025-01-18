@@ -209,10 +209,6 @@ namespace chessGame
             {
                 board[newX, newY].OnCell.HasMoved = true;
             }
-            if (board[newX, newY].OnCell.PieceName == "pawn" && ((whiteTurn && newY == 0) || (!whiteTurn && newY == 7)))
-            {
-                board[newX, newY].OnCell.CanPromote = true;
-            }
             board[pastX, pastY].OnCell = new Empty(false, pastX, pastY);
         }
         public void revertMove(Piece piece, int revertToX, int revertToY, int currentX, int currentY)

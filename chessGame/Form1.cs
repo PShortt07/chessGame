@@ -5,6 +5,7 @@ using System.Threading;
 using static System.Formats.Asn1.AsnWriter;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.IO;
 namespace chessGame
 {
     public partial class Form1 : Form
@@ -24,6 +25,8 @@ namespace chessGame
         bool moveInProgress = false;
         bool leaderboardDefined = false;
         bool leaderboardShowing = false;
+        Pawn toPromote;
+        Button[] promotionOptions = new Button[4];
         public Form1(string uName)
         {
             KeyDown += Form1_KeyDown2;
@@ -109,78 +112,7 @@ namespace chessGame
                 if (location.LegalMove)
                 {
                     numOfMoves++;
-                    //if (location.OnCell.CanPromote)
-                    //{
-                    //promotion(location.OnCell);
-                    //}
-                    List<Piece> AIPiecesPassIn = AI.MyPieces;
-                    long AIScorePassIn = AI.Score;
-                    long humanScorePassIn = human.Score;
-                    List<Piece> humanPiecesPassIn = human.MyPieces;
-                    b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
-                    AI.MyPieces = AIPiecesPassIn;
-                    AI.Score = AIScorePassIn;
-                    human.MyPieces = humanPiecesPassIn;
-                    human.Score = humanScorePassIn;
-                    //updates TakenPieces list if necessary
-                    if (b.board[currentX, currentY].OnCell.PieceName != "empty")
-                    {
-                        human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
-                        updateTakenPieces(currentX, currentY, true);
-                    }
-                    b.movePiece(currentX, currentY, pastX, pastY, true);
-                    //updates images on cells
-                    boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
-                    boardDisplay[currentX, currentY].Refresh();
-                    boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
-                    boardDisplay[pastX, pastY].Refresh();
-                    resetColours();
-                    b.resetLegal();
-                    updateScores();
-                    //checks if game is over, and if so displays an appropriate message
-                    if (b.isGameOver(false) == true)
-                    {
-                        if (true)
-                        {
-                            winMessage.Text = "CHECKMATE - YOU WIN!";
-                            //checks if leaderboard needs to be updated and if so does so
-                            checkForHighScoreUpdate();
-                        }
-                        else
-                        {
-                            winMessage.Text = "STALEMATE - DRAW";
-                        }
-                        winMessage.Show();
-                        returnToMenu.Show();
-                    }
-                    else
-                    {
-                        //AI makes its move
-                        b.whiteTurn = false;
-                        int pieces = AI.TakenPieces.Count;
-                        AI.makeMove(ref human, ref b, this);
-                        refreshBoard();
-                        b.whiteTurn = true;
-                        //checks if game is over, and if so displays an appropriate message
-                        if (b.isGameOver(true) == true)
-                        {
-                            if (b.wInCheck)
-                            {
-                                winMessage.Text = "CHECKMATE - AI WINS!";
-                            }
-                            else
-                            {
-                                winMessage.Text = "STALEMATE - DRAW";
-                            }
-                            winMessage.Show();
-                            returnToMenu.Show();
-                        }
-                        else
-                        {
-                            moveInProgress = false;
-                        }
-                    }
-                    updateScores();
+                    startRound(currentX, currentY, pastX, pastY);
                 }
                 else
                 {
@@ -207,6 +139,91 @@ namespace chessGame
                     moveInProgress = false;
                 }
             }
+        }
+        private void startRound(int currentX, int currentY, int pastX, int pastY)
+        {
+            List<Piece> AIPiecesPassIn = AI.MyPieces;
+            long AIScorePassIn = AI.Score;
+            long humanScorePassIn = human.Score;
+            List<Piece> humanPiecesPassIn = human.MyPieces;
+            b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
+            AI.MyPieces = AIPiecesPassIn;
+            AI.Score = AIScorePassIn;
+            human.MyPieces = humanPiecesPassIn;
+            human.Score = humanScorePassIn;
+            //updates TakenPieces list if necessary
+            if (b.board[currentX, currentY].OnCell.PieceName != "empty")
+            {
+                human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                updateTakenPieces(currentX, currentY, true);
+            }
+            b.movePiece(currentX, currentY, pastX, pastY, true);
+            if (b.board[currentX, currentY].OnCell.PieceName == "pawn" && (currentY == 0 || currentY == 7))
+            {
+                Pawn pawn = (Pawn)b.board[currentX, currentY].OnCell;
+                pawn.canPromote = true;
+                toPromote = pawn;
+                promotion();
+            }
+            else
+            {
+                //updates images on cells
+                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
+                boardDisplay[currentX, currentY].Refresh();
+                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
+                boardDisplay[pastX, pastY].Refresh();
+                b.resetLegal();
+                resetColours();
+                updateScores();
+                AIMove();
+            }
+        }
+        private void AIMove()
+        {
+            //checks if game is over, and if so displays an appropriate message
+            if (b.isGameOver(false) == true)
+            {
+                if (b.bInCheck)
+                {
+                    winMessage.Text = "CHECKMATE - YOU WIN!";
+                    //checks if leaderboard needs to be updated and if so does so
+                    checkForHighScoreUpdate();
+                }
+                else
+                {
+                    winMessage.Text = "STALEMATE - DRAW";
+                }
+                winMessage.Show();
+                returnToMenu.Show();
+            }
+            else
+            {
+                //AI makes its move
+                b.whiteTurn = false;
+                int pieces = AI.TakenPieces.Count;
+                AI.makeMove(ref human, ref b, this);
+                refreshBoard();
+                b.whiteTurn = true;
+                //checks if game is over, and if so displays an appropriate message
+                if (b.isGameOver(true) == true)
+                {
+                    if (b.wInCheck)
+                    {
+                        winMessage.Text = "CHECKMATE - AI WINS!";
+                    }
+                    else
+                    {
+                        winMessage.Text = "STALEMATE - DRAW";
+                    }
+                    winMessage.Show();
+                    returnToMenu.Show();
+                }
+                else
+                {
+                    moveInProgress = false;
+                }
+            }
+            updateScores();
         }
         private void updateScores()
         {
@@ -343,22 +360,58 @@ namespace chessGame
             AIScore.Location = new Point(100, 80);
             AIScore.Size = new Size(20, 10);
         }
-        private void promotion(Piece p)
+        private void promotion()
         {
             Button opQ = new Button();
             opQ.Image = Resources.queen;
+            promotionOptions[0] = opQ;
             Button opR = new Button();
+            opR.Image = Resources.rook;
+            promotionOptions[1] = opR;
             Button opK = new Button();
+            opK.Image = Resources.knight;
+            promotionOptions[2] = opK;
             Button opB = new Button();
-            Button[] options = new Button[4];
-            for (int i = 0; i < options.Length; i++)
+            opB.Image = Resources.bishop;
+            promotionOptions[3] = opB;
+            for (int i = 0; i < promotionOptions.Length; i++)
             {
-                options[i].Height = 50;
-                options[i].Width = 50;
-                options[i].BringToFront();
-                options[i].Location = new Point(450, 150 + i * 50);
-                Controls.Add(options[i]);
+                promotionOptions[i].Show();
+                promotionOptions[i].Height = 50;
+                promotionOptions[i].Width = 50;
+                promotionOptions[i].BringToFront();
+                promotionOptions[i].Location = new Point(450, 150 + i * 50);
+                promotionOptions[i].Click += new EventHandler(promotionSelection);
+                Controls.Add(promotionOptions[i]);
             }
+        }
+        private void promotionSelection(object sender, EventArgs e)
+        {
+            switch(((Button)sender).Name)
+            {
+                case "opQ":
+                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Queen(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    break;
+                case "opR":
+                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Rook(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    break;
+                case "opK":
+                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Knight(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    break;
+                case "opB":
+                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Bishop(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    break;
+            }
+            foreach(Button button in promotionOptions)
+            {
+                Controls.Remove(button);
+                button.Dispose();
+            }
+            resetColours();
+            b.resetLegal();
+            updateScores();
+            refreshBoard();
+            AIMove();
         }
         private void resetColours()
         {

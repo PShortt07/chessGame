@@ -8,6 +8,7 @@ namespace chessGame
 {
     internal class Pawn:Piece
     {
+        public bool canPromote = false;
         public Pawn(bool white, int x, int y) : base(white, x, y)
         {
             Value = 10;
