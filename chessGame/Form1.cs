@@ -158,7 +158,11 @@ namespace chessGame
                 updateTakenPieces(currentX, currentY, true);
             }
             b.movePiece(currentX, currentY, pastX, pastY, true);
-            if (b.board[currentX, currentY].OnCell.PieceName == "pawn" && (currentY == 0 || currentY == 7))
+            boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
+            boardDisplay[currentX, currentY].Refresh();
+            boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
+            boardDisplay[pastX, pastY].Refresh();
+            if (b.board[currentX, currentY].OnCell.PieceName == "pawn" && currentY == 0)
             {
                 Pawn pawn = (Pawn)b.board[currentX, currentY].OnCell;
                 pawn.canPromote = true;
@@ -168,10 +172,6 @@ namespace chessGame
             else
             {
                 //updates images on cells
-                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
-                boardDisplay[currentX, currentY].Refresh();
-                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
-                boardDisplay[pastX, pastY].Refresh();
                 b.resetLegal();
                 resetColours();
                 updateScores();
@@ -233,9 +233,11 @@ namespace chessGame
         private void checkForHighScoreUpdate()
         {
             //find currently recorded high score for the user
+            //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
+            //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
             string name = playerUsername;
             string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
             scoresCon.Open();
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
@@ -362,25 +364,33 @@ namespace chessGame
         }
         private void promotion()
         {
+            //queen
             Button opQ = new Button();
+            opQ.Name = "opQ";
             opQ.Image = Resources.queen;
             promotionOptions[0] = opQ;
+            //rook
             Button opR = new Button();
+            opR.Name = "opR";
             opR.Image = Resources.rook;
             promotionOptions[1] = opR;
+            //knight
             Button opK = new Button();
+            opK.Name = "opK";
             opK.Image = Resources.knight;
             promotionOptions[2] = opK;
+            //bishop
             Button opB = new Button();
+            opB.Name = "opB";
             opB.Image = Resources.bishop;
             promotionOptions[3] = opB;
             for (int i = 0; i < promotionOptions.Length; i++)
             {
                 promotionOptions[i].Show();
-                promotionOptions[i].Height = 50;
-                promotionOptions[i].Width = 50;
+                promotionOptions[i].Height = 60;
+                promotionOptions[i].Width = 60;
                 promotionOptions[i].BringToFront();
-                promotionOptions[i].Location = new Point(450, 150 + i * 50);
+                promotionOptions[i].Location = new Point(130, 150 + i * 50);
                 promotionOptions[i].Click += new EventHandler(promotionSelection);
                 Controls.Add(promotionOptions[i]);
             }
@@ -407,8 +417,8 @@ namespace chessGame
                 Controls.Remove(button);
                 button.Dispose();
             }
-            resetColours();
             b.resetLegal();
+            resetColours();
             updateScores();
             refreshBoard();
             AIMove();
@@ -483,7 +493,9 @@ namespace chessGame
         }
         private void createLeaderboard(DataGridView leaderboardDisplay)
         {
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\source\repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
+            //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
             scoresCon.Open();
             string sql = "SELECT * FROM [highScores] ORDER BY Moves";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);

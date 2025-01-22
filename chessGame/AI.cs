@@ -80,6 +80,12 @@ namespace chessGame
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             chessBoard.movePiece(newX, newY, oldX, oldY, true);
+            if (chessBoard.board[newX, newY].OnCell.PieceName == "pawn" && chessBoard.board[newX, newY].OnCell.PosY == 7)
+            {
+                Piece pawn = chessBoard.board[newX, newY].OnCell;
+                chessBoard.board[newX, newY].OnCell = new Queen(pawn.IsWhite, newX, newY);
+                chessBoard.board[newX, newY].OnCell.LastTaken.Push(pawn);
+            }
         }
         private long minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
@@ -96,7 +102,7 @@ namespace chessGame
                 //try to use lower value pieces earlier in the game
                 if (piece.Value == 1)
                 {
-                    total += 2;
+                    total += 10;
                 }
                 else if (piece.Value == 3)
                 {
@@ -133,6 +139,16 @@ namespace chessGame
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
+                //probably problematic promotion code
+                if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
+                {
+                    Piece pawn = chessBoard.board[piece.PosX, piece.PosY].OnCell;
+                    chessBoard.board[piece.PosX, piece.PosY].OnCell = new Queen(pawn.IsWhite, piece.PosX, piece.PosY);
+                    foreach (Piece p in pawn.LastTaken)
+                    {
+                        chessBoard.board[piece.PosX, piece.PosY].OnCell.LastTaken.Push(p);
+                    }
+                }
                 chessBoard.whiteTurn = false;
                 foreach (Cell c in chessBoard.board)
                 {
@@ -163,6 +179,15 @@ namespace chessGame
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
                 chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
+                if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 0)
+                {
+                    Piece pawn = chessBoard.board[piece.PosX, piece.PosY].OnCell;
+                    chessBoard.board[piece.PosX, piece.PosY].OnCell = new Queen(pawn.IsWhite, piece.PosX, piece.PosY);
+                    foreach (Piece p in pawn.LastTaken)
+                    {
+                        chessBoard.board[piece.PosX, piece.PosY].OnCell.LastTaken.Push(p);
+                    }
+                }
                 chessBoard.whiteTurn = true;
                 foreach (Cell c in chessBoard.board)
                 {
