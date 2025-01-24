@@ -152,7 +152,8 @@ namespace chessGame
         public bool doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
         {
             //makes the move, finds which spaces are covered by which colour, then reverts the move
-            movePiece(newX, newY, currentX, currentY, false);
+            Move thisMove = new Move();
+            movePiece(thisMove, false);
             //checks if the player whose turn it is has been taken out of check
             bool outOfCheck = false;
             if (whiteTurn)
@@ -163,7 +164,7 @@ namespace chessGame
             {
                 outOfCheck = !findIfInCheck(false);
             }
-            revertMove(board[newX, newY].OnCell, currentX, currentY, newX, newY);
+            revertMove(thisMove);
             return outOfCheck;
         }
         public void changeScores(int newX, int newY, int oldX, int oldY, ref long humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref long AIScore, bool realMove)
@@ -186,38 +187,55 @@ namespace chessGame
             }
         }
         //updates board array when a piece is moved
-        public void movePiece(int newX, int newY, int pastX, int pastY, bool realMove)
+        public void movePiece(Move thisMove, bool realMove)
         {
-            if (board[pastX, pastY].OnCell.PieceName == "king")
+            if (thisMove.pieceMoving.PieceName == "king")
             {
-                if (board[pastX, pastY].OnCell.IsWhite)
+                if (thisMove.pieceMoving.IsWhite)
                 {
-                    wKingX = newX;
-                    wKingY = newY;
+                    wKingX = thisMove.toX;
+                    wKingY = thisMove.toY;
                 }
                 else
                 {
-                    bKingX = newX;
-                    bKingY = newY;
+                    bKingX = thisMove.toX;
+                    bKingY = thisMove.toY;
                 }
             }
-            board[pastX, pastY].OnCell.LastTaken.Push(board[newX, newY].OnCell);
-            board[newX, newY].OnCell = board[pastX, pastY].OnCell;
-            board[newX, newY].OnCell.PosX = newX;
-            board[newX, newY].OnCell.PosY = newY;
-            if (!board[newX, newY].OnCell.HasMoved && realMove == true)
+            if (thisMove.promoted)
             {
-                board[newX, newY].OnCell.HasMoved = true;
+                board[thisMove.toX, thisMove.toY].OnCell = thisMove.promotedPiece;
+                thisMove.promotedPiece.PosX = thisMove.toX;
+                thisMove.promotedPiece.PosY = thisMove.toY;
             }
-            board[pastX, pastY].OnCell = new Empty(false, pastX, pastY);
+            else
+            {
+                board[thisMove.toX, thisMove.toY].OnCell = thisMove.pieceMoving;
+                thisMove.pieceMoving.PosX = thisMove.toX;
+                thisMove.pieceMoving.PosY = thisMove.toY;
+            }
+            thisMove.pieceMoving.LastTaken.Push(thisMove.capturedPiece);
+            if (!thisMove.pieceMoving.HasMoved && realMove == true)
+            {
+                thisMove.pieceMoving.HasMoved = true;
+            }
+            board[thisMove.fromX, thisMove.fromY].OnCell = new Empty(false, thisMove.fromX, thisMove.fromY);
         }
-        public void revertMove(Piece piece, int revertToX, int revertToY, int currentX, int currentY)
+        public void revertMove(Move reverting)
         {
-            board[revertToX, revertToY].OnCell = board[currentX, currentY].OnCell;
-            board[revertToX, revertToY].OnCell.PosX = revertToX;
-            board[revertToX, revertToY].OnCell.PosY = revertToY;
+            int origX = reverting.fromX;
+            int origY = reverting.fromY;
+            int currentX = reverting.toX;
+            int currentY = reverting.toY;
+            board[origX, origY].OnCell = board[currentX, currentY].OnCell;
+            board[origX, origY].OnCell.PosX = origX;
+            board[origX, origY].OnCell.PosY = origY;
             board[currentX, currentY].OnCell = new Empty(false, currentX, currentY);
-            Piece toReplace = piece.LastTaken.Pop();
+            if (reverting.promoted)
+            {
+                board[origX, origY].OnCell = reverting.pieceMoving;
+            }
+            Piece toReplace = reverting.pieceMoving.LastTaken.Pop();
             board[currentX, currentY].OnCell = toReplace;
         }
         public void resetCaptures()
@@ -518,9 +536,10 @@ namespace chessGame
         }
         private bool doesThisMovePutInCheck(bool checkingForWhite, Cell currentCell, Cell newCell)
         {
-            movePiece(newCell.OnCell.PosX, newCell.OnCell.PosY, currentCell.OnCell.PosX, currentCell.OnCell.PosY, false);
+            Move thisMove = new Move();
+            movePiece(thisMove, false);
             bool does = findIfInCheck(checkingForWhite);
-            revertMove(newCell.OnCell, currentCell.OnCell.PosX, currentCell.OnCell.PosY, newCell.OnCell.PosX, newCell.OnCell.PosY);
+            revertMove(thisMove);
             return does;
         }
         //resets board for next legal moves to be processed
@@ -614,6 +633,7 @@ namespace chessGame
                 //adds not allowed moves to new list
                 foreach (Cell allowed in allowedMoves)
                 {
+                    Move thisMove = new Move(current.Row, current.Col, allowed.Row, allowed.Col, false, current.OnCell, allowed.OnCell);
                     if (doesThisMovePutInCheck(current.OnCell.IsWhite, current, allowed) == true)
                     {
                         notAllowedMoves.Add(allowed);

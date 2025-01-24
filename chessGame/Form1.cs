@@ -27,6 +27,8 @@ namespace chessGame
         bool leaderboardShowing = false;
         Pawn toPromote;
         Button[] promotionOptions = new Button[4];
+        int toX;
+        int toY;
         public Form1(string uName)
         {
             KeyDown += Form1_KeyDown2;
@@ -151,26 +153,28 @@ namespace chessGame
             AI.Score = AIScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             human.Score = humanScorePassIn;
-            //updates TakenPieces list if necessary
-            if (b.board[currentX, currentY].OnCell.PieceName != "empty")
+            Move thisMove;
+            if (b.board[pastX, pastY].OnCell.PieceName == "pawn" && currentY == 0)
             {
-                human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
-                updateTakenPieces(currentX, currentY, true);
-            }
-            b.movePiece(currentX, currentY, pastX, pastY, true);
-            boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
-            boardDisplay[currentX, currentY].Refresh();
-            boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
-            boardDisplay[pastX, pastY].Refresh();
-            if (b.board[currentX, currentY].OnCell.PieceName == "pawn" && currentY == 0)
-            {
+                toX = currentX;
+                toX = currentY;
                 Pawn pawn = (Pawn)b.board[currentX, currentY].OnCell;
-                pawn.canPromote = true;
                 toPromote = pawn;
                 promotion();
             }
             else
             {
+                thisMove = new Move(pastX, pastY, currentX, currentY, false, b.board[pastX, pastY].OnCell, b.board[currentX, currentY].OnCell);
+                b.movePiece(thisMove, true);
+                if (b.board[currentX, currentY].OnCell.PieceName != "empty")
+                {
+                    human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
+                    updateTakenPieces(currentX, currentY, true);
+                }
+                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
+                boardDisplay[currentX, currentY].Refresh();
+                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
+                boardDisplay[pastX, pastY].Refresh();
                 //updates images on cells
                 b.resetLegal();
                 resetColours();
@@ -397,19 +401,20 @@ namespace chessGame
         }
         private void promotionSelection(object sender, EventArgs e)
         {
-            switch(((Button)sender).Name)
+            Move promotingMove = new Move(toPromote.PosX, toPromote.PosY, toX, toY, true, toPromote, b.board[toPromote.PosX, toPromote.PosY].OnCell);
+            switch (((Button)sender).Name)
             {
                 case "opQ":
-                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Queen(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    promotingMove.setPromotion(new Queen(toPromote.IsWhite, toPromote.PosX, toPromote.PosY));
                     break;
                 case "opR":
-                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Rook(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    promotingMove.setPromotion(new Rook(toPromote.IsWhite, toPromote.PosX, toPromote.PosY));
                     break;
                 case "opK":
-                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Knight(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    promotingMove.setPromotion(new Knight(toPromote.IsWhite, toPromote.PosX, toPromote.PosY));
                     break;
                 case "opB":
-                    b.board[toPromote.PosX, toPromote.PosY].OnCell = new Bishop(toPromote.IsWhite, toPromote.PosX, toPromote.PosY);
+                    promotingMove.setPromotion(new Bishop(toPromote.IsWhite, toPromote.PosX, toPromote.PosY));
                     break;
             }
             foreach(Button button in promotionOptions)
@@ -417,6 +422,12 @@ namespace chessGame
                 Controls.Remove(button);
                 button.Dispose();
             }
+            if (b.board[toX, toY].OnCell.PieceName != "empty")
+            {
+                human.TakenPieces.Add(b.board[toX, toY].OnCell);
+                updateTakenPieces(toX, toY, true);
+            }
+            b.movePiece(promotingMove, true);
             b.resetLegal();
             resetColours();
             updateScores();

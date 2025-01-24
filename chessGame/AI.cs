@@ -43,13 +43,6 @@ namespace chessGame
             long highestValue = possibleMoves[0].value;
             foreach (PotentialMove move in possibleMoves)
             {
-                if (move.value > highestValue)
-                {
-                    highestValue = move.value;
-                }
-            }
-            foreach (PotentialMove move in possibleMoves)
-            {
                 if (move.value == highestValue)
                 {
                     highestValueMoves.Add(move);
@@ -79,13 +72,18 @@ namespace chessGame
             MyPieces = myPiecesPassIn;
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
-            chessBoard.movePiece(newX, newY, oldX, oldY, true);
+            Move thisMove;
             if (chessBoard.board[newX, newY].OnCell.PieceName == "pawn" && chessBoard.board[newX, newY].OnCell.PosY == 7)
             {
+                thisMove = new Move(oldX, oldY, newX, newY, true, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
+                thisMove.setPromotion(new Queen(IsWhite, newX, newY));
                 Piece pawn = chessBoard.board[newX, newY].OnCell;
-                chessBoard.board[newX, newY].OnCell = new Queen(pawn.IsWhite, newX, newY);
-                chessBoard.board[newX, newY].OnCell.LastTaken.Push(pawn);
             }
+            else
+            {
+                thisMove = new Move(oldX, oldY, newX, newY, false, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
+            }
+            chessBoard.movePiece(thisMove, true);
         }
         private long minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
@@ -138,17 +136,14 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
-                //probably problematic promotion code
+                Move thisMove = new Move(origX, origY, position.Row, position.Col, false, piece, chessBoard.board[position.Row, position.Col].OnCell);
+                //always chooses queen for the sake of efficiency
                 if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
                 {
-                    Piece pawn = chessBoard.board[piece.PosX, piece.PosY].OnCell;
-                    chessBoard.board[piece.PosX, piece.PosY].OnCell = new Queen(pawn.IsWhite, piece.PosX, piece.PosY);
-                    foreach (Piece p in pawn.LastTaken)
-                    {
-                        chessBoard.board[piece.PosX, piece.PosY].OnCell.LastTaken.Push(p);
-                    }
+                    thisMove.promoted = true;
+                    thisMove.setPromotion(new Queen(IsWhite, piece.PosX, piece.PosY));
                 }
+                chessBoard.movePiece(thisMove, false);
                 chessBoard.whiteTurn = false;
                 foreach (Cell c in chessBoard.board)
                 {
@@ -169,7 +164,7 @@ namespace chessGame
                         }
                     }
                 }
-                chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
+                chessBoard.revertMove(thisMove);
                 return maxEvaluation;
             }
             else
@@ -178,16 +173,14 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                chessBoard.movePiece(position.Row, position.Col, piece.PosX, piece.PosY, false);
+                Move thisMove = new Move(origX, origY, position.Row, position.Col, false, piece, chessBoard.board[position.Row, position.Col].OnCell);
+                //always chooses queen for the sake of efficiency
                 if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 0)
                 {
-                    Piece pawn = chessBoard.board[piece.PosX, piece.PosY].OnCell;
-                    chessBoard.board[piece.PosX, piece.PosY].OnCell = new Queen(pawn.IsWhite, piece.PosX, piece.PosY);
-                    foreach (Piece p in pawn.LastTaken)
-                    {
-                        chessBoard.board[piece.PosX, piece.PosY].OnCell.LastTaken.Push(p);
-                    }
+                    thisMove.promoted = true;
+                    thisMove.setPromotion(new Queen(IsWhite, piece.PosX, piece.PosY));
                 }
+                chessBoard.movePiece(thisMove, false);
                 chessBoard.whiteTurn = true;
                 foreach (Cell c in chessBoard.board)
                 {
@@ -208,7 +201,7 @@ namespace chessGame
                         }
                     }
                 }
-                chessBoard.revertMove(piece, origX, origY, piece.PosX, piece.PosY);
+                chessBoard.revertMove(thisMove);
                 return minEvaluation;
             }
         }
