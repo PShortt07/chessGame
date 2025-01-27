@@ -152,7 +152,7 @@ namespace chessGame
         public bool doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
         {
             //makes the move, finds which spaces are covered by which colour, then reverts the move
-            Move thisMove = new Move();
+            Move thisMove = new Move(currentX, currentY, newX, newY, false, board[currentX, currentY].OnCell, board[newX, newY].OnCell);
             movePiece(thisMove, false);
             //checks if the player whose turn it is has been taken out of check
             bool outOfCheck = false;
@@ -536,7 +536,7 @@ namespace chessGame
         }
         private bool doesThisMovePutInCheck(bool checkingForWhite, Cell currentCell, Cell newCell)
         {
-            Move thisMove = new Move();
+            Move thisMove = new Move(currentCell.Row, currentCell.Col, newCell.Row, newCell.Col, false, currentCell.OnCell, newCell.OnCell);
             movePiece(thisMove, false);
             bool does = findIfInCheck(checkingForWhite);
             revertMove(thisMove);

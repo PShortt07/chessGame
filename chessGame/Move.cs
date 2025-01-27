@@ -14,14 +14,15 @@ namespace chessGame
         public Piece capturedPiece;
         public Piece promotedPiece;
 
-        public Move(int FromX, int FromY, int ToX, int ToY, bool Promoted, Piece pieceMoving, Piece capturedPiece)
+        public Move(int FromX, int FromY, int ToX, int ToY, bool Promoted, Piece PieceMoving, Piece CapturedPiece)
         {
             fromX = FromX;
             fromY = FromY;
             toX = ToX;
             toY = ToY;
             promoted = Promoted;
-            this.capturedPiece = capturedPiece;
+            capturedPiece = CapturedPiece;
+            pieceMoving = PieceMoving;
         }
         public void setPromotion(Piece PromotedPiece)
         {
