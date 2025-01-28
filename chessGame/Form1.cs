@@ -88,8 +88,8 @@ namespace chessGame
             {
                 moveInProgress = true;
                 Button clicked = (Button)sender;
-                int currentX = 0;
-                int currentY = 0;
+                int newX = 0;
+                int newY = 0;
                 int pastX = 0;
                 int pastY = 0;
                 //finds location of the last button clicked and the current button
@@ -99,8 +99,8 @@ namespace chessGame
                     {
                         if (boardDisplay[i, j] == clicked)
                         {
-                            currentX = i;
-                            currentY = j;
+                            newX = i;
+                            newY = j;
                         }
                         if (boardDisplay[i, j] == lastClicked)
                         {
@@ -110,21 +110,21 @@ namespace chessGame
                     }
                 }
                 //moves piece if one has been selected and the clicked button is a legal move
-                Cell location = b.board[currentX, currentY];
+                Cell location = b.board[newX, newY];
                 if (location.LegalMove)
                 {
                     numOfMoves++;
-                    startRound(currentX, currentY, pastX, pastY);
+                    startRound(newX, newY, pastX, pastY);
                 }
                 else
                 {
                     resetColours();
                     //assumes player is white
                     //changes all legal move position background colours to light green
-                    if (b.board[currentX, currentY].OnCell.IsWhite == human.IsWhite)
+                    if (b.board[newX, newY].OnCell.IsWhite == human.IsWhite)
                     {
                         b.resetLegal();
-                        b.FindLegalMoves(currentX, currentY);
+                        b.FindLegalMoves(newX, newY);
                         for (int i = 0; i < 8; i++)
                         {
                             for (int j = 0; j < 8; j++)
@@ -142,37 +142,37 @@ namespace chessGame
                 }
             }
         }
-        private void startRound(int currentX, int currentY, int pastX, int pastY)
+        private void startRound(int newX, int newY, int pastX, int pastY)
         {
             List<Piece> AIPiecesPassIn = AI.MyPieces;
             long AIScorePassIn = AI.Score;
             long humanScorePassIn = human.Score;
             List<Piece> humanPiecesPassIn = human.MyPieces;
-            b.changeScores(currentX, currentY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
+            b.changeScores(newX, newY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
             AI.MyPieces = AIPiecesPassIn;
             AI.Score = AIScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             human.Score = humanScorePassIn;
             Move thisMove;
-            if (b.board[pastX, pastY].OnCell.PieceName == "pawn" && currentY == 0)
+            if (b.board[pastX, pastY].OnCell.PieceName == "pawn" && newY == 0)
             {
-                toX = currentX;
-                toX = currentY;
-                Pawn pawn = (Pawn)b.board[currentX, currentY].OnCell;
+                toX = newX;
+                toX = newY;
+                Pawn pawn = (Pawn)b.board[newX, newY].OnCell;
                 toPromote = pawn;
                 promotion();
             }
             else
             {
-                thisMove = new Move(pastX, pastY, currentX, currentY, false, b.board[pastX, pastY].OnCell, b.board[currentX, currentY].OnCell);
-                b.movePiece(thisMove, true);
-                if (b.board[currentX, currentY].OnCell.PieceName != "empty")
+                thisMove = new Move(pastX, pastY, newX, newY, false, b.board[pastX, pastY].OnCell, b.board[newX, newY].OnCell);
+                if (thisMove.capturedPiece.PieceName != "empty")
                 {
-                    human.TakenPieces.Add(b.board[currentX, currentY].OnCell);
-                    updateTakenPieces(currentX, currentY, true);
+                    human.TakenPieces.Add(b.board[newX, newY].OnCell);
+                    updateTakenPieces(newX, newY, true);
                 }
-                boardDisplay[currentX, currentY].Image = b.board[currentX, currentY].OnCell.PieceImage;
-                boardDisplay[currentX, currentY].Refresh();
+                b.movePiece(thisMove, true);
+                boardDisplay[newX, newY].Image = b.board[newX, newY].OnCell.PieceImage;
+                boardDisplay[newX, newY].Refresh();
                 boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
                 boardDisplay[pastX, pastY].Refresh();
                 //updates images on cells
