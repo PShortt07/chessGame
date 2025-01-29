@@ -11,13 +11,15 @@ namespace chessGame
     internal class AI:Player
     {
         private int depth;
-        private Dictionary<long, long> transpoTable;
+        private Dictionary<string, long> transpoTable;
+        private Dictionary<int, Dictionary<long, long>> tableWithDepth;
         public AI(Board b, int depth, Player human)
         {
             this.depth = depth;
             IsWhite = false;
             TakenPieces = new List<Piece>();
-            transpoTable = new Dictionary<long, long>();
+            transpoTable = new Dictionary<string, long>();
+            tableWithDepth = new Dictionary<int, Dictionary<long, long>>();
         }
         //makes AI decide and make its move
         public void makeMove(ref Player human, ref Board chessBoard, Form1 f)
@@ -33,13 +35,14 @@ namespace chessGame
                 List<Cell> toSearch = chessBoard.FindLegalMoves(p.PosX, p.PosY);
                 foreach (Cell move in toSearch.OrderByDescending(x => x.Capture))
                 {
-                    long value = minimax(p, move, false, double.NegativeInfinity, double.PositiveInfinity, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
+                    Move possible = new Move(p.PosX, p.PosY, move.Row, move.Col, false, p, move.OnCell);
+                    long value = minimax(p, possible, false, double.NegativeInfinity, double.PositiveInfinity, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
                     possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //finds the highest possible score result of a move
-            possibleMoves.OrderByDescending(x => x.value);
+            possibleMoves = possibleMoves.OrderByDescending(x => x.value).ToList<PotentialMove>();
             long highestValue = possibleMoves[0].value;
             foreach (PotentialMove move in possibleMoves)
             {
@@ -73,7 +76,8 @@ namespace chessGame
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             Move thisMove;
-            if (chessBoard.board[newX, newY].OnCell.PieceName == "pawn" && chessBoard.board[newX, newY].OnCell.PosY == 7)
+            //checks for promotion
+            if (chessBoard.board[oldX, oldY].OnCell.PieceName == "pawn" && newY == 7)
             {
                 thisMove = new Move(oldX, oldY, newX, newY, true, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
                 thisMove.setPromotion(new Queen(IsWhite, newX, newY));
@@ -85,12 +89,16 @@ namespace chessGame
             }
             chessBoard.movePiece(thisMove, true);
         }
-        private long minimax(Piece piece, Cell position, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
+        private long minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
-            long hashValue = generateHashValue(chessBoard);
-            if (transpoTable.ContainsKey(hashValue))
+            string hashValue = generateHashValue(chessBoard, depth);
+            //returns evaluation if the board state has already been evaluated
+            foreach (KeyValuePair<string, long> entry in transpoTable)
             {
-                return transpoTable[hashValue];
+                if (entry.Key == hashValue)
+                {
+                    return entry.Value;
+                }
             }
             //scoring system
             if (depth == 0)
@@ -100,7 +108,7 @@ namespace chessGame
                 //try to use lower value pieces earlier in the game
                 if (piece.Value == 1)
                 {
-                    total += 10;
+                    total += 2;
                 }
                 else if (piece.Value == 3)
                 {
@@ -116,18 +124,18 @@ namespace chessGame
                     }
                 }
                 total += (long)covered;
-                transpoTable.Add(generateHashValue(chessBoard), total);
+                transpoTable.Add(generateHashValue(chessBoard, depth), total);
                 return total;
             }
             if (chessBoard.isGameOver(true))
             {
-                transpoTable.Add(generateHashValue(chessBoard), 500);
-                return 200;
+                transpoTable.Add(generateHashValue(chessBoard, depth), 500);
+                return 500;
             }
             else if (chessBoard.isGameOver(false))
             {
-                transpoTable.Add(generateHashValue(chessBoard), -500);
-                return -200;
+                transpoTable.Add(generateHashValue(chessBoard, depth), -500);
+                return -500;
             }
             //minimax
             if (maxPlayer)
@@ -136,13 +144,6 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                Move thisMove = new Move(origX, origY, position.Row, position.Col, false, piece, chessBoard.board[position.Row, position.Col].OnCell);
-                //always chooses queen for the sake of efficiency
-                if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
-                {
-                    thisMove.promoted = true;
-                    thisMove.setPromotion(new Queen(IsWhite, piece.PosX, piece.PosY));
-                }
                 chessBoard.movePiece(thisMove, false);
                 chessBoard.whiteTurn = false;
                 foreach (Cell c in chessBoard.board)
@@ -152,8 +153,16 @@ namespace chessGame
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
                         {
                             long scoreLoss = move.OnCell.Value;
+                            Move newMove = new Move(origX, origY, move.Row, move.Col, false, piece, move.OnCell);
+                            if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
+                            {
+                                thisMove.promoted = true;
+                                //always chooses queen for the sake of efficiency
+                                thisMove.setPromotion(new Queen(IsWhite, piece.PosX, piece.PosY));
+                                scoreLoss -= 9;
+                            }
                             humanScore -= scoreLoss;
-                            long evaluation = minimax(piece, move, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            long evaluation = minimax(piece, newMove, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             humanScore += scoreLoss;
                             maxEvaluation = (long)Math.Max(maxEvaluation, evaluation);
                             alpha = Math.Max(alpha, evaluation);
@@ -173,13 +182,6 @@ namespace chessGame
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
-                Move thisMove = new Move(origX, origY, position.Row, position.Col, false, piece, chessBoard.board[position.Row, position.Col].OnCell);
-                //always chooses queen for the sake of efficiency
-                if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 0)
-                {
-                    thisMove.promoted = true;
-                    thisMove.setPromotion(new Queen(IsWhite, piece.PosX, piece.PosY));
-                }
                 chessBoard.movePiece(thisMove, false);
                 chessBoard.whiteTurn = true;
                 foreach (Cell c in chessBoard.board)
@@ -189,8 +191,16 @@ namespace chessGame
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
                         {
                             long scoreLoss = move.OnCell.Value;
+                            Move newMove = new Move(origX, origY, move.Row, move.Col, false, piece, move.OnCell);
+                            if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
+                            {
+                                thisMove.promoted = true;
+                                //always chooses queen for the sake of efficiency
+                                thisMove.setPromotion(new Queen(IsWhite, piece.PosX, piece.PosY));
+                                scoreLoss -= 9;
+                            }
                             myScore -= scoreLoss;
-                            long evaluation = minimax(piece, move, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            long evaluation = minimax(piece, newMove, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             myScore += scoreLoss;
                             minEvaluation = (long)Math.Min(minEvaluation, evaluation);
                             beta = Math.Min(beta, evaluation);
@@ -206,7 +216,7 @@ namespace chessGame
             }
         }
         //https://www.youtube.com/watch?v=l-hh51ncgDI used as a basis for this method
-        private long generateHashValue(Board chessBoard)
+        private string generateHashValue(Board chessBoard, int depth)
         {
             long hashValue = 0;
             for (int i = 0; i < 8; i++)
@@ -281,7 +291,8 @@ namespace chessGame
                     }
                 }
             }
-            return hashValue;
+            string toReturn = hashValue.ToString() + depth.ToString();
+            return toReturn;
         }
         }
     }
