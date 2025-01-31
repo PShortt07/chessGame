@@ -21,7 +21,7 @@ namespace chessGame
         Label AIScore = new Label();
         int AIDepth = 1;
         int numOfMoves = 0;
-        string playerUsername;
+        public string playerUsername;
         bool moveInProgress = false;
         bool leaderboardDefined = false;
         bool leaderboardShowing = false;
@@ -31,6 +31,7 @@ namespace chessGame
         int toY;
         public Form1(string uName)
         {
+            this.StartPosition = FormStartPosition.CenterScreen;
             KeyDown += Form1_KeyDown2;
             playerUsername = uName;
             InitializeComponent();
@@ -157,8 +158,8 @@ namespace chessGame
             if (b.board[pastX, pastY].OnCell.PieceName == "pawn" && newY == 0)
             {
                 toX = newX;
-                toX = newY;
-                Pawn pawn = (Pawn)b.board[newX, newY].OnCell;
+                toY = newY;
+                Pawn pawn = (Pawn)b.board[pastX, pastY].OnCell;
                 toPromote = pawn;
                 promotion();
             }
@@ -241,7 +242,7 @@ namespace chessGame
             //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
             string name = playerUsername;
             string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
             scoresCon.Open();
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
@@ -268,7 +269,7 @@ namespace chessGame
             cmd.Parameters.AddWithValue("score", score);
             if (insertQuery)
             {
-                cmd.Parameters.AddWithValue("difficulty", AIDepth);
+                cmd.Parameters.AddWithValue("difficulty", AIDepth+1);
             }
             cmd.ExecuteNonQuery();
         }
@@ -472,13 +473,13 @@ namespace chessGame
             switch (difficultySelector.SelectedItem)
             {
                 case 1:
-                    AIDepth = 1;
+                    AIDepth = 0;
                     break;
                 case 2:
-                    AIDepth = 2;
+                    AIDepth = 1;
                     break;
                 case 3:
-                    AIDepth = 4;
+                    AIDepth = 2;
                     break;
             }
         }
@@ -506,7 +507,7 @@ namespace chessGame
         {
             //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
             //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
             scoresCon.Open();
             string sql = "SELECT * FROM [highScores] ORDER BY Moves";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);
@@ -535,7 +536,7 @@ namespace chessGame
         {
             if (e.KeyCode == Keys.Escape)
             {
-                quitMenu qM = new quitMenu();
+                quitMenu qM = new quitMenu(this);
                 qM.Show();
                 e.SuppressKeyPress = true;
             }
@@ -544,8 +545,7 @@ namespace chessGame
         private void returnToMenu_Click(object sender, EventArgs e)
         {
             Form1 newForm = new Form1(playerUsername);
-            newForm.ShowDialog();
-
+            newForm.Show();
             this.Close();
         }
     }

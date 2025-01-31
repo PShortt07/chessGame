@@ -91,15 +91,6 @@ namespace chessGame
         }
         private long minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
-            string hashValue = generateHashValue(chessBoard, depth);
-            //returns evaluation if the board state has already been evaluated
-            foreach (KeyValuePair<string, long> entry in transpoTable)
-            {
-                if (entry.Key == hashValue)
-                {
-                    return entry.Value;
-                }
-            }
             //scoring system
             if (depth == 0)
             {
@@ -124,7 +115,6 @@ namespace chessGame
                     }
                 }
                 total += (long)covered;
-                transpoTable.Add(generateHashValue(chessBoard, depth), total);
                 return total;
             }
             if (chessBoard.isGameOver(true))
