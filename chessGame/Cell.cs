@@ -29,6 +29,7 @@ namespace chessGame
         private long wPawnV;
         private long bKingV;
         private long wKingV;
+        private bool lastMove;
 
         public int Row { get => row; set => row = value; }
         public int Col { get => col; set => col = value; }
@@ -50,9 +51,11 @@ namespace chessGame
         public long WPawnV { get => wPawnV; set => wPawnV = value; }
         public long BKingV { get => bKingV; set => bKingV = value; }
         public long WKingV { get => wKingV; set => wKingV = value; }
+        public bool LastMove { get => lastMove; set => lastMove = value; }
 
         public Cell(int xPos, int yPos)
         {
+            LastMove = false;
             Capture = false;
             onCell = new Empty(false, xPos, yPos);
             OnCell = new Empty(false, xPos, yPos);

@@ -29,6 +29,7 @@ namespace chessGame
         Button[] promotionOptions = new Button[4];
         int toX;
         int toY;
+        Cell lastMove;
         public Form1(string uName)
         {
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -145,6 +146,7 @@ namespace chessGame
         }
         private void startRound(int newX, int newY, int pastX, int pastY)
         {
+            refreshBoard();
             List<Piece> AIPiecesPassIn = AI.MyPieces;
             long AIScorePassIn = AI.Score;
             long humanScorePassIn = human.Score;
@@ -154,6 +156,7 @@ namespace chessGame
             AI.Score = AIScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             human.Score = humanScorePassIn;
+            lastMove = b.board[pastX, pastY];
             Move thisMove;
             if (b.board[pastX, pastY].OnCell.PieceName == "pawn" && newY == 0)
             {
@@ -206,8 +209,14 @@ namespace chessGame
                 //AI makes its move
                 b.whiteTurn = false;
                 int pieces = AI.TakenPieces.Count;
-                AI.makeMove(ref human, ref b, this);
-                refreshBoard();
+                Move AIMove = AI.makeMove(ref human, ref b, this);
+                lastMove = b.board[AIMove.fromX, AIMove.fromY];
+                boardDisplay[AIMove.fromX, AIMove.fromY].BackColor = Color.DarkSalmon;
+                boardDisplay[AIMove.fromX, AIMove.fromY].Image = b.board[AIMove.fromX, AIMove.fromY].OnCell.PieceImage;
+                boardDisplay[AIMove.fromX, AIMove.fromY].Refresh();
+                boardDisplay[AIMove.toX, AIMove.toY].BackColor = Color.DarkSalmon;
+                boardDisplay[AIMove.toX, AIMove.toY].Image = b.board[AIMove.toX, AIMove.toY].OnCell.PieceImage;
+                boardDisplay[AIMove.toX, AIMove.toY].Refresh();
                 b.whiteTurn = true;
                 //checks if game is over, and if so displays an appropriate message
                 if (b.isGameOver(true) == true)
@@ -242,7 +251,7 @@ namespace chessGame
             //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
             string name = playerUsername;
             string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
@@ -281,11 +290,11 @@ namespace chessGame
             pB.Image = b.board[newX, newY].OnCell.PieceImage;
             if (player)
             {
-                pB.Location = new Point(250 + human.TakenPieces.Count * 50, 600);
+                pB.Location = new Point(220 + human.TakenPieces.Count * 50, 600);
             }
             else
             {
-                pB.Location = new Point(250 + AI.TakenPieces.Count * 50, 20);
+                pB.Location = new Point(220 + AI.TakenPieces.Count * 50, 20);
             }
             Controls.Add(pB);
         }
@@ -316,6 +325,28 @@ namespace chessGame
                 for (int j = 0; j < 8; j++)
                 {
                     boardDisplay[i, j].Image = b.board[i, j].OnCell.PieceImage;
+                    if (i % 2 == 0)
+                    {
+                        if (j % 2 == 0)
+                        {
+                            boardDisplay[i, j].BackColor = System.Drawing.Color.White;
+                        }
+                        else
+                        {
+                            boardDisplay[i, j].BackColor = System.Drawing.Color.BurlyWood;
+                        }
+                    }
+                    else
+                    {
+                        if (j % 2 == 0)
+                        {
+                            boardDisplay[i, j].BackColor = System.Drawing.Color.BurlyWood;
+                        }
+                        else
+                        {
+                            boardDisplay[i, j].BackColor = System.Drawing.Color.White;
+                        }
+                    }
                     boardDisplay[i, j].Refresh();
                 }
             }
@@ -507,7 +538,7 @@ namespace chessGame
         {
             //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
             //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
             scoresCon.Open();
             string sql = "SELECT * FROM [highScores] ORDER BY Moves";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);

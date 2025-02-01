@@ -22,7 +22,7 @@ namespace chessGame
             tableWithDepth = new Dictionary<int, Dictionary<long, long>>();
         }
         //makes AI decide and make its move
-        public void makeMove(ref Player human, ref Board chessBoard, Form1 f)
+        public Move makeMove(ref Player human, ref Board chessBoard, Form1 f)
         {
             List<PotentialMove> storedMoves = new List<PotentialMove>();
             List<Piece> tempPieces = MyPieces;
@@ -88,6 +88,7 @@ namespace chessGame
                 thisMove = new Move(oldX, oldY, newX, newY, false, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
             }
             chessBoard.movePiece(thisMove, true);
+            return thisMove;
         }
         private long minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
