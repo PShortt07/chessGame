@@ -12,25 +12,25 @@ namespace chessGame
 {
     public partial class quitMenu : Form
     {
-        Form1 currentForm;
-        public quitMenu(Form1 CurrentForm)
+        Game currentGame;
+        public quitMenu(Game CurrentGame)
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
-            currentForm = CurrentForm;
+            currentGame = CurrentGame;
         }
 
         private void menuButton_Click(object sender, EventArgs e)
         {
-            currentForm.Close();
-            Form1 f1 = new Form1(currentForm.playerUsername);
+            currentGame.Close();
+            Game f1 = new Game(currentGame.playerUsername);
             f1.Show();
             this.Close();
         }
 
         private void quitButton_Click(object sender, EventArgs e)
         {
-            currentForm.Close();
+            currentGame.Close();
             this.Close();
         }
     }

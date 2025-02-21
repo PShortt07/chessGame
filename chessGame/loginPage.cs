@@ -78,7 +78,7 @@ namespace chessGame
             scoresCon.Close();
             if (found != null)
             {
-                Form1 f1 = new Form1(username);
+                Game f1 = new Game(username);
                 f1.Show();
                 this.Hide();
             }
@@ -141,7 +141,7 @@ namespace chessGame
                 scoresCon.Close();
                 if (goneThrough)
                 {
-                    Form1 f1 = new Form1(username);
+                    Game f1 = new Game(username);
                     f1.Show();
                     this.Hide();
                 }

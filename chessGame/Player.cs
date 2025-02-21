@@ -8,14 +8,11 @@ namespace chessGame
 {
     internal class Player
     {
-        private bool myMove;
         private List<Piece> myPieces;
         private List<Piece> takenPieces;
-        private long score;
+        private int score;
         private bool isWhite;
-
-        public bool MyMove { get => myMove; set => myMove = value; }
-        public long Score { get => score; set => score = value; }
+        public int Score { get => score; set => score = value; }
         public List<Piece> MyPieces { get => myPieces; set => myPieces = value; }
         public List<Piece> TakenPieces { get => takenPieces; set => takenPieces = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }

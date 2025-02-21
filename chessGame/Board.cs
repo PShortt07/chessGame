@@ -34,19 +34,6 @@ namespace chessGame
                 for (int j = 0; j < 8; j++)
                 {
                     board[i, j] = new Cell(i,j);
-                    //assigns each cell a random value for each piece that could be on it for hashing purposes
-                    board[i, j].WPawnV = RNG.Next(1000000);
-                    board[i, j].BPawnV = RNG.Next(1000000);
-                    board[i, j].WRookV = RNG.Next(1000000);
-                    board[i, j].BRookV = RNG.Next(1000000);
-                    board[i, j].WKnightV = RNG.Next(1000000);
-                    board[i, j].BKnightV = RNG.Next(1000000);
-                    board[i, j].WBishopV = RNG.Next(1000000);
-                    board[i, j].BBishopV = RNG.Next(1000000);
-                    board[i, j].WQueenV = RNG.Next(1000000);
-                    board[i, j].BQueenV = RNG.Next(1000000);
-                    board[i, j].WKingV = RNG.Next(1000000);
-                    board[i, j].BKingV = RNG.Next(1000000);
                 }
             }
             for (int i = 0; i < 8; i++)
@@ -90,37 +77,15 @@ namespace chessGame
         }
         public bool isGameOver(bool checkingWhite)
         {
-            if (checkingWhite)
+            foreach (Cell c in board)
             {
-                for (int i = 0; i < 8; i++)
+                if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
                 {
-                    for (int j = 0; j < 8; j++)
+                    List<Cell> moves = new List<Cell>();
+                    moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
+                    if (moves.Count > 0)
                     {
-                        Cell c = board[i, j];
-                        if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == true)
-                        {
-                            List<Cell> moves = new List<Cell>();
-                            moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
-                            if (moves.Count > 0)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (Cell c in board)
-                {
-                    if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == false)
-                    {
-                        List<Cell> moves = new List<Cell>();
-                        moves = FindLegalMoves(c.OnCell.PosX, c.OnCell.PosY);
-                        if (moves.Count > 0)
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
             }
@@ -149,25 +114,7 @@ namespace chessGame
                 }
             }
         }
-        public bool doesTakeOutOfCheck(int newX, int newY, int currentX, int currentY)
-        {
-            //makes the move, finds which spaces are covered by which colour, then reverts the move
-            Move thisMove = new Move(currentX, currentY, newX, newY, false, board[currentX, currentY].OnCell, board[newX, newY].OnCell);
-            movePiece(thisMove, false);
-            //checks if the player whose turn it is has been taken out of check
-            bool outOfCheck = false;
-            if (whiteTurn)
-            {
-                outOfCheck = !findIfInCheck(true);
-            }
-            else
-            {
-                outOfCheck = !findIfInCheck(false);
-            }
-            revertMove(thisMove);
-            return outOfCheck;
-        }
-        public void changeScores(int newX, int newY, int oldX, int oldY, ref long humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref long AIScore, bool realMove)
+        public void changeScores(int newX, int newY, int oldX, int oldY, ref int humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref int AIScore, bool realMove)
         {
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
@@ -238,7 +185,7 @@ namespace chessGame
             Piece toReplace = reverting.pieceMoving.LastTaken.Pop();
             board[currentX, currentY].OnCell = toReplace;
         }
-        public void resetCaptures()
+        private void resetCaptures()
         {
             foreach (Cell c in board)
             {
@@ -248,6 +195,7 @@ namespace chessGame
         //finds all available moves
         public List<Cell> FindLegalMoves(int posX, int posY)
         {
+            resetCaptures();
             foreach (Cell c in board)
             {
                 if (c.OnCell.PieceName == "king")
@@ -284,10 +232,6 @@ namespace chessGame
                 }
             }
             return allowedMoves;
-        }
-        private void allowMovesThatTakeOutOfCheck(Cell selected, ref List<Cell> allowedMoves)
-        {
-            addMovesToList(ref allowedMoves, selected, true);
         }
         private void showLegalPawn(int posX, int posY, ref List<Cell> allowedMoves, bool whitePiece)
         {

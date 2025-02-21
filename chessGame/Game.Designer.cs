@@ -2,7 +2,7 @@
 
 namespace chessGame
 {
-    partial class Form1
+    partial class Game
     {
         /// <summary>
         ///  Required designer variable.
@@ -30,7 +30,7 @@ namespace chessGame
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
             playButton = new Button();
             titleLabel = new Label();
             difficultySelector = new ComboBox();

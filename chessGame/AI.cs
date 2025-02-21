@@ -11,20 +11,15 @@ namespace chessGame
     internal class AI:Player
     {
         private int depth;
-        private Dictionary<string, long> transpoTable;
-        private Dictionary<int, Dictionary<long, long>> tableWithDepth;
         public AI(Board b, int depth, Player human)
         {
             this.depth = depth;
             IsWhite = false;
             TakenPieces = new List<Piece>();
-            transpoTable = new Dictionary<string, long>();
-            tableWithDepth = new Dictionary<int, Dictionary<long, long>>();
         }
         //makes AI decide and make its move
-        public Move makeMove(ref Player human, ref Board chessBoard, Form1 f)
+        public Move makeMove(ref Player human, ref Board chessBoard, Game f)
         {
-            List<PotentialMove> storedMoves = new List<PotentialMove>();
             List<Piece> tempPieces = MyPieces;
             long humanScore = human.Score;
             long myScore = Score;
@@ -40,6 +35,36 @@ namespace chessGame
                     possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
+            PotentialMove bestMove = chooseBestMove(possibleMoves);
+            //accounts for taken pieces
+            int newX = bestMove.newCell.OnCell.PosX;
+            int newY = bestMove.newCell.OnCell.PosY;
+            int oldX = bestMove.p.PosX;
+            int oldY = bestMove.p.PosY;
+            if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == human.IsWhite)
+            {
+                TakenPieces.Add(bestMove.newCell.OnCell);
+                f.updateTakenPieces(newX, newY, false);
+            }
+            changeScoresForMove(ref chessBoard, newX, newY, oldX, oldY, ref human);
+            Move thisMove;
+            //checks for promotion
+            if (chessBoard.board[oldX, oldY].OnCell.PieceName == "pawn" && newY == 7)
+            {
+                thisMove = new Move(oldX, oldY, newX, newY, true, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
+                thisMove.setPromotion(new Queen(IsWhite, newX, newY));
+                Piece pawn = chessBoard.board[newX, newY].OnCell;
+            }
+            else
+            {
+                thisMove = new Move(oldX, oldY, newX, newY, false, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
+            }
+            //makes move
+            chessBoard.movePiece(thisMove, true);
+            return thisMove;
+        }
+        private PotentialMove chooseBestMove(List<PotentialMove> possibleMoves)
+        {
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //finds the highest possible score result of a move
             possibleMoves = possibleMoves.OrderByDescending(x => x.value).ToList<PotentialMove>();
@@ -54,41 +79,20 @@ namespace chessGame
             PotentialMove bestMove = null;
             Random RNG = new Random();
             bestMove = highestValueMoves[RNG.Next(highestValueMoves.Count)];
-            //accounts for taken pieces
-            int newX = bestMove.newCell.OnCell.PosX;
-            int newY = bestMove.newCell.OnCell.PosY;
-            int oldX = bestMove.p.PosX;
-            int oldY = bestMove.p.PosY;
-            if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == human.IsWhite)
-            {
-                TakenPieces.Add(bestMove.newCell.OnCell);
-                f.updateTakenPieces(newX, newY, false);
-            }
-            //makes move
+            return bestMove;
+        }
+        private void changeScoresForMove(ref Board chessBoard, int newX, int newY, int oldX, int oldY, ref Player human)
+        {
             //creates new variables to pass in to changeScores() then assigns changed qualities to AI
             List<Piece> myPiecesPassIn = MyPieces;
-            long scorePassIn = Score;
+            int scorePassIn = Score;
             List<Piece> humanPiecesPassIn = human.MyPieces;
-            long humanScorePassIn = human.Score;
+            int humanScorePassIn = human.Score;
             chessBoard.changeScores(newX, newY, oldX, oldY, ref humanScorePassIn, ref humanPiecesPassIn, ref myPiecesPassIn, ref scorePassIn, true);
             Score = scorePassIn;
             MyPieces = myPiecesPassIn;
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
-            Move thisMove;
-            //checks for promotion
-            if (chessBoard.board[oldX, oldY].OnCell.PieceName == "pawn" && newY == 7)
-            {
-                thisMove = new Move(oldX, oldY, newX, newY, true, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
-                thisMove.setPromotion(new Queen(IsWhite, newX, newY));
-                Piece pawn = chessBoard.board[newX, newY].OnCell;
-            }
-            else
-            {
-                thisMove = new Move(oldX, oldY, newX, newY, false, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
-            }
-            chessBoard.movePiece(thisMove, true);
-            return thisMove;
         }
         private long minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
         {
@@ -120,12 +124,10 @@ namespace chessGame
             }
             if (chessBoard.isGameOver(true))
             {
-                transpoTable.Add(generateHashValue(chessBoard, depth), 500);
                 return 500;
             }
             else if (chessBoard.isGameOver(false))
             {
-                transpoTable.Add(generateHashValue(chessBoard, depth), -500);
                 return -500;
             }
             //minimax
@@ -207,83 +209,5 @@ namespace chessGame
             }
         }
         //https://www.youtube.com/watch?v=l-hh51ncgDI used as a basis for this method
-        private string generateHashValue(Board chessBoard, int depth)
-        {
-            long hashValue = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8 ; j++)
-                {
-                    if (chessBoard.board[i, j].OnCell.PieceName != "empty")
-                    {
-                        switch (chessBoard.board[i, j].OnCell.PieceName)
-                        {
-                            case "pawn":
-                                if (chessBoard.board[i, j].OnCell.IsWhite)
-                                {
-                                    hashValue ^= chessBoard.board[i, j].WPawnV;
-                                }
-                                else
-                                {
-                                    hashValue ^= chessBoard.board[i, j].BPawnV;
-                                }
-                                break;
-                            case "rook":
-                                if (chessBoard.board[i, j].OnCell.IsWhite)
-                                {
-                                    hashValue ^= chessBoard.board[i, j].WRookV;
-                                }
-                                else
-                                {
-                                    hashValue ^= chessBoard.board[i, j].BRookV;
-                                }
-                                break;
-                            case "knight":
-                                if (chessBoard.board[i, j].OnCell.IsWhite)
-                                {
-                                    hashValue ^= chessBoard.board[i, j].WKnightV;
-                                }
-                                else
-                                {
-                                    hashValue ^= chessBoard.board[i, j].BKnightV;
-                                }
-                                break;
-                            case "bishop":
-                                if (chessBoard.board[i, j].OnCell.IsWhite)
-                                {
-                                    hashValue ^= chessBoard.board[i, j].WBishopV;
-                                }
-                                else
-                                {
-                                    hashValue ^= chessBoard.board[i, j].BBishopV;
-                                }
-                                break;
-                            case "queen":
-                                if (chessBoard.board[i, j].OnCell.IsWhite)
-                                {
-                                    hashValue ^= chessBoard.board[i, j].WQueenV;
-                                }
-                                else
-                                {
-                                    hashValue ^= chessBoard.board[i, j].BQueenV;
-                                }
-                                break;
-                            case "king":
-                                if (chessBoard.board[i, j].OnCell.IsWhite)
-                                {
-                                    hashValue ^= chessBoard.board[i, j].WKingV;
-                                }
-                                else
-                                {
-                                    hashValue ^= chessBoard.board[i, j].BKingV;
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-            string toReturn = hashValue.ToString() + depth.ToString();
-            return toReturn;
-        }
         }
     }

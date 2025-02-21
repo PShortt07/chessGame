@@ -8,29 +8,28 @@ using System.Data;
 using System.IO;
 namespace chessGame
 {
-    public partial class Form1 : Form
+    public partial class Game : Form
     {
-        Board b = new Board();
-        AI AI;
-        Player human = new Player();
-        Button[,] boardDisplay = new Button[8, 8];
-        DataGridView leaderboardDisplay = new DataGridView();
-        Button lastClicked = new Button();
-        TextBox winMessage = new TextBox();
-        Label hScore = new Label();
-        Label AIScore = new Label();
-        int AIDepth = 1;
-        int numOfMoves = 0;
+        private Board chessBoard = new Board();
+        private AI AI;
+        private Player human = new Player();
+        private Button[,] boardDisplay = new Button[8, 8];
+        private DataGridView leaderboardDisplay = new DataGridView();
+        private Button lastClicked = new Button();
+        private TextBox winMessage = new TextBox();
+        private Label hScore = new Label();
+        private Label AIScore = new Label();
+        private int AIDepth = 1;
+        private int numOfMoves = 0;
         public string playerUsername;
-        bool moveInProgress = false;
-        bool leaderboardDefined = false;
-        bool leaderboardShowing = false;
-        Pawn toPromote;
-        Button[] promotionOptions = new Button[4];
-        int toX;
-        int toY;
-        Cell lastMove;
-        public Form1(string uName)
+        private bool moveInProgress = false;
+        private bool leaderboardDefined = false;
+        private bool leaderboardShowing = false;
+        private Pawn toPromote;
+        private Button[] promotionOptions = new Button[4];
+        private int toX;
+        private int toY;
+        public Game(string uName)
         {
             this.StartPosition = FormStartPosition.CenterScreen;
             KeyDown += Form1_KeyDown2;
@@ -112,7 +111,7 @@ namespace chessGame
                     }
                 }
                 //moves piece if one has been selected and the clicked button is a legal move
-                Cell location = b.board[newX, newY];
+                Cell location = chessBoard.board[newX, newY];
                 if (location.LegalMove)
                 {
                     numOfMoves++;
@@ -123,15 +122,15 @@ namespace chessGame
                     resetColours();
                     //assumes player is white
                     //changes all legal move position background colours to light green
-                    if (b.board[newX, newY].OnCell.IsWhite == human.IsWhite)
+                    if (chessBoard.board[newX, newY].OnCell.IsWhite == human.IsWhite)
                     {
-                        b.resetLegal();
-                        b.FindLegalMoves(newX, newY);
+                        chessBoard.resetLegal();
+                        chessBoard.FindLegalMoves(newX, newY);
                         for (int i = 0; i < 8; i++)
                         {
                             for (int j = 0; j < 8; j++)
                             {
-                                if (b.board[i, j].LegalMove)
+                                if (chessBoard.board[i, j].LegalMove)
                                 {
                                     boardDisplay[i, j].BackColor = Color.LightGreen;
                                     boardDisplay[i, j].Refresh();
@@ -148,39 +147,38 @@ namespace chessGame
         {
             refreshBoard();
             List<Piece> AIPiecesPassIn = AI.MyPieces;
-            long AIScorePassIn = AI.Score;
-            long humanScorePassIn = human.Score;
+            int AIScorePassIn = AI.Score;
+            int humanScorePassIn = human.Score;
             List<Piece> humanPiecesPassIn = human.MyPieces;
-            b.changeScores(newX, newY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
+            chessBoard.changeScores(newX, newY, pastX, pastY, ref humanScorePassIn, ref humanPiecesPassIn, ref AIPiecesPassIn, ref AIScorePassIn, true);
             AI.MyPieces = AIPiecesPassIn;
             AI.Score = AIScorePassIn;
             human.MyPieces = humanPiecesPassIn;
             human.Score = humanScorePassIn;
-            lastMove = b.board[pastX, pastY];
             Move thisMove;
-            if (b.board[pastX, pastY].OnCell.PieceName == "pawn" && newY == 0)
+            if (chessBoard.board[pastX, pastY].OnCell.PieceName == "pawn" && newY == 0)
             {
                 toX = newX;
                 toY = newY;
-                Pawn pawn = (Pawn)b.board[pastX, pastY].OnCell;
+                Pawn pawn = (Pawn)chessBoard.board[pastX, pastY].OnCell;
                 toPromote = pawn;
                 promotion();
             }
             else
             {
-                thisMove = new Move(pastX, pastY, newX, newY, false, b.board[pastX, pastY].OnCell, b.board[newX, newY].OnCell);
+                thisMove = new Move(pastX, pastY, newX, newY, false, chessBoard.board[pastX, pastY].OnCell, chessBoard.board[newX, newY].OnCell);
                 if (thisMove.capturedPiece.PieceName != "empty")
                 {
-                    human.TakenPieces.Add(b.board[newX, newY].OnCell);
+                    human.TakenPieces.Add(chessBoard.board[newX, newY].OnCell);
                     updateTakenPieces(newX, newY, true);
                 }
-                b.movePiece(thisMove, true);
-                boardDisplay[newX, newY].Image = b.board[newX, newY].OnCell.PieceImage;
+                chessBoard.movePiece(thisMove, true);
+                boardDisplay[newX, newY].Image = chessBoard.board[newX, newY].OnCell.PieceImage;
                 boardDisplay[newX, newY].Refresh();
-                boardDisplay[pastX, pastY].Image = b.board[pastX, pastY].OnCell.PieceImage;
+                boardDisplay[pastX, pastY].Image = chessBoard.board[pastX, pastY].OnCell.PieceImage;
                 boardDisplay[pastX, pastY].Refresh();
                 //updates images on cells
-                b.resetLegal();
+                chessBoard.resetLegal();
                 resetColours();
                 updateScores();
                 AIMove();
@@ -189,9 +187,9 @@ namespace chessGame
         private void AIMove()
         {
             //checks if game is over, and if so displays an appropriate message
-            if (b.isGameOver(false) == true)
+            if (chessBoard.isGameOver(false) == true)
             {
-                if (b.bInCheck)
+                if (chessBoard.bInCheck)
                 {
                     winMessage.Text = "CHECKMATE - YOU WIN!";
                     //checks if leaderboard needs to be updated and if so does so
@@ -207,21 +205,20 @@ namespace chessGame
             else
             {
                 //AI makes its move
-                b.whiteTurn = false;
+                chessBoard.whiteTurn = false;
                 int pieces = AI.TakenPieces.Count;
-                Move AIMove = AI.makeMove(ref human, ref b, this);
-                lastMove = b.board[AIMove.fromX, AIMove.fromY];
+                Move AIMove = AI.makeMove(ref human, ref chessBoard, this);
                 boardDisplay[AIMove.fromX, AIMove.fromY].BackColor = Color.DarkSalmon;
-                boardDisplay[AIMove.fromX, AIMove.fromY].Image = b.board[AIMove.fromX, AIMove.fromY].OnCell.PieceImage;
+                boardDisplay[AIMove.fromX, AIMove.fromY].Image = chessBoard.board[AIMove.fromX, AIMove.fromY].OnCell.PieceImage;
                 boardDisplay[AIMove.fromX, AIMove.fromY].Refresh();
                 boardDisplay[AIMove.toX, AIMove.toY].BackColor = Color.DarkSalmon;
-                boardDisplay[AIMove.toX, AIMove.toY].Image = b.board[AIMove.toX, AIMove.toY].OnCell.PieceImage;
+                boardDisplay[AIMove.toX, AIMove.toY].Image = chessBoard.board[AIMove.toX, AIMove.toY].OnCell.PieceImage;
                 boardDisplay[AIMove.toX, AIMove.toY].Refresh();
-                b.whiteTurn = true;
+                chessBoard.whiteTurn = true;
                 //checks if game is over, and if so displays an appropriate message
-                if (b.isGameOver(true) == true)
+                if (chessBoard.isGameOver(true) == true)
                 {
-                    if (b.wInCheck)
+                    if (chessBoard.wInCheck)
                     {
                         winMessage.Text = "CHECKMATE - AI WINS!";
                     }
@@ -287,7 +284,7 @@ namespace chessGame
             PictureBox pB = new PictureBox();
             pB.BackColor = Color.Transparent;
             pB.Size = new Size(50, 50);
-            pB.Image = b.board[newX, newY].OnCell.PieceImage;
+            pB.Image = chessBoard.board[newX, newY].OnCell.PieceImage;
             if (player)
             {
                 pB.Location = new Point(220 + human.TakenPieces.Count * 50, 600);
@@ -310,21 +307,21 @@ namespace chessGame
             difficultySelector.Hide();
             winMessage.Hide();
             underline.Hide();
-            DrawBoard(b.board);
+            DrawBoard(chessBoard.board);
             hScore.Text = "39";
             AIScore.Text = "39";
             hScore.Show();
             AIScore.Show();
-            AI = new AI(b, AIDepth, human);
-            b.refreshLists(ref human, ref AI);
+            AI = new AI(chessBoard, AIDepth, human);
+            chessBoard.refreshLists(ref human, ref AI);
         }
-        public void refreshBoard()
+        private void refreshBoard()
         {
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    boardDisplay[i, j].Image = b.board[i, j].OnCell.PieceImage;
+                    boardDisplay[i, j].Image = chessBoard.board[i, j].OnCell.PieceImage;
                     if (i % 2 == 0)
                     {
                         if (j % 2 == 0)
@@ -433,7 +430,7 @@ namespace chessGame
         }
         private void promotionSelection(object sender, EventArgs e)
         {
-            Move promotingMove = new Move(toPromote.PosX, toPromote.PosY, toX, toY, true, toPromote, b.board[toPromote.PosX, toPromote.PosY].OnCell);
+            Move promotingMove = new Move(toPromote.PosX, toPromote.PosY, toX, toY, true, toPromote, chessBoard.board[toPromote.PosX, toPromote.PosY].OnCell);
             switch (((Button)sender).Name)
             {
                 case "opQ":
@@ -454,13 +451,13 @@ namespace chessGame
                 Controls.Remove(button);
                 button.Dispose();
             }
-            if (b.board[toX, toY].OnCell.PieceName != "empty")
+            if (chessBoard.board[toX, toY].OnCell.PieceName != "empty")
             {
-                human.TakenPieces.Add(b.board[toX, toY].OnCell);
+                human.TakenPieces.Add(chessBoard.board[toX, toY].OnCell);
                 updateTakenPieces(toX, toY, true);
             }
-            b.movePiece(promotingMove, true);
-            b.resetLegal();
+            chessBoard.movePiece(promotingMove, true);
+            chessBoard.resetLegal();
             resetColours();
             updateScores();
             refreshBoard();
@@ -575,7 +572,7 @@ namespace chessGame
 
         private void returnToMenu_Click(object sender, EventArgs e)
         {
-            Form1 newForm = new Form1(playerUsername);
+            Game newForm = new Game(playerUsername);
             newForm.Show();
             this.Close();
         }
