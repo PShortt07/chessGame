@@ -31,7 +31,7 @@ namespace chessGame
                 foreach (Cell move in toSearch.OrderByDescending(x => x.Capture))
                 {
                     Move possible = new Move(p.PosX, p.PosY, move.Row, move.Col, false, p, move.OnCell);
-                    long value = minimax(p, possible, false, double.NegativeInfinity, double.PositiveInfinity, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
+                    double value = minimax(p, possible, false, double.NegativeInfinity, double.PositiveInfinity, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
                     possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
@@ -68,7 +68,7 @@ namespace chessGame
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
             //finds the highest possible score result of a move
             possibleMoves = possibleMoves.OrderByDescending(x => x.value).ToList<PotentialMove>();
-            long highestValue = possibleMoves[0].value;
+            double highestValue = possibleMoves[0].value;
             foreach (PotentialMove move in possibleMoves)
             {
                 if (move.value == highestValue)
@@ -94,13 +94,13 @@ namespace chessGame
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
         }
-        private long minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, long humanScore, long myScore)
+        private double minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, double humanScore, double myScore)
         {
             //scoring system
             if (depth == 0)
             {
                 //score difference
-                long total = myScore - humanScore;
+                double total = myScore - humanScore;
                 //try to use lower value pieces earlier in the game
                 if (piece.Value == 1)
                 {
@@ -119,21 +119,21 @@ namespace chessGame
                         covered += 0.1;
                     }
                 }
-                total += (long)covered;
+                total += covered;
                 return total;
             }
-            if (chessBoard.isGameOver(true))
+            if (chessBoard.isGameOver(true) && chessBoard.wInCheck)
             {
                 return 500;
             }
-            else if (chessBoard.isGameOver(false))
+            else if (chessBoard.isGameOver(false) && chessBoard.bInCheck)
             {
                 return -500;
             }
             //minimax
             if (maxPlayer)
             {
-                long maxEvaluation = long.MinValue;
+                double maxEvaluation = double.MinValue;
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
@@ -155,9 +155,9 @@ namespace chessGame
                                 scoreLoss -= 9;
                             }
                             humanScore -= scoreLoss;
-                            long evaluation = minimax(piece, newMove, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            double evaluation = minimax(piece, newMove, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             humanScore += scoreLoss;
-                            maxEvaluation = (long)Math.Max(maxEvaluation, evaluation);
+                            maxEvaluation = Math.Max(maxEvaluation, evaluation);
                             alpha = Math.Max(alpha, evaluation);
                             if (beta <= alpha)
                             {
@@ -171,7 +171,7 @@ namespace chessGame
             }
             else
             {
-                long minEvaluation = long.MaxValue;
+                double minEvaluation = double.MaxValue;
                 int origX = piece.PosX;
                 int origY = piece.PosY;
                 List<Piece> pieces = MyPieces;
@@ -193,9 +193,9 @@ namespace chessGame
                                 scoreLoss -= 9;
                             }
                             myScore -= scoreLoss;
-                            long evaluation = minimax(piece, newMove, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
+                            double evaluation = minimax(piece, newMove, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             myScore += scoreLoss;
-                            minEvaluation = (long)Math.Min(minEvaluation, evaluation);
+                            minEvaluation = Math.Min(minEvaluation, evaluation);
                             beta = Math.Min(beta, evaluation);
                             if (beta <= alpha)
                             {
