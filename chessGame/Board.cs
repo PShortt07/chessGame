@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -41,6 +42,7 @@ namespace chessGame
                 board[i, 1].OnCell = new Pawn(false, i, 1); //black pawns
                 board[i, 6].OnCell = new Pawn(true, i, 6); //white pawns
             }
+            //sets up all pieces
             board[0, 0].OnCell = new Rook(false, 0, 0);
             board[0, 7].OnCell = new Rook(true, 0, 7);
             board[7, 0].OnCell = new Rook(false, 7, 0);
@@ -60,8 +62,10 @@ namespace chessGame
         }
         public void refreshLists(ref Player human, ref AI AI)
         {
+            //clears lists
             human.MyPieces = new List<Piece>();
             AI.MyPieces = new List<Piece>();
+            //adds all pieces to the appropriate list
             foreach (Cell c in board)
             {
                 Piece assessing = c.OnCell;
@@ -77,6 +81,7 @@ namespace chessGame
         }
         public bool isGameOver(bool checkingWhite)
         {
+            //checks if any legal moves can be made by the appropriate side
             foreach (Cell c in board)
             {
                 if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite == checkingWhite)
@@ -116,6 +121,7 @@ namespace chessGame
         }
         public void changeScores(int newX, int newY, int oldX, int oldY, ref int humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref int AIScore, bool realMove)
         {
+            //subtracts piece value from score and removes piece from list
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
                 AIScore -= board[newX, newY].OnCell.Value;
@@ -136,6 +142,7 @@ namespace chessGame
         //updates board array when a piece is moved
         public void movePiece(Move thisMove, bool realMove)
         {
+            //updates king position variables if necessary
             if (thisMove.pieceMoving.PieceName == "king")
             {
                 if (thisMove.pieceMoving.IsWhite)
@@ -149,27 +156,32 @@ namespace chessGame
                     bKingY = thisMove.toY;
                 }
             }
+            //acccounts for promotion
             if (thisMove.promoted)
             {
                 board[thisMove.toX, thisMove.toY].OnCell = thisMove.promotedPiece;
                 thisMove.promotedPiece.PosX = thisMove.toX;
                 thisMove.promotedPiece.PosY = thisMove.toY;
             }
+            //standard move
             else
             {
                 board[thisMove.toX, thisMove.toY].OnCell = thisMove.pieceMoving;
                 thisMove.pieceMoving.PosX = thisMove.toX;
                 thisMove.pieceMoving.PosY = thisMove.toY;
             }
+            //adds taken piece to a stack
             thisMove.pieceMoving.LastTaken.Push(thisMove.capturedPiece);
             if (!thisMove.pieceMoving.HasMoved && realMove == true)
             {
                 thisMove.pieceMoving.HasMoved = true;
             }
+            //makes previous cell empty
             board[thisMove.fromX, thisMove.fromY].OnCell = new Empty(false, thisMove.fromX, thisMove.fromY);
         }
         public void revertMove(Move reverting)
         {
+            //reverts moves
             int origX = reverting.fromX;
             int origY = reverting.fromY;
             int currentX = reverting.toX;
@@ -198,6 +210,7 @@ namespace chessGame
             resetCaptures();
             foreach (Cell c in board)
             {
+                //updates king position variables
                 if (c.OnCell.PieceName == "king")
                 {
                     if (c.OnCell.IsWhite)
@@ -212,6 +225,7 @@ namespace chessGame
                     }
                 }
             }
+            //finds if either king is in check
             wInCheck = findIfInCheck(true);
             bInCheck = findIfInCheck(false);
             Cell current = board[posX, posY];

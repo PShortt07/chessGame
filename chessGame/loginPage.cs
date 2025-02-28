@@ -32,8 +32,10 @@ namespace chessGame
         }
         private string hashPassword(string password)
         {
+            //mid square hasing algorithm
             char[] passwordChars = password.ToCharArray();
             string toHash = "";
+            //converts each character to its character code and adds them to the toHash string
             for (int i = 0; i < passwordChars.Count(); i++)
             {
                 int code = (int)passwordChars[i];
@@ -46,15 +48,19 @@ namespace chessGame
                 try
                 {
                     canContinue = true;
+                    //squares the number and converts it into a string
                     hashed = (long.Parse(toHash) ^ 2).ToString();
                 }
                 catch
                 {
+                    //accounts for when the number too large to be parsed
                     toHash = toHash.Substring(1, toHash.Length - 1);
                     canContinue = false;
                 }
             } while (!canContinue);
-            hashed = hashed.Substring(1, hashed.Length - 2);
+            //takes the middle of the string
+            hashed = hashed.Substring(3, hashed.Length - 4);
+            //ensures the hashed string is not too long to be stored in the database
             if (hashed.Length > 100)
             {
                 hashed = hashed.Substring(0, 100);
@@ -67,7 +73,7 @@ namespace chessGame
             //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
             SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
             scoresCon.Open();
-            //fix this
+            //checks for account in database
             string toInsert = "SELECT * FROM [userLogins] WHERE Username = @username AND Password = @password";
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             string username = usernameTextBox.Text;
@@ -78,24 +84,28 @@ namespace chessGame
             scoresCon.Close();
             if (found != null)
             {
+                //opens main menu and hides login page
                 Game f1 = new Game(username);
                 f1.Show();
                 this.Hide();
             }
             else
             {
+                //accounts for there being no match found in the database
                 errorMessage.Text = "Account not found";
             }
         }
 
         private void signUpButton_Click(object sender, EventArgs e)
         {
+            //sets of characters to check for in password
             string sChars = @" !#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
             string nums = "0123456789";
             string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             string proposedPassword = passwordTextBox.Text;
             string username = usernameTextBox.Text;
             bool safe = true;
+            //password requirements
             if (username.Length > 25)
             {
                 errorMessage.Text = "Username too long - must be less than 25 characters";
@@ -116,10 +126,16 @@ namespace chessGame
                 errorMessage.Text = "Password needs at least one capital letter";
                 safe = false;
             }
+            if (proposedPassword.Length < 8)
+            {
+                errorMessage.Text = "Password too short - must be at least 8 characters";
+                safe = false;
+            }
             if (safe)
             {
                 //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
                 //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
+                //hashes password then stores it in the database
                 proposedPassword = hashPassword(proposedPassword);
                 SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
                 scoresCon.Open();
@@ -135,12 +151,14 @@ namespace chessGame
                 }
                 catch
                 {
+                    //checks if username is taken
                     errorMessage.Text = "Username taken. Please try another.";
                     goneThrough = false;
                 }
                 scoresCon.Close();
                 if (goneThrough)
                 {
+                    //opens main menu and hides login page
                     Game f1 = new Game(username);
                     f1.Show();
                     this.Hide();

@@ -72,12 +72,6 @@ namespace chessGame
             Controls.Add(AIScore);
             AIScore.Hide();
         }
-
-        private void Form1_KeyDown(object? sender, KeyEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void label1_Click(object sender, EventArgs e)
         {
 

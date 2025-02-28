@@ -17,16 +17,18 @@ namespace chessGame
             IsWhite = false;
             TakenPieces = new List<Piece>();
         }
-        //makes AI decide and make its move
+        //makes AI decide on and make its move
         public Move makeMove(ref Player human, ref Board chessBoard, Game f)
         {
+            //makes variables so that the real values are not changed during evaluation
             List<Piece> tempPieces = MyPieces;
             long humanScore = human.Score;
             long myScore = Score;
-            //adds best move for each piece to a list then resets the second board for the next piece analysis
+            //adds best move for each piece to a list
             List<PotentialMove> possibleMoves = new List<PotentialMove>();
             foreach (Piece p in tempPieces)
             {
+                //finds all legal moves for the current piece and adds them to a list to be evaluated
                 List<Cell> toSearch = chessBoard.FindLegalMoves(p.PosX, p.PosY);
                 foreach (Cell move in toSearch.OrderByDescending(x => x.Capture))
                 {
@@ -35,23 +37,26 @@ namespace chessGame
                     possibleMoves.Add(new PotentialMove(value, p, move));
                 }
             }
+            //chooses the best move from the list
             PotentialMove bestMove = chooseBestMove(possibleMoves);
-            //accounts for taken pieces
             int newX = bestMove.newCell.OnCell.PosX;
             int newY = bestMove.newCell.OnCell.PosY;
             int oldX = bestMove.p.PosX;
             int oldY = bestMove.p.PosY;
+            //accounts for taken pieces
             if (bestMove.newCell.OnCell.PieceName != "empty" && bestMove.newCell.OnCell.IsWhite == human.IsWhite)
             {
                 TakenPieces.Add(bestMove.newCell.OnCell);
                 f.updateTakenPieces(newX, newY, false);
             }
+            //changes scores
             changeScoresForMove(ref chessBoard, newX, newY, oldX, oldY, ref human);
             Move thisMove;
             //checks for promotion
             if (chessBoard.board[oldX, oldY].OnCell.PieceName == "pawn" && newY == 7)
             {
                 thisMove = new Move(oldX, oldY, newX, newY, true, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
+                //always chooses queen for the sake of efficiency
                 thisMove.setPromotion(new Queen(IsWhite, newX, newY));
                 Piece pawn = chessBoard.board[newX, newY].OnCell;
             }
@@ -66,7 +71,7 @@ namespace chessGame
         private PotentialMove chooseBestMove(List<PotentialMove> possibleMoves)
         {
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
-            //finds the highest possible score result of a move
+            //finds the highest scoring move(s)
             possibleMoves = possibleMoves.OrderByDescending(x => x.value).ToList<PotentialMove>();
             double highestValue = possibleMoves[0].value;
             foreach (PotentialMove move in possibleMoves)
@@ -77,13 +82,14 @@ namespace chessGame
                 }
             }
             PotentialMove bestMove = null;
+            //chooses a random move from the highest scoring moves
             Random RNG = new Random();
             bestMove = highestValueMoves[RNG.Next(highestValueMoves.Count)];
             return bestMove;
         }
         private void changeScoresForMove(ref Board chessBoard, int newX, int newY, int oldX, int oldY, ref Player human)
         {
-            //creates new variables to pass in to changeScores() then assigns changed qualities to AI
+            //creates new variables to pass in to changeScores() then assigns changed qualities to AI and player
             List<Piece> myPiecesPassIn = MyPieces;
             int scorePassIn = Score;
             List<Piece> humanPiecesPassIn = human.MyPieces;
@@ -122,10 +128,12 @@ namespace chessGame
                 total += covered;
                 return total;
             }
+            //if the AI has checkmated the player
             if (chessBoard.isGameOver(true) && chessBoard.wInCheck)
             {
                 return 500;
             }
+            //if the player has checkmated the AI
             else if (chessBoard.isGameOver(false) && chessBoard.bInCheck)
             {
                 return -500;
@@ -147,6 +155,7 @@ namespace chessGame
                         {
                             long scoreLoss = move.OnCell.Value;
                             Move newMove = new Move(origX, origY, move.Row, move.Col, false, piece, move.OnCell);
+                            //promotion
                             if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
                             {
                                 thisMove.promoted = true;
@@ -157,7 +166,9 @@ namespace chessGame
                             humanScore -= scoreLoss;
                             double evaluation = minimax(piece, newMove, false, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             humanScore += scoreLoss;
+                            //updates maxEvaluation if necessary
                             maxEvaluation = Math.Max(maxEvaluation, evaluation);
+                            //alpha-beta pruning
                             alpha = Math.Max(alpha, evaluation);
                             if (beta <= alpha)
                             {
@@ -185,6 +196,7 @@ namespace chessGame
                         {
                             long scoreLoss = move.OnCell.Value;
                             Move newMove = new Move(origX, origY, move.Row, move.Col, false, piece, move.OnCell);
+                            //promotion
                             if (chessBoard.board[piece.PosX, piece.PosY].OnCell.PieceName == "pawn" && piece.PosY == 7)
                             {
                                 thisMove.promoted = true;
@@ -195,7 +207,9 @@ namespace chessGame
                             myScore -= scoreLoss;
                             double evaluation = minimax(piece, newMove, true, alpha, beta, depth - 1, chessBoard, humanScore, myScore);
                             myScore += scoreLoss;
+                            //updates minEvaluation if necessary
                             minEvaluation = Math.Min(minEvaluation, evaluation);
+                            //alpha-beta pruning
                             beta = Math.Min(beta, evaluation);
                             if (beta <= alpha)
                             {
