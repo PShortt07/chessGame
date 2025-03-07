@@ -235,22 +235,29 @@ namespace chessGame
             hScore.Text = (human.Score / 10).ToString();
             AIScore.Text = (AI.Score / 10).ToString();
         }
+        private SqlConnection retrieveScoresCon()
+        {
+            //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
+            //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            return scoresCon;
+        }
         private void checkForHighScoreUpdate()
         {
             //find currently recorded high score for the user
-            //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
-            //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
             string name = playerUsername;
-            string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name";
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
+            int difficulty = AIDepth + 1;
+            string toInsert = "SELECT Moves FROM [highScores] WHERE Username = @name AND Difficulty = @difficulty";
+            SqlConnection scoresCon = retrieveScoresCon();
             scoresCon.Open();
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
+            cmd.Parameters.AddWithValue("difficulty", difficulty);
             var hS = cmd.ExecuteScalar();
             //updates score if lower than previous high score
             if (hS != null && numOfMoves < int.Parse(hS.ToString()))
             {
-                toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name";
+                toInsert = "UPDATE [highScores] SET Moves = @score WHERE Username = @name AND Difficulty = @difficulty";
                 changeHighScores(toInsert, scoresCon, false);
             }
             else if (hS == null)
@@ -267,10 +274,7 @@ namespace chessGame
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             cmd.Parameters.AddWithValue("name", name);
             cmd.Parameters.AddWithValue("score", score);
-            if (insertQuery)
-            {
-                cmd.Parameters.AddWithValue("difficulty", AIDepth+1);
-            }
+            cmd.Parameters.AddWithValue("difficulty", AIDepth + 1);
             cmd.ExecuteNonQuery();
         }
         public void updateTakenPieces(int newX, int newY, bool player)
@@ -527,9 +531,7 @@ namespace chessGame
         }
         private void createLeaderboard(DataGridView leaderboardDisplay)
         {
-            //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
-            //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
+            SqlConnection scoresCon = retrieveScoresCon();
             scoresCon.Open();
             string sql = "SELECT * FROM [highScores] ORDER BY Moves";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(sql, scoresCon);

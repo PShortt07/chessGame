@@ -67,11 +67,16 @@ namespace chessGame
             }
             return hashed;
         }
-        private void logInButton_Click(object sender, EventArgs e)
+        private SqlConnection retrieveScoresCon()
         {
             //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
             //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
-            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
+            SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True");
+            return scoresCon;
+        }
+        private void logInButton_Click(object sender, EventArgs e)
+        {
+            SqlConnection scoresCon = retrieveScoresCon();
             scoresCon.Open();
             //checks for account in database
             string toInsert = "SELECT * FROM [userLogins] WHERE Username = @username AND Password = @password";
@@ -133,11 +138,9 @@ namespace chessGame
             }
             if (safe)
             {
-                //Home: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\patri\Source\Repos\chessGame2\chessGame\scores.mdf;Integrated Security=True
-                //College: Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True
                 //hashes password then stores it in the database
                 proposedPassword = hashPassword(proposedPassword);
-                SqlConnection scoresCon = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=H:\CS\chessGameSBID\chessGame\Database1.mdf;Integrated Security=True");
+                SqlConnection scoresCon = retrieveScoresCon();
                 scoresCon.Open();
                 string toInsert = "INSERT INTO [userLogins] (Username, Password) VALUES (@u, @p)";
                 SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
