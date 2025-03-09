@@ -21,6 +21,7 @@ namespace chessGame
         {
             TakenPieces = new List<Piece>();
             MyPieces = new List<Piece>();
+            //all piece values added together
             Score = 390;
         }
     }

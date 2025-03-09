@@ -22,6 +22,7 @@ namespace chessGame
 
         private void menuButton_Click(object sender, EventArgs e)
         {
+            //closes current game and opens a new window for the main menu
             currentGame.Close();
             Game f1 = new Game(currentGame.playerUsername);
             f1.Show();
@@ -30,8 +31,8 @@ namespace chessGame
 
         private void quitButton_Click(object sender, EventArgs e)
         {
-            currentGame.Close();
-            this.Close();
+            //closes all windows
+            Application.Exit();
         }
     }
 }

@@ -200,7 +200,6 @@ namespace chessGame
             {
                 //AI makes its move
                 chessBoard.whiteTurn = false;
-                int pieces = AI.TakenPieces.Count;
                 Move AIMove = AI.makeMove(ref human, ref chessBoard, this);
                 boardDisplay[AIMove.fromX, AIMove.fromY].BackColor = Color.DarkSalmon;
                 boardDisplay[AIMove.fromX, AIMove.fromY].Image = chessBoard.board[AIMove.fromX, AIMove.fromY].OnCell.PieceImage;

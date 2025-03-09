@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -26,15 +27,23 @@ namespace chessGame
             long myScore = Score;
             //adds best move for each piece to a list
             List<PotentialMove> possibleMoves = new List<PotentialMove>();
-            foreach (Piece p in tempPieces)
+            for (int i = 0; i < 8; i++)
             {
-                //finds all legal moves for the current piece and adds them to a list to be evaluated
-                List<Cell> toSearch = chessBoard.FindLegalMoves(p.PosX, p.PosY);
-                foreach (Cell move in toSearch.OrderByDescending(x => x.Capture))
+                for (int j = 0; j < 8; j++)
                 {
-                    Move possible = new Move(p.PosX, p.PosY, move.Row, move.Col, false, p, move.OnCell);
-                    double value = minimax(p, possible, false, double.NegativeInfinity, double.PositiveInfinity, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
-                    possibleMoves.Add(new PotentialMove(value, p, move));
+                    if (chessBoard.board[i, j].OnCell.PieceName != "empty" && !chessBoard.board[i, j].OnCell.IsWhite)
+                    {
+                        Piece p = chessBoard.board[i, j].OnCell;
+                        //finds all legal moves for the current piece and adds them to a list to be evaluated
+                        List<Cell> toSearch = chessBoard.FindLegalMoves(p.PosX, p.PosY);
+                        foreach (Cell move in toSearch.OrderByDescending(x => x.Capture))
+                        {
+                            Move possible = new Move(p.PosX, p.PosY, move.Row, move.Col, false, p, move.OnCell);
+                            //small correction by Copilot (alpha and beta values passed in previously were 0 and 0 rather than negative and positive infinity, causing minimax to behave incorrectly)
+                            double value = minimax(p, possible, false, double.NegativeInfinity, double.PositiveInfinity, depth, chessBoard, humanScore - move.OnCell.Value, myScore);
+                            possibleMoves.Add(new PotentialMove(value, p, move));
+                        }
+                    }
                 }
             }
             //chooses the best move from the list
@@ -58,7 +67,6 @@ namespace chessGame
                 thisMove = new Move(oldX, oldY, newX, newY, true, chessBoard.board[oldX, oldY].OnCell, chessBoard.board[newX, newY].OnCell);
                 //always chooses queen for the sake of efficiency
                 thisMove.setPromotion(new Queen(IsWhite, newX, newY));
-                Piece pawn = chessBoard.board[newX, newY].OnCell;
             }
             else
             {
@@ -71,7 +79,7 @@ namespace chessGame
         private PotentialMove chooseBestMove(List<PotentialMove> possibleMoves)
         {
             List<PotentialMove> highestValueMoves = new List<PotentialMove>();
-            //finds the highest scoring move(s)
+            //finds the highest scoring move(s) - small correction by Copilot (previously incorrectly used .OrderBy rather than .OrderByDescending)
             possibleMoves = possibleMoves.OrderByDescending(x => x.value).ToList<PotentialMove>();
             double highestValue = possibleMoves[0].value;
             foreach (PotentialMove move in possibleMoves)
@@ -100,33 +108,37 @@ namespace chessGame
             human.Score = humanScorePassIn;
             human.MyPieces = humanPiecesPassIn;
         }
+        private double evaluateBoard(double myScore, double humanScore, Piece piece, Board chessBoard)
+        {
+            //score difference
+            double total = myScore - humanScore;
+            //try to use lower value pieces earlier in the game
+            if (piece.Value == 1)
+            {
+                total += 2;
+            }
+            else if (piece.Value == 3)
+            {
+                total++;
+            }
+            //try to cover as many cells as possible
+            double covered = 0;
+            foreach (Cell c in chessBoard.board)
+            {
+                if (c.CoveredByBlack)
+                {
+                    covered += 0.1;
+                }
+            }
+            total += covered;
+            return total;
+        }
         private double minimax(Piece piece, Move thisMove, bool maxPlayer, double alpha, double beta, int depth, Board chessBoard, double humanScore, double myScore)
         {
             //scoring system
             if (depth == 0)
             {
-                //score difference
-                double total = myScore - humanScore;
-                //try to use lower value pieces earlier in the game
-                if (piece.Value == 1)
-                {
-                    total += 2;
-                }
-                else if (piece.Value == 3)
-                {
-                    total++;
-                }
-                //try to cover as many cells as possible
-                double covered = 0;
-                foreach (Cell c in chessBoard.board)
-                {
-                    if (c.CoveredByBlack)
-                    {
-                        covered += 0.1;
-                    }
-                }
-                total += covered;
-                return total;
+                return evaluateBoard(myScore, humanScore, piece, chessBoard);
             }
             //if the AI has checkmated the player
             if (chessBoard.isGameOver(true) && chessBoard.wInCheck)
@@ -149,6 +161,7 @@ namespace chessGame
                 chessBoard.whiteTurn = false;
                 foreach (Cell c in chessBoard.board)
                 {
+                    //checks for all black pieces
                     if (c.OnCell.PieceName != "empty" && !c.OnCell.IsWhite)
                     {
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
@@ -190,6 +203,7 @@ namespace chessGame
                 chessBoard.whiteTurn = true;
                 foreach (Cell c in chessBoard.board)
                 {
+                    //checks for all white pieces
                     if (c.OnCell.PieceName != "empty" && c.OnCell.IsWhite)
                     {
                         foreach (Cell move in chessBoard.FindLegalMoves(c.Row, c.Col))
@@ -222,6 +236,6 @@ namespace chessGame
                 return minEvaluation;
             }
         }
-        //https://www.youtube.com/watch?v=l-hh51ncgDI used as a basis for this method
+        //https://www.youtube.com/watch?v=l-hh51ncgDI used as a basis for the minimax method
         }
     }

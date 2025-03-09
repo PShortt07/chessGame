@@ -42,7 +42,7 @@ namespace chessGame
                 board[i, 1].OnCell = new Pawn(false, i, 1); //black pawns
                 board[i, 6].OnCell = new Pawn(true, i, 6); //white pawns
             }
-            //sets up all pieces
+            //sets up all pieces, assigning them to their appropriate starting position in the board[] array
             board[0, 0].OnCell = new Rook(false, 0, 0);
             board[0, 7].OnCell = new Rook(true, 0, 7);
             board[7, 0].OnCell = new Rook(false, 7, 0);
@@ -96,7 +96,7 @@ namespace chessGame
             }
             return true;
         }
-        //checks occupation status of a cell
+        //checks and returns the occupation status of a cell
         public string SpaceStatus(int posX, int posY, bool forWhite)
         {
             if (posX > 7 || posY > 7 || posX < 0 || posY < 0)
@@ -121,7 +121,7 @@ namespace chessGame
         }
         public void changeScores(int newX, int newY, int oldX, int oldY, ref int humanScore, ref List<Piece> humanPieces, ref List<Piece> AIPieces, ref int AIScore, bool realMove)
         {
-            //subtracts piece value from score and removes piece from list
+            //subtracts piece value from the appropriate score and removes the piece from the appropriate pieces list, unless this move is part of the minimax analysis
             if (board[newX, newY].OnCell.PieceName != "empty" && board[oldX, oldY].OnCell.IsWhite == true)
             {
                 AIScore -= board[newX, newY].OnCell.Value;
@@ -190,6 +190,7 @@ namespace chessGame
             board[origX, origY].OnCell.PosX = origX;
             board[origX, origY].OnCell.PosY = origY;
             board[currentX, currentY].OnCell = new Empty(false, currentX, currentY);
+            //accounts for promotion
             if (reverting.promoted)
             {
                 board[origX, origY].OnCell = reverting.pieceMoving;

@@ -82,6 +82,7 @@ namespace chessGame
             string toInsert = "SELECT * FROM [userLogins] WHERE Username = @username AND Password = @password";
             SqlCommand cmd = new SqlCommand(toInsert, scoresCon);
             string username = usernameTextBox.Text;
+            //encrypts password
             string password = hashPassword(passwordTextBox.Text);
             cmd.Parameters.AddWithValue("username", username);
             cmd.Parameters.AddWithValue("password", password);
@@ -103,7 +104,7 @@ namespace chessGame
 
         private void signUpButton_Click(object sender, EventArgs e)
         {
-            //sets of characters to check for in password
+            //sets of characters to check for in the password
             string sChars = @" !#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
             string nums = "0123456789";
             string capLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
